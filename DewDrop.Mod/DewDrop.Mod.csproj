@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>DewDrop</AssemblyName>
+    <RootNamespace>DewDrop</RootNamespace>
+    <Version>0.1.0</Version>
+    <EnableHarmony>true</EnableHarmony>
+    <ModFolderName>DewDrop</ModFolderName>
+    <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
+    <GamePath Condition="'$(GamePath)' == '' And Exists('C:\Steam\steamapps\common\Stardew Valley')">C:\Steam\steamapps\common\Stardew Valley</GamePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ships with the game; decodes the WebP pictures Nexus serves, which Texture2D.FromStream can't -->
+    <Reference Include="SkiaSharp" HintPath="$(GamePath)\SkiaSharp.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DewDrop.Core\DewDrop.Core.csproj" />
+  </ItemGroup>
+
+</Project>

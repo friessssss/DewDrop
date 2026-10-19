@@ -1,3 +1,4 @@
-If reporting an issue with Stardrop, please ensure that a copy of Stardrop's log is attached.
+If reporting an issue with DewDrop, please attach your SMAPI log. You can upload it at
+[smapi.io/log](https://smapi.io/log) and share the link.
 
-The log file can be found via Stardrop's menu under `View` > `Log File`.
+For a pull request, make sure `dotnet build DewDrop.sln` succeeds and test the change in the game.
