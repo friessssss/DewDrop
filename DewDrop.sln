@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DewDrop.Core", "DewDrop.Core\DewDrop.Core.csproj", "{8C81945D-579B-413D-A6B4-515F67FE7154}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DewDrop.Mod", "DewDrop.Mod\DewDrop.Mod.csproj", "{021174D7-65C7-4781-9B17-027C109C5551}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C81945D-579B-413D-A6B4-515F67FE7154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C81945D-579B-413D-A6B4-515F67FE7154}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C81945D-579B-413D-A6B4-515F67FE7154}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C81945D-579B-413D-A6B4-515F67FE7154}.Release|Any CPU.Build.0 = Release|Any CPU
+		{021174D7-65C7-4781-9B17-027C109C5551}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{021174D7-65C7-4781-9B17-027C109C5551}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{021174D7-65C7-4781-9B17-027C109C5551}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{021174D7-65C7-4781-9B17-027C109C5551}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
