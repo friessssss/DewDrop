@@ -11,6 +11,8 @@ ROOT="$(mktemp -d "${TMPDIR:-/tmp}/dewdrop-test.XXXXXX")"
 trap 'rm -rf "$ROOT"' EXIT
 export HOME="$ROOT/home"
 export TMPDIR="$ROOT/tmp"
+# CI runners set these, and the installer follows them (as .NET does), so the throwaway HOME needs them gone
+unset XDG_CONFIG_HOME XDG_CACHE_HOME
 mkdir -p "$TMPDIR"
 
 if [ "$(uname -s)" = "Darwin" ]; then
