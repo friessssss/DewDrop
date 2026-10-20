@@ -173,7 +173,7 @@ Random details, like where clouds and flowers go, come from fixed seeds. Every b
 | `lib/font.mjs` | Dewdrop Sans: the glyphs, plus `measure`, `wrap` and `rasterize`. |
 | `lib/canvas.mjs` | `Canvas`, a small RGBA drawing surface at one art pixel per canvas pixel. It has shapes, dithering, gradients, outlines and text. `blitResized` shrinks real screenshots smoothly, `scaled(n)` enlarges art with hard pixel edges, and `save` writes a PNG. |
 | `lib/png.mjs` | A PNG reader and writer, and an animated-PNG writer for animations such as `demo-tour.png`. |
-| `lib/components.mjs` | The building blocks: `dewDrop`, `leaf`, `logoMark`, `panel`, `plaque`, `arrow`, `icon` (with `ICON_NAMES`), `trashCan`, `framedShot` and `card`. |
+| `lib/components.mjs` | The building blocks: `dewDrop`, `leaf`, `logoMark`, `panel`, `plaque`, `arrow`, `icon` (with `ICON_NAMES`), `framedShot` and `card`. |
 | `lib/scenes.mjs` | Larger scenes: `sky`, `cloud`, `hills`, `sparkle`, `meadow`, `banner`, `ribbon` and `divider`, plus the seeded random generator `rng`. |
 | `build.mjs` | Draws every image the docs use and saves it into `docs/.gitbook/assets/`. |
 
@@ -186,7 +186,6 @@ Random details, like where clouds and flowers go, come from fixed seeds. Every b
 * `stackedNode(title, body, { width, iconName, border, minHeight })`: a diagram step with the icon on top and centered text. `nodeHeight` tells you how tall one will be, so a row of steps can share a height; `build.mjs` lays rows out with its `flowRow` helper.
 * `arrow(canvas, x0, y0, x1, y1)`: a thick arrow. It only draws horizontal or vertical arrows.
 * `icon(name)`: one of the 16×16 icons.
-* `trashCan()`: an 18×26 metal trash can in the icon style, drawn over the **Installed** screenshot's rows (see [Screenshots](#screenshots)).
 
 ### Adding an icon
 
@@ -207,16 +206,25 @@ Every row must be the same length and use only these letters, or the build stops
 
 ## Screenshots
 
-Screenshots are the one place real game pixels appear. Each one is a real capture from the game, never a mock-up.
+Screenshots are the one place real game pixels appear. Each one is a real capture from the game, never a mock-up. When the menu changes, capture the screenshot again; never draw new UI onto an old capture.
 
-The one exception is small UI added after a capture was taken. `OVERLAYS` in `build.mjs` draws it in palette colors, at the spot the game draws it, as the build loads the capture (the file in `tools/docs-art/shots/` isn't changed), until someone captures that screenshot again. Right now that's the trash cans on the rows of `installed.png`. When you replace a capture, delete its entry in `OVERLAYS`.
-
-1. Load a Debug build and capture with the [debug bridge](debug-bridge.md). Use the same setup every time: `window 1920 1080` and `uiscale 1.0`. Move your real mouse into a corner and wait for messages to clear before each `shot`. The `window` command changes the game's saved display settings, so back up `startup_preferences` in the game's data folder (`%AppData%\StardewValley` on Windows) first and put it back afterward.
+1. Load a Debug build and capture with the [debug bridge](debug-bridge.md). Use the same setup every time: `window 1920 1080` and `uiscale 1.0`. Move your real mouse into a corner and wait for messages to clear before each `shot`. The `window` command changes the game's saved display settings, so back up `startup_preferences` in the game's data folder (`%AppData%\StardewValley` on Windows) first and put it back afterward. If the game window won't stay in front while you capture, set `pauseWhenOutOfFocus` to `false` in that file too, with the game closed. Otherwise the menu stops updating while the window is in the background (see [Timing and gotchas](debug-bridge.md#timing-and-gotchas)).
 2. Check every capture for anything personal before you commit it, such as your Nexus Mods user name. Blur it in the raw capture itself, and list the area in `REDACT` in `build.mjs` as a second guard.
 3. Save the raw captures in `tools/docs-art/shots/` under the names listed in `SHOTS` in `build.mjs`, then rebuild. Menu captures are cropped to the menu. `title-prompt.png`, the **Load your profile?** box, is cropped to the box with the fixed rectangle listed for it in `SHOTS`. `framedShot` adds the frame and label, and the result goes into `docs/.gitbook/assets/` as `shot-<name>.png`. Most of the same captures also make up the `demo-tour.png` animation.
 4. Build Release again afterward so you don't keep playing on the Debug build.
 
 The **Load your profile?** box only opens on a normal launch whose mods differ from your profile. To capture `title-prompt.png`, set that up as described in [Testing starting in your profile](debug-bridge.md#testing-starting-in-your-profile), then send `shot` once the box is open. The capture shows the box with its **Start in my profile from Steam from now on** checkbox, ticked, and the note under it. The box only shows that checkbox on Windows with the Steam version of the game, while **Start in my profile from Steam** is off and can be used, and it starts unticked right after a restart that didn't come back. Capture it on a launch that meets those conditions, and answer **Not now** afterward so nothing changes.
+
+The menu captures show a profile named **SVE playthrough**, with 11 of 36 mods on. Start the game in that profile, by starting SMAPI with `--mods-path` pointing at `Selected Mods` as **Apply & Restart** does, so the bottom bar says the mods loaded right now match it. `mod-page-installed.png` is Content Patcher's page, with its newest version installed.
+
+`uninstall-dialog.png` and `uninstalled.png` show a stand-in mod, never one of your real mods:
+
+1. Put a folder named `Example Mod` in your `Mods` folder, holding only a `manifest.json` with the name **Example Mod**, the author **You**, the version `1.0.0`, a made-up unique ID and an `EntryDll`.
+2. Click **Rescan**. If that turned the mod on, turn it off again.
+3. Scroll it into view with `key Down`, click its trash can, `wait 300` and `shot` the dialog. Then send `key Escape`.
+4. Send `uninstall` with its unique ID, and `shot` the row.
+
+DewDrop moves the folder out of `Mods` when the game closes and deletes it at the next start.
 
 ## Rules
 

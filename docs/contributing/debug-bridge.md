@@ -252,6 +252,11 @@ At 3840×2160 the frame is at x 1120, y 501, 1600 × 1150.
 * `scroll` only moves a list when your real mouse is over it. Use `key Down` and `key Up` instead.
 * The tooltip box and the tab highlight are drawn at your real mouse position. The game also re-hovers at the real mouse every tick, so put `hover` and `shot` in the same file with no `wait` between them.
 
+**The game window in the background**
+
+* When `pauseWhenOutOfFocus` is `true` in the game's `startup_preferences` file, the game skips its own update while its window isn't in front. The bridge still runs commands, and clicks, keys and `shot` still work, but the menu stops updating itself. For example, the **Profiles** tab's buttons keep the state they had, so **Use this profile** stays grayed out after **Duplicate** until you click another tab and back. A mod's page never shows its **Installed** note or its **Uninstall** button.
+* So keep the game window in front, or close the game, set `pauseWhenOutOfFocus` to `false` and start it again. Back up `startup_preferences` first and put it back afterward.
+
 **Clean screenshots**
 
 * Info messages stay for 5 seconds and error messages for 8. Wait for them to clear, or click one to dismiss it.
@@ -263,7 +268,7 @@ At 3840×2160 the frame is at x 1120, y 501, 1600 × 1150.
 * A `wait` on the last line doesn't hold back `DONE`.
 * A line starting with `#` isn't a comment. It gets `unknown command`.
 
-**Not tested yet:** whether `uiscale` is saved between sessions, how the bridge behaves while the window is minimized or in the background, and sending `open` while the menu is already open.
+**Not tested yet:** whether `uiscale` is saved between sessions, how the bridge behaves while the window is minimized, and sending `open` while the menu is already open.
 
 ## Testing starting in your profile
 

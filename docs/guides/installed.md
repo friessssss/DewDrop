@@ -106,6 +106,8 @@ Uninstalling deletes a mod's folder from your `Mods` folder, settings included: 
 2. A dialog asks "Uninstall *name*?" and says what will happen (see below).
 3. Click **Uninstall**, or press **Enter**. To keep the mod, click **Cancel**.
 
+<figure><img src="../.gitbook/assets/shot-uninstall-dialog.png" alt="The Uninstall Example Mod? dialog over the Installed tab. It says DewDrop deletes its folder, settings included, when the game closes, and that until then you can undo it on the Installed tab. Below are the Uninstall and Cancel buttons."><figcaption><p>The dialog that opens when you click a mod's trash can.</p></figcaption></figure>
+
 A message says "Uninstalled *name*. It's deleted when the game closes."
 
 Under the question, the dialog says one of these:
@@ -131,6 +133,8 @@ The mod's row stays on the list, so you can change your mind:
 * It has no checkbox, its name is grayed out, and it says **Deleted when the game closes** in orange, next to an **Undo** button.
 * It stays in every **Show:** view, and in a search when it matches.
 * Clicking the row only reminds you: "*name* is uninstalled. Click Undo to keep it."
+
+<figure><img src="../.gitbook/assets/shot-uninstalled.png" alt="The Installed tab with Example Mod uninstalled. Its row has no checkbox and says Deleted when the game closes in orange, next to an Undo button, while the rows around it keep their checkboxes and trash cans. The toolbar reads 36 installed, 11 on, 1 to delete, and the bottom bar says the mods loaded right now match the profile and that uninstalled mods are deleted when the game closes."><figcaption><p>An uninstalled mod stays on the list, with Undo, until the game closes.</p></figcaption></figure>
 
 Everywhere else, DewDrop treats the mod as gone. For example, Browse and the mod's page no longer show it as installed.
 

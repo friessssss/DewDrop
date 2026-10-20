@@ -45,6 +45,8 @@ Every file has a button on its right. What it says depends on your Nexus Mods ac
 
 Why the difference? Nexus Mods only lets Premium members download straight into an app. Free accounts download through the website. [Free vs Premium downloads](../nexus-mods/free-vs-premium.md) explains it.
 
+<figure><img src="../.gitbook/assets/shot-mod-page-installed.png" alt="Content Patcher's page in DewDrop. The top bar shows Installed v2.9.1 in green and a red Uninstall button, next to Show old files and Open on Nexus. In the file list, the Content Patcher 2.9.1 file says Installed in green, and the older 2.8.1 file has an Install button."><figcaption><p>A mod you already have: its file says Installed, and Uninstall is in the top bar.</p></figcaption></figure>
+
 ### Which file counts as installed
 
 For each copy of the mod you have, DewDrop marks at most one file:
