@@ -126,6 +126,8 @@ The installer downloads SMAPI's official installer from GitHub and runs it for y
 | "The SMAPI download didn't contain ... SMAPI.Installer ..." | Your antivirus may have removed it. Check its quarantine list. |
 | "The SMAPI installer didn't finish within 3 minutes, so I stopped it." | It usually takes seconds, so it got stuck, most often on an old SMAPI file it couldn't replace. Close the game and any SMAPI window. On Windows, [run the installer as administrator](#windows-wont-let-the-installer-change-files). |
 | "The SMAPI installer finished, but SMAPI still looks missing or out of date." | On macOS and Linux, SMAPI's own messages are just above. On Windows, try the installer as administrator. |
+| "...this Mac needs Rosetta to run it." or "Bad CPU type in executable" (macOS) | SMAPI's installer is made for Intel Macs, so a Mac with an Apple chip (M1 or later) needs Apple's free Rosetta add-on to run it. Answer **Y** and enter your Mac password when asked, or install it yourself in Terminal with `softwareupdate --install-rosetta`, then run the installer again. |
+| "The SMAPI installer couldn't start" (macOS and Linux) | The reason is just above it. On a Mac, it's usually the missing Rosetta (see the row above). |
 | "I can't change files in ..." (macOS and Linux) | Some game files belong to another user, usually because SMAPI was once installed with `sudo`. Run the `sudo chown -R ...` command the installer printed (your user name and game folder are already in it), enter your password, then run the installer again. |
 | "DewDrop needs SMAPI. Install it from ..." | You answered **N** when the installer offered to install SMAPI. DewDrop can't run without it. |
 

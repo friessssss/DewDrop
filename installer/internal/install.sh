@@ -407,6 +407,27 @@ check_smapi_writable() {
     fi
 }
 
+# SMAPI's macOS installer is an Intel program, so an Apple Silicon Mac needs Apple's Rosetta to run it. Without
+# Rosetta, macOS refuses to start it ("Bad CPU type in executable").
+rosetta_works() { arch -x86_64 /usr/bin/true >/dev/null 2>&1; }
+
+ensure_rosetta() {
+    [ "$OS" = "mac" ] || return 0
+    # Not uname -m, which says x86_64 when this shell itself is running under Rosetta.
+    [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = 1 ] || return 0
+    rosetta_works && return 0
+    warn "SMAPI's installer is made for Intel Macs, so this Mac needs Rosetta to run it."
+    note "Rosetta is Apple's free add-on for running Intel apps. Installing it asks for your Mac password."
+    ask_yes_no "Install Rosetta now?" y || die "SMAPI can't be installed without Rosetta. Install it with:  softwareupdate --install-rosetta  then run this installer again."
+    if [ "$DRY_RUN" = 1 ]; then
+        dry "run: sudo softwareupdate --install-rosetta --agree-to-license"
+        return
+    fi
+    sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+    rosetta_works || die "Rosetta didn't install. Install it with:  softwareupdate --install-rosetta  then run this installer again."
+    ok "Rosetta is installed."
+}
+
 game_running() {
     pgrep -x 'StardewModdingAPI|StardewModdingA|Stardew Valley|StardewValley' >/dev/null 2>&1
 }
@@ -468,6 +489,7 @@ install_smapi() {
     [ -n "$url" ] || die "Couldn't download SMAPI automatically. Get it from https://smapi.io, run its installer, then run this one again."
     local internal="linux"
     [ "$OS" = "mac" ] && internal="macOS"
+    ensure_rosetta
     if [ "$DRY_RUN" = 1 ]; then
         dry "download $url and run: internal/$internal/SMAPI.Installer --install --game-path \"$GAME\" --no-prompt"
         SMAPI_VERSION="$latest"; return
@@ -496,8 +518,13 @@ install_smapi() {
         sleep 1
         waited=$((waited + 1))
     done
-    wait "$pid" 2>/dev/null
+    local status=0
+    wait "$pid" 2>/dev/null || status=$?
     printf '\n%s==> Back in the DewDrop installer%s\n' "$C_CYAN" "$C_RESET"
+    # 126 and 127 come from the shell, not SMAPI: the installer never started.
+    if [ "$status" = 126 ] || [ "$status" = 127 ]; then
+        die "The SMAPI installer couldn't start (see the message above). Install SMAPI yourself from https://smapi.io, then run this installer again."
+    fi
 
     local now
     now="$(smapi_version "$GAME")"

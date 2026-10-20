@@ -109,6 +109,8 @@ If no SMAPI window opens, the game started without mods. One exception: on macOS
 
 **Double-clicking does nothing:** open Terminal, type `bash` and a space, drag `Install on macOS.command` into the window, and press **Return**.
 
+**"Install Rosetta now?":** SMAPI's installer is made for Intel Macs, so a Mac with an Apple chip (M1 or later) needs Apple's free Rosetta add-on to run it. Press **Enter**, then type your Mac password (it doesn't show as you type) and press **Return**.
+
 **"Operation not permitted":** macOS is blocking Terminal from your game folder. Switch on **Terminal** in **System Settings** > **Privacy & Security** > **Full Disk Access**, then run the installer again. You can switch it off there afterwards.
 
 **macOS later says SMAPI is malware:** it says this about apps Apple hasn't checked. SMAPI is the standard, open-source Stardew Valley mod loader. See "Enable macOS security permissions" in [SMAPI's macOS guide](https://stardewvalleywiki.com/Modding:Installing_SMAPI_on_Mac).
