@@ -60,6 +60,9 @@ namespace DewDrop.UI
             _apply = new UiButton("Apply & Restart", ConfirmRestart, primary: true);
             _current = Installed;
 
+            // Messages from the game's start (a Steam change, mods turned on) wait for the menu, or they'd expire unseen
+            ModEntry.ShowWaitingToasts();
+
             DoLayout();
             _current.OnShow();
         }
@@ -621,14 +624,23 @@ namespace DewDrop.UI
                 status = problem;
                 color = Ui.Bad;
             }
-            else if (!mods.RunningFromProfileFolder)
+            else if (mods.Kind == SessionKind.Plain && PlainSessionStatus(mods) is { } plain)
+            {
+                // Started from Steam or a shortcut: say what's different, or that nothing is
+                status = plain;
+                color = Ui.Attention;
+            }
+            else if (mods.Kind == SessionKind.Custom)
             {
                 status = "This session didn't start from a DewDrop profile. Restart to load this profile.";
                 color = Ui.Attention;
             }
             else if (mods.NeedsRestart())
             {
-                status = "Changes are ready. Restart the game to load them.";
+                // With Steam starting the game in the profile, closing the game brings the links up to date
+                status = ProfileStart.SteamWanted && ProfileStart.SteamOn
+                    ? "Changes load the next time you start the game from Steam, or restart now."
+                    : "Changes are ready. Restart the game to load them.";
                 color = Ui.Attention;
             }
             else
@@ -654,6 +666,34 @@ namespace DewDrop.UI
             Ui.Label(b, shownStatus, new Vector2(x, statusY), color);
 
             _apply.Draw(b);
+        }
+
+        /// <summary>
+        /// For a session SMAPI started on the Mods folder: which mods differ from the profile, or null when the same mods
+        /// loaded (then only pending changes can call for a restart).
+        /// </summary>
+        private static string? PlainSessionStatus(ModManager mods)
+        {
+            var difference = mods.Difference();
+            if (difference.TurnedOff.Count > 0)
+            {
+                var n = difference.TurnedOff.Count;
+                return $"{n} mod{(n == 1 ? " that is" : "s that are")} off in this profile loaded anyway. Restart to load this profile.";
+            }
+
+            if (difference.NotLoaded.Count > 0)
+            {
+                var n = difference.NotLoaded.Count;
+                return $"{n} mod{(n == 1 ? "" : "s")} in this profile didn't load. Restart to load this profile.";
+            }
+
+            if (difference.OtherCopy.Count > 0)
+            {
+                var n = difference.OtherCopy.Count;
+                return $"{n} mod{(n == 1 ? "" : "s")} loaded from a different copy than this profile uses. Restart to load this profile.";
+            }
+
+            return null;
         }
 
         private void DrawToasts(SpriteBatch b)

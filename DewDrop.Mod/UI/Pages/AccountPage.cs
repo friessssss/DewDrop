@@ -95,6 +95,13 @@ namespace DewDrop.UI.Pages
 
             _settings = new[]
             {
+                new Setting("Start in my profile from Steam", "", () => ProfileStart.SteamWanted, value => ProfileStart.SteamWanted = value)
+                {
+                    Describe = SteamDescription,
+                    Enabled = () => ProfileStart.SteamUnavailableReason is null
+                },
+                new Setting("Ask to load my profile", "When the game starts with different mods than your profile (from a shortcut, say), DewDrop asks whether to restart into it.",
+                    () => ModEntry.Config.AskToLoadProfile, value => ModEntry.Config.AskToLoadProfile = value),
                 new Setting("Turn on mods when installed", "Mods you download are switched on in the active profile right away.",
                     () => ModEntry.Config.EnableModsOnInstall, value => ModEntry.Config.EnableModsOnInstall = value),
                 new Setting("Show adult content in Browse", "Include mods Nexus Mods marks as adult content.",
@@ -725,10 +732,41 @@ namespace DewDrop.UI.Pages
 
         // ---------- settings ----------
 
-        private sealed record Setting(string Label, string Description, Func<bool> Get, Action<bool> Set);
+        private sealed record Setting(string Label, string Description, Func<bool> Get, Action<bool> Set)
+        {
+            /// <summary>A description that follows the current state.</summary>
+            public Func<string>? Describe { get; init; }
+
+            /// <summary>Whether the row can be changed here; when not, <see cref="Describe"/> says why.</summary>
+            public Func<bool>? Enabled { get; init; }
+        }
+
+        private static string SteamDescription()
+        {
+            if (ProfileStart.SteamUnavailableReason is { } reason)
+            {
+                return reason;
+            }
+
+            var wanted = ProfileStart.SteamWanted;
+            var on = ProfileStart.SteamOn;
+            return (wanted, on) switch
+            {
+                (true, true) => "Steam starts the game in your profile. Changes you make load the next time you start it.",
+                (true, false) => "Turns on when you quit the game: Steam closes and opens again once to save it. After that, Steam starts the game in your profile.",
+                (false, true) => "Turns off when you quit the game: Steam closes and opens again once to save it.",
+                _ => "Have Steam start the game in your profile, so you don't need Apply & Restart. Steam closes and opens again once when you quit, to save it."
+            };
+        }
 
         private static void Toggle(Setting setting)
         {
+            if (setting.Enabled is { } enabled && !enabled())
+            {
+                Game1.playSound("cancel");
+                return;
+            }
+
             setting.Set(!setting.Get());
             Game1.playSound("drumkit6");
             ModEntry.SaveConfig();
@@ -857,7 +895,8 @@ namespace DewDrop.UI.Pages
             if (_hoverSetting >= 0)
             {
                 var setting = _settings[_hoverSetting];
-                return _settingLabels[_hoverSetting] == setting.Label ? setting.Description : $"{setting.Label}\n{setting.Description}";
+                var description = setting.Describe?.Invoke() ?? setting.Description;
+                return _settingLabels[_hoverSetting] == setting.Label ? description : $"{setting.Label}\n{description}";
             }
 
             if (_state.LoggedIn && _nameText != _nameFull && _nameBounds.Contains(x, y))
@@ -934,8 +973,9 @@ namespace DewDrop.UI.Pages
                 }
 
                 var checkboxX = row.X + CheckboxInset;
-                Ui.Checkbox(b, new Vector2(checkboxX, row.Center.Y - Ui.CheckboxSize / 2), _settings[i].Get());
-                Ui.Label(b, _settingLabels[i], new Vector2(checkboxX + Ui.CheckboxSize + 12, row.Center.Y - lineHeight / 2));
+                var enabled = _settings[i].Enabled?.Invoke() ?? true;
+                Ui.Checkbox(b, new Vector2(checkboxX, row.Center.Y - Ui.CheckboxSize / 2), enabled && _settings[i].Get());
+                Ui.Label(b, _settingLabels[i], new Vector2(checkboxX + Ui.CheckboxSize + 12, row.Center.Y - lineHeight / 2), enabled ? Ui.Text : Ui.Muted);
             }
 
             _infoText.Draw(b);

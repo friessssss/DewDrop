@@ -6,5 +6,5 @@
   "UniqueID": "friessssss.DewDrop",
   "EntryDll": "DewDrop.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": []
+  "UpdateKeys": [ "GitHub:friessssss/DewDrop" ]
 }

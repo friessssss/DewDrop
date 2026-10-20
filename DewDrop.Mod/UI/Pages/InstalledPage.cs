@@ -26,6 +26,7 @@ namespace DewDrop.UI.Pages
         private readonly TextInput _search = new("Search installed mods");
         private readonly UiButton _filterButton;
         private readonly UiButton _checkUpdates;
+        private readonly UiButton _rescan;
         private readonly ScrollList<InstalledMod> _list = new(RowHeight);
         private readonly Dictionary<InstalledMod, UiButton> _updateButtons = new();
         private Filter _filter = Filter.All;
@@ -42,6 +43,10 @@ namespace DewDrop.UI.Pages
         {
             _filterButton = new UiButton("Show: All", CycleFilter);
             _checkUpdates = new UiButton("Check for updates", CheckForUpdates);
+            _rescan = new UiButton("Rescan", Rescan)
+            {
+                Tooltip = "Look through your Mods folder again, for mods you added or removed while the game was running."
+            };
             _search.OnChanged = _ => Refresh(resetScroll: true);
             _list.EmptyText = "No mods match.";
         }
@@ -83,6 +88,7 @@ namespace DewDrop.UI.Pages
             _filterButton.At(_search.Bounds.Right + 16, bounds.Y - 4);
             _filterButton.Bounds.Width = 220;
             _checkUpdates.AtRight(bounds.Right, bounds.Y - 4);
+            _rescan.AtRight(_checkUpdates.Bounds.X - 12, bounds.Y - 4);
 
             // A collection profile gets a line under the toolbar saying why the checkboxes are locked, and a profile
             // or settings file that couldn't be read one saying what's off
@@ -178,6 +184,56 @@ namespace DewDrop.UI.Pages
                 }, error: true));
         }
 
+        /// <summary>Picks up mods copied into (or deleted from) the Mods folder by hand since the game started.</summary>
+        private void Rescan()
+        {
+            if (ModEntry.Downloads.Jobs.FirstOrDefault(j => j.State == DownloadState.Installing) is { } installing)
+            {
+                ModEntry.Toast($"{installing.Title} is still installing. Rescan when it's done.");
+                return;
+            }
+
+            var mods = ModEntry.Mods;
+            var (added, removed) = mods.Rescan();
+            Refresh();
+
+            static string Names(IReadOnlyList<string> names) =>
+                string.Join(", ", names.Take(3)) + (names.Count > 3 ? $" and {names.Count - 3} more" : "");
+
+            if (added.Count == 0 && removed.Count == 0)
+            {
+                ModEntry.Toast("No changes: your Mods folder has the same mods as before.");
+                return;
+            }
+
+            if (added.Count > 0)
+            {
+                // Mods copied in by hand aren't in the profile yet, so they'd stay off after a restart; "Turn on mods
+                // when installed" covers them like a download
+                if (ModEntry.Config.EnableModsOnInstall)
+                {
+                    if (mods.TurnOnUnseen(added).Count > 0)
+                    {
+                        Refresh();
+                    }
+                }
+                else
+                {
+                    mods.MarkSeen(added.Select(m => m.UniqueId));
+                }
+
+                var off = added.Count(m => !mods.IsEnabled(m));
+                var them = added.Count == 1 ? "it" : "them";
+                var next = off > 0 ? $" Turn {them} on, then restart to load {them}." : $" Restart to load {them}.";
+                ModEntry.Toast($"Found {added.Count} new mod{(added.Count == 1 ? "" : "s")}: {Names(added.Select(m => m.Name).ToList())}.{next}");
+            }
+
+            if (removed.Count > 0)
+            {
+                ModEntry.Toast($"{removed.Count} mod{(removed.Count == 1 ? " is" : "s are")} no longer in your Mods folder: {Names(removed)}.");
+            }
+        }
+
         public override void Update(GameTime time)
         {
             _search.Tick();
@@ -201,7 +257,7 @@ namespace DewDrop.UI.Pages
         public override void ReceiveLeftClick(int x, int y)
         {
             _search.Click(x, y);
-            if (_filterButton.TryClick(x, y) || _checkUpdates.TryClick(x, y) || _list.ReceiveLeftClick(x, y))
+            if (_filterButton.TryClick(x, y) || _checkUpdates.TryClick(x, y) || _rescan.TryClick(x, y) || _list.ReceiveLeftClick(x, y))
             {
                 return;
             }
@@ -285,10 +341,16 @@ namespace DewDrop.UI.Pages
             _search.Hover(x, y);
             _filterButton.Hover(x, y);
             _checkUpdates.Hover(x, y);
+            _rescan.Hover(x, y);
             _list.Hover(x, y);
             foreach (var button in _updateButtons.Values)
             {
                 button.Hover(x, y);
+            }
+
+            if (_rescan.HoverText(x, y) is { } rescanTip)
+            {
+                return rescanTip;
             }
 
             if (_notice is { } notice && _noticeBanner.Contains(x, y) && Ui.Small.MeasureString(notice.Text).X > _noticeBanner.Width)
@@ -337,11 +399,12 @@ namespace DewDrop.UI.Pages
             _search.Draw(b);
             _filterButton.Draw(b);
             _checkUpdates.Draw(b);
+            _rescan.Draw(b);
 
             var enabledCount = mods.Installed.Count(mods.IsEnabled);
             var summary = $"{mods.Installed.Count} installed, {enabledCount} on";
             var summarySize = Ui.Small.MeasureString(summary);
-            var summaryX = _checkUpdates.Bounds.X - 24 - summarySize.X;
+            var summaryX = _rescan.Bounds.X - 24 - summarySize.X;
             if (summaryX > _filterButton.Bounds.Right + 16)
             {
                 Ui.Label(b, summary, new Vector2(summaryX, Bounds.Y + 12), Ui.Muted);
@@ -455,6 +518,12 @@ namespace DewDrop.UI.Pages
 
             // Only known from a profile launch: mods that failed to load then are left out of the restart check
             if (mods.RunningFromProfileFolder && enabled && !mods.IsLoaded(mod))
+            {
+                return ("On after restart", Ui.Attention);
+            }
+
+            // A Steam or shortcut launch: on in the profile, not loaded, and SMAPI didn't reject it
+            if (mods.Kind == SessionKind.Plain && enabled && mods.Difference().NotLoaded.Any(m => m.UniqueId.Equals(mod.UniqueId, StringComparison.OrdinalIgnoreCase)))
             {
                 return ("On after restart", Ui.Attention);
             }

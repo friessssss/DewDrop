@@ -221,6 +221,9 @@ namespace DewDrop.Framework
             _mods.MarkChanged(result.InstalledIds.Concat(result.UpdatedIds).Concat(result.PendingIds));
             _mods.Reload();
 
+            // Installed through DewDrop, so never "new in your Mods folder" (those get turned on at the next start)
+            _mods.MarkSeen(result.InstalledIds.Concat(result.UpdatedIds).Concat(result.PendingIds));
+
             // Not into a collection profile, nor one whose file couldn't be read (that copy is only a stand-in)
             if (_config.EnableModsOnInstall && _mods.CanEditActiveProfile)
             {

@@ -212,13 +212,7 @@ namespace DewDrop.UI.Pages
 
             if (!nexus.IsPremium)
             {
-                // Only Windows has the nxm:// handler that sends the website's download back to the game
-                ModEntry.Toast(!OperatingSystem.IsWindows()
-                    ? "Opened the file on Nexus Mods."
-                    : _handlerReady
-                        ? "Click 'Slow download' then let DewDrop take it from there."
-                        : "Set up download links on the Account tab, then click 'Slow download'.");
-                DownloadManager.OpenOnNexus(job.ModId, job.FileId);
+                UpdateActions.OpenForFreeAccount(job.ModId, job.FileId);
                 return;
             }
 

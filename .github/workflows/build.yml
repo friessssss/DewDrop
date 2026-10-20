@@ -19,3 +19,38 @@ jobs:
     # DewDrop.Mod needs a Stardew Valley install to build, so CI only builds the game-independent library.
     - name: Build DewDrop.Core
       run: dotnet build DewDrop.Core/DewDrop.Core.csproj
+    - name: Test DewDrop.Core
+      run: dotnet test DewDrop.Core.Tests/DewDrop.Core.Tests.csproj
+
+  # The macOS/Linux installer, on Linux and on macOS (which ships bash 3.2).
+  installer-unix:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Check script syntax
+      run: |
+        /bin/bash -n installer/internal/install.sh
+        /bin/bash -n "installer/Install on Linux.sh"
+        /bin/bash -n "installer/Install on macOS.command"
+    - name: Test install.sh
+      run: /bin/bash installer/tests/install-sh.test.sh
+
+  installer-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Check install.ps1 parses in Windows PowerShell and is plain ASCII
+      shell: powershell
+      run: |
+        $errors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseFile("$PWD\installer\internal\install.ps1", [ref]$null, [ref]$errors)
+        if ($errors) { $errors; exit 1 }
+        if ([IO.File]::ReadAllBytes("$PWD\installer\internal\install.ps1") | Where-Object { $_ -gt 127 }) { 'install.ps1 must be plain ASCII'; exit 1 }
+    - name: Test install.ps1
+      shell: powershell
+      run: .\installer\tests\install-ps1.test.ps1

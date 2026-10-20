@@ -29,6 +29,9 @@ namespace DewDrop
         /// <summary>Messages for the menu to show; newest last.</summary>
         internal static List<Toast> Toasts { get; } = new();
 
+        /// <summary>Messages from before the menu was first opened, shown when it is.</summary>
+        private static readonly List<(string Text, bool IsError)> WaitingToasts = new();
+
         /// <summary>Links from the website's "Mod manager download" button waiting in the queue for a Nexus login.</summary>
         internal static int NxmWaiting { get; private set; }
 
@@ -69,6 +72,10 @@ namespace DewDrop
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+
+            // The game closing: links and Steam's launch option for the next start. SMAPI's game runner doesn't raise
+            // MonoGame's Exiting event; it shuts down and exits the process, so this runs at ProcessExit
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => ProfileStart.OnExiting();
             helper.Events.Content.AssetsInvalidated += TitleMenuPatches.OnAssetsInvalidated;
 #if DEBUG
             DebugBridge.Init(helper);
@@ -94,6 +101,8 @@ namespace DewDrop
                 Monitor.Log($"Running mods path: {Mods.RunningModsPath} (profile folder: {Mods.RunningFromProfileFolder})", LogLevel.Info);
                 Monitor.Log($"Mods folder: {Mods.ModsFolder}; install folder: {Mods.InstallFolder}", LogLevel.Info);
                 Monitor.Log($"Active profile: {Mods.ActiveProfile.Name}; installed mods: {Mods.Installed.Count}; needs restart: {Mods.NeedsRestart()}", LogLevel.Info);
+                Monitor.Log($"Session: {Mods.Kind}; ask to load my profile: {Config.AskToLoadProfile} ({ProfileStart.Status})", LogLevel.Info);
+                Monitor.Log($"Start in my profile from Steam: {(ProfileStart.SteamUnavailableReason ?? $"{(ProfileStart.SteamWanted ? "on" : "off")}, Steam launch option: {ProfileStart.SteamOption}{(ProfileStart.SteamPending ? " (changes when the game closes)" : "")}")}", LogLevel.Info);
                 Monitor.Log($"Nexus: {(Nexus.IsLoggedIn ? $"{Nexus.Account!.Name}{(Nexus.IsPremium ? " (Premium)" : "")}" : "not logged in")}", LogLevel.Info);
             });
         }
@@ -101,6 +110,7 @@ namespace DewDrop
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
             Nexus.RestoreSavedLogin();
+            ProfileStart.OnGameLaunched();
             if (Config.CheckUpdatesOnLaunch)
             {
                 Mods.CheckForUpdates();
@@ -116,6 +126,7 @@ namespace DewDrop
         {
             MainThread.Pump();
             Thumbnails.Upload();
+            ProfileStart.Update();
 
             if (e.IsMultipleOf(NxmPollTicks))
             {
@@ -194,8 +205,33 @@ namespace DewDrop
             }
         }
 
+        /// <summary>Shows the messages that waited for the menu to open.</summary>
+        internal static void ShowWaitingToasts()
+        {
+            foreach (var (text, isError) in WaitingToasts)
+            {
+                Toasts.Add(new Toast(text, isError, DateTime.Now.AddSeconds(isError ? 12 : 8)));
+            }
+            WaitingToasts.Clear();
+        }
+
+        /// <summary>A message from the game's start, shown when the menu is first opened (a toast now would expire unseen).</summary>
+        internal static void ToastWhenMenuOpens(string text, bool error = false)
+        {
+            WaitingToasts.Add((text, error));
+            if (error)
+            {
+                Log.Warn(text);
+            }
+            else
+            {
+                Log.Trace(text);
+            }
+        }
+
         internal static void Toast(string text, bool error = false)
         {
+
             Toasts.Add(new Toast(text, error, DateTime.Now.AddSeconds(error ? 8 : 5)));
             if (Toasts.Count > 4)
             {

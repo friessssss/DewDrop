@@ -296,7 +296,7 @@ namespace DewDrop.UI.Pages
             else
             {
                 button.Label = "Get on Nexus";
-                button.Tooltip = "Free accounts download from the website. DewDrop installs the file when it arrives.";
+                button.Tooltip = UpdateActions.FreeAccountHint;
             }
         }
 
@@ -320,16 +320,7 @@ namespace DewDrop.UI.Pages
                 return;
             }
 
-            DownloadManager.OpenOnNexus(_mod.ModId, file.FileId);
-            if (OperatingSystem.IsWindows() && !ModEntry.Nxm.IsRegistered(ModEntry.NxmHandlerScriptPath))
-            {
-                // Windows' Default apps choice is something only the player can change, so say that rather than "set it up"
-                ModEntry.Toast(AccountPage.LinksProblem() ?? "Turn on mod manager links on the Account tab first.", error: true);
-            }
-            else
-            {
-                ModEntry.Toast("Click 'Slow download' on the website; DewDrop installs it when it arrives.");
-            }
+            UpdateActions.OpenForFreeAccount(_mod.ModId, file.FileId);
         }
 
         // ---------- input ----------

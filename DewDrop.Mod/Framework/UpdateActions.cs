@@ -1,4 +1,5 @@
 using DewDrop.Core.Models;
+using DewDrop.UI.Pages;
 
 namespace DewDrop.Framework
 {
@@ -62,11 +63,37 @@ namespace DewDrop.Framework
                     }
                     else
                     {
-                        ModEntry.Toast("Click 'Slow download' then let DewDrop take it from there.");
-                        DownloadManager.OpenOnNexus(nexusId.Value, file.FileId);
+                        OpenForFreeAccount(nexusId.Value, file.FileId);
                     }
                 });
         }
+
+        /// <summary>
+        /// Free accounts download on the website: opens the file there and says what happens next on this PC. Only
+        /// Windows has the nxm:// handler that sends the website's download back to the game.
+        /// </summary>
+        public static void OpenForFreeAccount(int modId, int? fileId)
+        {
+            DownloadManager.OpenOnNexus(modId, fileId);
+            if (!OperatingSystem.IsWindows())
+            {
+                ModEntry.Toast("Opened the file on Nexus Mods. Mod manager links only work on Windows for now, so add the mod to your Mods folder yourself.");
+            }
+            else if (!ModEntry.Nxm.IsRegistered(ModEntry.NxmHandlerScriptPath))
+            {
+                // Windows' Default apps choice is something only the player can change, so say that rather than "set it up"
+                ModEntry.Toast(AccountPage.LinksProblem() ?? "Turn on mod manager links on the Account tab first, then click 'Slow download'.", error: true);
+            }
+            else
+            {
+                ModEntry.Toast("Click 'Slow download' on the website; DewDrop installs it when it arrives.");
+            }
+        }
+
+        /// <summary>What a free account's download button does on this PC, for tooltips (no registry reads, as they're drawn every frame).</summary>
+        public static string FreeAccountHint => OperatingSystem.IsWindows()
+            ? "Free accounts download from the website. With mod manager links on (Account tab), DewDrop installs the file when it arrives."
+            : "Free accounts download from the website. Mod manager links only work on Windows for now, so add the mod to your Mods folder yourself.";
 
         /// <summary>The file marked with a version, preferring a main file; null if Nexus has none.</summary>
         public static NexusModFile? PickMainFile(List<NexusModFile> files, string? version)
