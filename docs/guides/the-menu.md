@@ -42,7 +42,7 @@ The five tabs along the top are always in this order. Click one to switch, or pr
 
 | Tab | What it's for | Guide |
 | --- | --- | --- |
-| **Installed** | Turn mods on and off for your profile, find mods that need something, and check for updates. When updates are found, the tab reads **Installed (2 new)**, for example. | [Managing your mods](installed.md) |
+| **Installed** | Turn mods on and off for your profile, find mods that need something, check for updates, and uninstall mods. When updates are found, the tab reads **Installed (2 new)**, for example. | [Managing your mods](installed.md) |
 | **Browse** | Search Nexus Mods and open a mod's page to install it. | [Browsing Nexus Mods](browse.md) |
 | **Profiles** | Create, switch, copy, rename and delete profiles. | [Profiles](profiles.md) |
 | **Downloads** | Watch downloads and installs. While some are running, the tab shows how many, such as **Downloads (1)**. | [Downloads](downloads.md) |
@@ -63,8 +63,10 @@ The line under it is the status. It's always one of these:
 | "2 mods in this profile didn't load. Restart to load this profile." (orange) | A normal launch that didn't load some mods that are on in your profile, for example ones you added after the game started. **Apply & Restart** loads them. |
 | "1 mod loaded from a different copy than this profile uses. Restart to load this profile." (orange) | A normal launch loaded a different copy of a mod than the one your profile uses, such as your own copy instead of a Stardrop collection's. **Apply & Restart** switches to the right one. |
 | "This session didn't start from a DewDrop profile. Restart to load this profile." (orange) | SMAPI was started with its `--mods-path` launch option on a folder DewDrop doesn't manage. Click **Apply & Restart** when you want to switch into your profile. |
+| "Some Mod, which you uninstalled, is still loaded. Restart to finish uninstalling." (orange) | You uninstalled a mod the game is running. With more than one, it says "2 mods you uninstalled are still loaded." **Apply & Restart** finishes uninstalling them. See [Uninstall a mod](installed.md#uninstall-a-mod). |
 | "Changes are ready. Restart the game to load them." (orange) | Since this session started, you turned mods on or off, installed or updated a mod, or switched profiles. |
 | "Changes load the next time you start the game from Steam, or restart now." (orange) | The same, with **Start in my profile from Steam** on. DewDrop links your changes when you quit the game, so they load the next time you press **Play** in Steam. **Apply & Restart** loads them now. |
+| "The mods loaded right now match this profile. Uninstalled mods are deleted when the game closes." (gray) | What's loaded is exactly your profile. Mods you uninstalled weren't loaded, and their folders go when you quit. |
 | "The mods loaded right now match this profile." (gray) | Nothing to do. What's loaded is exactly your profile. |
 
 The numbers are examples. If more than one of the three normal-launch lines is true, the bar shows the one highest in the table.
@@ -89,7 +91,7 @@ Messages only show while the menu is open. A few come from the game starting, su
 
 ## Dialogs
 
-Some actions ask before they go ahead, such as **Apply & Restart**, deleting a profile, or logging out of Nexus Mods. The screen darkens and a box explains what will happen.
+Some actions ask before they go ahead, such as **Apply & Restart**, uninstalling a mod, deleting a profile, or logging out of Nexus Mods. The screen darkens and a box explains what will happen.
 
 * To go ahead, click the action button (like **Restart** or **Delete**) or press **Enter**.
 * To back out, click **Cancel**, click anywhere outside the box, or press **Esc**, **E** or controller **B**.

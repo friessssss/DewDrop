@@ -14,7 +14,8 @@ Click any card on the [Browse](browse.md) tab to open that mod's page. It shows 
 **Along the top:**
 
 * **Back** returns to your search results. **Backspace** does the same.
-* If you already have the mod, a note shows your version, such as **Installed v1.2.0**. Like the **Installed** tag on Browse, this needs the Nexus update key in your copy's `manifest.json`. When there's a newer version it adds **Update available: v1.3.0** in orange. If an update is already downloaded and waiting, it says **Update ready, restart to finish**.
+* If you already have the mod, a note shows your version, such as **Installed v1.2.0**. DewDrop recognizes your copy the same ways as the **Installed** tag on Browse: by its Nexus update key, by the file DewDrop installed it from, or from smapi.io's mod list. See [How DewDrop knows you have a mod](browse.md#how-dewdrop-knows-you-have-a-mod). When there's a newer version it adds **Update available: v1.3.0** in orange. If an update is already downloaded and waiting, it says **Update ready, restart to finish**.
+* **Uninstall**, in red, appears when you have copies of this mod that DewDrop can match to this page. See [Uninstall from a mod's page](#uninstall-from-a-mods-page).
 * **Show old files** appears when the mod has older versions. Click it to list them, and **Hide old files** to hide them again.
 * **Open on Nexus** opens the mod's page in your web browser.
 
@@ -32,7 +33,7 @@ The description also lists what else the mod needs, such as a framework like Con
 
 ## The Install button
 
-Every file has a button on its right. What it says depends on your Nexus Mods account and on whether the file is already downloading.
+Every file has a button on its right. What it says depends on your Nexus Mods account, and on whether you already have the file or it's already downloading.
 
 | Button | When you see it | What clicking does |
 | --- | --- | --- |
@@ -40,8 +41,22 @@ Every file has a button on its right. What it says depends on your Nexus Mods ac
 | **Install** (green) | You have Nexus Mods Premium. | Downloads and installs the file inside the game. |
 | **Get on Nexus** | You have a free Nexus Mods account. | Opens the file on the Nexus Mods website, where you click **Slow download**. |
 | **Queued...**, **Downloading 42%** or **Installing...** (grayed out) | DewDrop is already getting this file. | Nothing. Progress is also on the [Downloads](downloads.md) tab. |
+| **Installed** (green text, no button) | You already have this file, whatever your account. | Nothing. Pointing at it says "You have this file. To install it again, uninstall it first." |
 
 Why the difference? Nexus Mods only lets Premium members download straight into an app. Free accounts download through the website. [Free vs Premium downloads](../nexus-mods/free-vs-premium.md) explains it.
+
+<figure><img src="../.gitbook/assets/shot-mod-page-installed.png" alt="Content Patcher's page in DewDrop. The top bar shows Installed v2.9.1 in green and a red Uninstall button, next to Show old files and Open on Nexus. In the file list, the Content Patcher 2.9.1 file says Installed in green, and the older 2.8.1 file has an Install button."><figcaption><p>A mod you already have: its file says Installed, and Uninstall is in the top bar.</p></figcaption></figure>
+
+### Which file counts as installed
+
+For each copy of the mod you have, DewDrop marks at most one file:
+
+* **The file DewDrop installed it from,** as long as you still have that version. If a mod that file installed is gone, for example because you uninstalled one of its parts, DewDrop marks no file for this copy, so you can install the file again to put the part back.
+* **Otherwise, the one file whose version matches your copy.** This is for a copy DewDrop didn't install, or one whose version changed since. If several files share that version, it marks the single **MAIN** file among them. If that's not clear either, it marks none, rather than guess.
+
+An update that's downloaded and waiting for a restart counts as installed, so its file isn't offered again.
+
+If you start a Premium download of a file DewDrop's install record says you have, DewDrop doesn't download it again and says "*title* is already installed." "Mod manager download" links from the website still install it, as a reinstall.
 
 ## Install a file with Premium
 
@@ -86,9 +101,24 @@ What you can do instead:
 * **If you already have the mod,** DewDrop updates it in its existing folder and keeps your `config.json` settings.
 * **If the game is using the old files,** the message says "Update ready, finishes when the game restarts". The new version goes in when you use **Apply & Restart**, or when you quit the game.
 * **If the download holds several alternative versions of one mod,** DewDrop updates the one you already have, if it can match it by folder or name. Otherwise it can't tell which one you want, so it installs none and says so. Download the file from the website and copy the version you want into your `Mods` folder.
+* **If you uninstalled the mod and the game hasn't closed yet,** installing it again puts it back and cancels the uninstall.
 
 {% hint style="info" %}
 Everything you install loads after a restart, and the bottom bar reminds you until then. Install everything you want first, then click **Apply & Restart** once. If a mod is still installing, DewDrop asks you to restart when it's done. Downloads that haven't finished are cancelled by the restart, and the restart dialog warns you first.
+{% endhint %}
+
+## Uninstall from a mod's page
+
+When you have copies of the mod that DewDrop can match to its page, a red **Uninstall** button appears in the bar at the top. It finds them the same ways as the **Installed v1.2.0** note. Copies from Stardrop collections, and DewDrop itself, are never included.
+
+1. Click **Uninstall**. Pointing at it first says which mods it uninstalls.
+2. With one mod, the dialog is the same as on the **Installed** tab. When DewDrop matches several of your mods to the page, such as a mod and its content packs, it asks about all of them at once, for example "Uninstall Some Mod? That's 3 mods: A, B and C."
+3. Click **Uninstall** to confirm, or **Cancel** to keep them.
+
+Each mod's folder is deleted when the game closes. Until then you can undo it on the **Installed** tab, one mod at a time. See [Uninstall a mod](installed.md#uninstall-a-mod).
+
+{% hint style="warning" %}
+Check the names in the dialog. DewDrop only uninstalls the parts it can match to this page. If you installed the mod by hand and some of its parts have no Nexus update key, the list may leave them out. Remove the rest on the **Installed** tab.
 {% endhint %}
 
 ## Leaving the page

@@ -43,11 +43,21 @@ Each mod is a card with:
 * its picture (or "No picture" if it has none),
 * its name and author,
 * a heart with its number of endorsements, then its download count,
-* a green **Installed** tag if you already have it.
+* a tag if you already have it: a green **Installed**, or an orange **Update** when a new version of your copy was found.
 
-Hover over a card to read the mod's short summary. Click a card to open [the mod's page](mod-page.md), where you can read more and install it.
+Hover over a card to read the mod's short summary. If you have the mod, it also says which version, such as "Installed v1.2." or "Installed v1.2. Update available: v1.3". Click a card to open [the mod's page](mod-page.md), where you can read more and install it.
 
-The **Installed** tag relies on the update keys in each of your mods' `manifest.json` files. A mod you have might not show the tag if its author didn't add a Nexus update key.
+### How DewDrop knows you have a mod
+
+A card gets its tag when any of these links one of your mods to that mod on Nexus Mods:
+
+* **Its update key.** The Nexus update key in your copy's `manifest.json`, if its author added one.
+* **DewDrop's install record.** DewDrop remembers which Nexus file it installed each mod from, in `mod-sources.json`. See [Where DewDrop keeps files](../reference/file-locations.md).
+* **smapi.io's mod list.** During the [update check](updating-mods.md), DewDrop also asks smapi.io which Nexus mod each of your mods is. Its list covers code mods, such as the code part of Stardew Valley Expanded or Generic Mod Config Menu, but not content packs.
+
+So every mod you install through DewDrop shows the tag. A content pack you installed yourself, without a Nexus update key, may still not.
+
+A mod you uninstall loses its tag straight away, even before the game closes. See [Uninstall a mod](installed.md#uninstall-a-mod).
 
 ## Move between pages
 

@@ -59,8 +59,20 @@ namespace DewDrop.Framework
 
         public bool IsDownloading(int modId) => Jobs.Any(j => j.ModId == modId && j.IsActive);
 
-        /// <summary>Premium path: ask Nexus for a link to any file directly.</summary>
-        public void Start(int modId, int fileId, string title) => Enqueue(modId, fileId, title, null);
+        /// <summary>
+        /// Premium path: ask Nexus for a link to any file directly. A file DewDrop's record says is installed right now
+        /// isn't downloaded again; links from the website still are, since the player picked the file there.
+        /// </summary>
+        public void Start(int modId, int fileId, string title)
+        {
+            if (_mods.IsFileInstalled(modId, fileId))
+            {
+                ModEntry.Toast($"{title} is already installed.");
+                return;
+            }
+
+            Enqueue(modId, fileId, title, null);
+        }
 
         /// <summary>Free path: a link the user started from the website's "Mod manager download" button.</summary>
         public void Start(NxmLink link) => Enqueue(link.ModId, link.FileId, $"Nexus mod {link.ModId}", link);
@@ -230,7 +242,14 @@ namespace DewDrop.Framework
 
         private void OnInstalled(DownloadJob job, InstallResult result)
         {
-            _mods.MarkChanged(result.InstalledIds.Concat(result.UpdatedIds).Concat(result.PendingIds));
+            // A mod put back where one was waiting to be uninstalled stays, and the record of which file it came from
+            // lets Browse and its page show it as installed
+            _mods.KeepReinstalled(result);
+            _mods.RecordInstall(job.ModId, job.FileId, result);
+
+            // Files changed in place call for a restart. A waiting update does while it waits (PendingUpdateCount), and not
+            // once it's thrown away, as uninstalling the mod does.
+            _mods.MarkChanged(result.InstalledIds.Concat(result.UpdatedIds));
             _mods.Reload();
 
             // Installed through DewDrop, so never "new in your Mods folder" (those get turned on at the next start)

@@ -5,7 +5,15 @@ using SharpCompress.Common;
 namespace DewDrop.Core.Services
 {
     /// <param name="PendingIds">Updates downloaded but waiting for a restart, because the old copy is in use.</param>
-    public record InstallResult(List<string> InstalledIds, List<string> UpdatedIds, List<string> PendingIds, List<string> Errors);
+    public record InstallResult(List<string> InstalledIds, List<string> UpdatedIds, List<string> PendingIds, List<string> Errors)
+    {
+        /// <summary>Every mod folder the install wrote (or will, for an update waiting on a restart), with what went in it.</summary>
+        public List<InstalledFolder> Folders { get; } = new();
+    }
+
+    /// <param name="Version">The manifest version in the folder now, or once a waiting update goes in.</param>
+    /// <param name="NexusId">The Nexus mod ID from the manifest's update keys, if it has one.</param>
+    public record InstalledFolder(string UniqueId, string Version, string Folder, int? NexusId);
 
     /// <summary>
     /// Installs mods from an archive. Every folder in the archive holding a manifest.json is a mod; each is
@@ -154,6 +162,14 @@ namespace DewDrop.Core.Services
                     entry.WriteToFile(target, new ExtractionOptions { Overwrite = true });
                 }
 
+                // Putting the mod back where it was waiting to be uninstalled means the player wants it after all. Taken off
+                // the list before the new copy goes in, so a game closing right now has either moved the old copy away
+                // already (and the new one goes into an empty spot) or leaves the folder alone.
+                if (existing is not null)
+                {
+                    _pending.CancelRemoval(destination);
+                }
+
                 if (existing is null)
                 {
                     Directory.Move(staging, destination);
@@ -169,12 +185,17 @@ namespace DewDrop.Core.Services
                 }
                 else
                 {
-                    // The running game holds the old copy's files; finish after the restart
+                    // The running game holds the old copy's files; finish after the restart. This also replaces a
+                    // removal waiting for the folder, since the player wants the mod again.
                     _pending.Add(new PendingUpdates.Swap(manifest.UniqueID, destination, staging));
                     staging = null;
                     result.PendingIds.Add(manifest.UniqueID);
                     _log.Info($"Downloaded {manifest.Name} {manifest.Version}; it replaces the running copy on restart");
                 }
+
+                // "UpdateKeys": null reads as an empty list, but a hand-built manifest can still hold null
+                var nexusId = manifest.UpdateKeys is null ? null : manifest.GetNexusId();
+                result.Folders.Add(new InstalledFolder(manifest.UniqueID, manifest.Version ?? "", destination, nexusId));
             }
             catch (Exception ex)
             {

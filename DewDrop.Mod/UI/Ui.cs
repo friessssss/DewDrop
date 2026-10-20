@@ -31,6 +31,8 @@ namespace DewDrop.UI
         public static readonly Rectangle Heart = new(211, 428, 7, 6);
         public static readonly Rectangle Star = new(310, 392, 16, 16);                 // gold quality star
         public static readonly Rectangle Warning = new(403, 496, 5, 14);               // red "!"
+        public static readonly Rectangle TrashCan = new(564, 102, 18, 26);            // the inventory's trash can
+        public static readonly Rectangle TrashCanLid = new(564, 129, 18, 10);         // its lid, drawn over the top
 
         // ---------- colours ----------
         public static Color Text => Game1.textColor;
@@ -72,6 +74,16 @@ namespace DewDrop.UI
         public static void Sprite(SpriteBatch b, Rectangle source, Vector2 position, float scale = 4f, Color? tint = null, Texture2D? texture = null)
         {
             b.Draw(texture ?? Game1.mouseCursors, position, source, tint ?? Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.9f);
+        }
+
+        /// <summary>The inventory's trash can at a scale, with its lid tipped open like vanilla's while hovered.</summary>
+        public static void TrashCanIcon(SpriteBatch b, Vector2 position, float scale, bool open, bool enabled = true)
+        {
+            var tint = enabled ? Color.White : Color.White * 0.4f;
+            b.Draw(Game1.mouseCursors, position, TrashCan, tint, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.9f);
+
+            // Vanilla draws the lid 15,10 pixels into the can, turning about the lid's own 16,10
+            b.Draw(Game1.mouseCursors, position + new Vector2(15, 10) * scale, TrashCanLid, tint, open ? MathF.PI / 4 : 0f, new Vector2(16, 10), scale, SpriteEffects.None, 0.91f);
         }
 
         /// <summary>Text with the game's usual drop shadow.</summary>

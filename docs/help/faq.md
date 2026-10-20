@@ -64,14 +64,14 @@ If you turn on "Mod manager download" links on Windows, any website can try to s
 <details>
 <summary>Does DewDrop move or delete my mods?</summary>
 
-No. Your mods stay in your `Mods` folder. Turning a mod off only changes your profile, and **Apply &#x26; Restart** loads your profile through links, not copies. Deleting a profile never deletes mods. The one time DewDrop replaces a mod's folder is when you update that mod, and it keeps the mod's `config.json`. See [How DewDrop works](../reference/how-it-works.md).
+Only when you ask it to. Your mods stay in your `Mods` folder. Turning a mod off only changes your profile, and **Apply &#x26; Restart** loads your profile through links, not copies. Deleting a profile never deletes mods. DewDrop replaces a mod's folder when you update that mod, and it keeps the mod's `config.json`. It deletes a mod's folder only when you [uninstall the mod](../guides/installed.md#uninstall-a-mod), and only once the game has closed. See [How DewDrop works](../reference/how-it-works.md).
 
 </details>
 
 <details>
 <summary>Will DewDrop affect my saves?</summary>
 
-DewDrop doesn't read or change your save files. But turning off a mod that a save uses can still affect that save, the same as removing the mod by hand. For example, items a mod added may disappear. Keep **Save Backup** on so you have backups.
+DewDrop doesn't read or change your save files. But turning off or uninstalling a mod that a save uses can still affect that save, the same as removing the mod by hand. For example, items a mod added may disappear. Keep **Save Backup** on so you have backups.
 
 </details>
 
@@ -188,7 +188,9 @@ Not from the menu yet. Extract the zip into your `Mods` folder, so the mod's `ma
 <details>
 <summary>How do I delete a mod?</summary>
 
-There's no delete button yet. Turning a mod off is usually enough. To remove it for good, close the game and delete the mod's folder from your `Mods` folder. **Open mods folder** on the **Downloads** tab opens it.
+On the **Installed** tab, click the trash can at the right of the mod's row, then click **Uninstall**. DewDrop deletes the mod's folder, settings included, when the game closes. Until then, its row has an **Undo** button. See [Uninstall a mod](../guides/installed.md#uninstall-a-mod).
+
+If you might want the mod again, turning it off is enough: its folder and settings stay.
 
 </details>
 

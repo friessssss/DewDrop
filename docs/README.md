@@ -13,7 +13,7 @@ DewDrop is a mod manager that lives inside Stardew Valley. It adds a **Mods** bu
 
 ## What you can do
 
-* <img src=".gitbook/assets/icons/installed.png" alt="" data-size="line"> **Installed**: turn mods on and off, search your list, spot missing requirements, and update mods. See [Managing your mods](guides/installed.md).
+* <img src=".gitbook/assets/icons/installed.png" alt="" data-size="line"> **Installed**: turn mods on and off, search your list, spot missing requirements, and update and uninstall mods. See [Managing your mods](guides/installed.md).
 * <img src=".gitbook/assets/icons/browse.png" alt="" data-size="line"> **Browse**: search and sort Nexus Mods, and install a file from a mod's page. Installing needs a free or Premium Nexus Mods account. See [Browsing Nexus Mods](guides/browse.md).
 * <img src=".gitbook/assets/icons/profiles.png" alt="" data-size="line"> **Profiles**: create, switch, duplicate, rename and delete profiles. See [Profiles](guides/profiles.md).
 * <img src=".gitbook/assets/icons/downloads.png" alt="" data-size="line"> **Downloads**: follow your downloads, cancel them, or try a failed one again. See [Downloads](guides/downloads.md).

@@ -1,5 +1,5 @@
 ---
-description: "What happens behind the Mods button: profiles, linked mods, Apply & Restart, starting in your profile, updates and the button art."
+description: "What happens behind the Mods button: profiles, linked mods, Apply & Restart, starting in your profile, updates, uninstalls and the button art."
 icon: gears
 ---
 
@@ -11,7 +11,7 @@ You don't need this page to use DewDrop. It explains what goes on behind the sce
 
 ## The short version
 
-1. Your mods stay in your `Mods` folder. DewDrop never moves them.
+1. Your mods stay in your `Mods` folder. DewDrop only moves one out when you uninstall it.
 2. A profile is a list of the mods you want turned on.
 3. **Apply & Restart** puts one link per turned-on mod into a folder called `Selected Mods`.
 4. DewDrop closes the game and starts SMAPI again, telling it to load mods from `Selected Mods` instead of `Mods`.
@@ -29,6 +29,8 @@ Turning a mod off only changes your profile. The mod's folder isn't moved, renam
 
 DewDrop reads the folder when the game starts, after it installs something, and when you click **Rescan** on the **Installed** tab.
 
+Two folders holding the same mod (the same unique ID) are a problem for SMAPI: when it loads the whole `Mods` folder, it loads neither. The **Installed** tab marks both **Installed twice**.
+
 ### Mods you copy in by hand
 
 DewDrop keeps a list of the mods it has already seen, in `startup.json`. A mod in your mods folder that isn't on that list is new: you copied it in yourself.
@@ -42,6 +44,21 @@ When the game starts, and when you click **Rescan**, DewDrop turns new mods on i
 Only mods DewDrop has never seen count as new. The first time DewDrop runs, every mod already installed counts as seen. So does every mod that's on in any profile, every mod you've turned on or off, and every mod installed through DewDrop. Mods from Stardrop collections are never turned on this way, and nothing is turned on while your active profile is a Stardrop collection profile, which DewDrop can't change.
 
 If you delete `startup.json` while the game is closed, every mod installed at the next start counts as seen.
+
+### Uninstalling a mod
+
+The trash can on the **Installed** tab, and **Uninstall** on a mod's page, don't delete anything straight away. The game may have the mod loaded, and mods read their files while you play, such as Content Patcher packs when a save loads. So DewDrop:
+
+1. Turns the mod off in your active profile, unless another loose copy of it stays installed or the profile is read-only. Other profiles aren't changed.
+2. Lists the mod's folder in `pending-updates.json`, in `Stardrop/Data/Cache/DewDrop`, and throws away any update waiting for that folder. From then on, DewDrop treats the mod as gone, apart from its row on the **Installed** tab, which offers **Undo**.
+3. As the game closes, on every system and after **Apply & Restart** too, removes the mod's link from `Selected Mods` and moves its folder into the hidden `.dewdrop-staging` folder beside it, under a new name that ends in `-removed`. A single rename can't leave half a mod behind.
+4. Deletes it the next time the game starts.
+
+Before it moves or deletes anything, DewDrop checks that the folder still holds the mod you uninstalled. If the folder is gone, or now holds another mod, it's left alone.
+
+On Windows, the move fails while a file in the folder is still open. Then the restart script, `relaunch.ps1`, tries again once the game has closed, and DewDrop tries again at each start, except in a session that loaded the mod again. After three starts it gives up, and the menu says "Couldn't delete '...' (uninstalled): a file stayed open. Delete it yourself."
+
+**Undo** takes the folder off the list, and turns the mod back on in the profile uninstalling turned it off in. DewDrop only remembers that profile until the game closes. Installing the same mod again into that folder takes it off the list too.
 
 ## Profiles
 
@@ -98,12 +115,12 @@ The [`dewdrop_status`](console-commands.md) console command shows which folder w
 ## What Apply & Restart does
 
 1. DewDrop checks it's safe to restart. It won't while a mod is still installing, if it couldn't read `Settings.json` or your active profile's file, or if SMAPI isn't in your game folder.
-2. It asks you to confirm. The dialog lists mods that are loaded now but will be off, and downloads that will be cancelled.
+2. It asks you to confirm. The dialog lists mods that are loaded now but will be off, mods you uninstalled, which it deletes, and downloads that will be cancelled.
 3. It rebuilds `Selected Mods` from your active profile, as described above.
 4. It notes the restart in `startup.json`, so the next launch can tell whether the restart came back. See [The restart note](#the-restart-note).
 5. It starts a small helper program that waits in the background.
-6. It cancels any running downloads, plays a sound and closes the game.
-7. The helper waits until the game has fully closed, finishes any updates that were waiting for a restart, and starts SMAPI with `--mods-path` pointing at `Selected Mods`. It hands the new game the restart's one-time ID in the `DEWDROP_LAUNCH` environment variable. On macOS, and on Linux without DewDrop's Steam launcher, it also sets SMAPI's `SMAPI_MODS_PATH` variable to the same folder.
+6. It cancels any running downloads, plays a sound and closes the game. As the game closes, DewDrop moves the mods you uninstalled out of the way (see [Uninstalling a mod](#uninstalling-a-mod)).
+7. The helper waits until the game has fully closed, finishes any updates that were waiting for a restart, and any uninstalls a file held up, then starts SMAPI with `--mods-path` pointing at `Selected Mods`. It hands the new game the restart's one-time ID in the `DEWDROP_LAUNCH` environment variable. On macOS, and on Linux without DewDrop's Steam launcher, it also sets SMAPI's `SMAPI_MODS_PATH` variable to the same folder.
 
 The new session is a clean start, so every mod in your profile loads fresh. It also skips the title intro and goes straight to the title buttons.
 
@@ -116,11 +133,11 @@ The new session is a clean start, so every mod in your profile loads fresh. It a
 {% tabs %}
 {% tab title="Windows" %}
 * DewDrop writes `relaunch.ps1` into `Stardrop\Data\Cache\DewDrop` and runs it in a hidden PowerShell window. It runs with `-ExecutionPolicy Bypass`, which applies to that one script only and doesn't change any Windows setting.
-* After the game closes (plus half a second), the script finishes waiting updates from `pending-updates.json`.
+* After the game closes (plus half a second), the script finishes waiting updates and uninstalls from `pending-updates.json`.
 * It then starts `StardewModdingAPI.exe` from your game folder. A new SMAPI console window opens as usual.
-* It writes to `relaunch.log` next to the script only when it finished updates, changed Steam's launch option or something went wrong. DewDrop checks that `StardewModdingAPI.exe` is in your game folder before it closes the game. If SMAPI still can't start, the game doesn't come back, and `relaunch.log` says why.
+* It writes to `relaunch.log` next to the script only when it finished updates or uninstalls, changed Steam's launch option or something went wrong. DewDrop checks that `StardewModdingAPI.exe` is in your game folder before it closes the game. If SMAPI still can't start, the game doesn't come back, and `relaunch.log` says why.
 * SMAPI is started directly, not through Steam or the Xbox app.
-* The same script also runs when you quit the game, if an update is waiting or Steam's launch option needs to change. Then it doesn't start the game. See [When you quit the game](#when-you-quit-the-game).
+* The same script also runs when you quit the game, if an update is waiting, an uninstall is held up by an open file, or Steam's launch option needs to change. Then it doesn't start the game. See [When you quit the game](#when-you-quit-the-game).
 {% endtab %}
 
 {% tab title="macOS" %}
@@ -185,12 +202,14 @@ Turning the setting on also needs the links in `Selected Mods` to be up to date,
 
 ### When you quit the game
 
-On Windows, and on Linux and the Steam Deck with DewDrop's Steam launcher, DewDrop does a little work as the game closes. It skips this after **Apply & Restart** or **Restart now**, which do their own.
+On every system, and after **Apply & Restart** too, DewDrop first moves the mods you uninstalled out of your `Mods` folder (see [Uninstalling a mod](#uninstalling-a-mod)).
+
+On Windows, and on Linux and the Steam Deck with DewDrop's Steam launcher, DewDrop then does a little more work as the game closes. It skips this after **Apply & Restart** or **Restart now**, which do their own.
 
 1. If **Start in my profile from Steam** is on, or waiting to turn on, and your profile has changed since the game started, DewDrop rebuilds `Selected Mods`. The same goes for a session that didn't start in your profile. The next **Play** in Steam then loads your changes.
-2. On Windows, if an update is waiting, or Steam's launch option needs to change, DewDrop starts `relaunch.ps1` without restarting the game. Once the game has closed, the script finishes the updates first, then changes Steam's launch option as described above.
+2. On Windows, if an update is waiting, an uninstalled mod couldn't be moved because a file was open, or Steam's launch option needs to change, DewDrop starts `relaunch.ps1` without restarting the game. Once the game has closed, the script finishes the updates and uninstalls first, then changes Steam's launch option as described above.
 
-If the game doesn't close normally, for example because it crashed, this may not happen. The waiting updates and the change to Steam then wait until the next time you quit.
+If the game doesn't close normally, for example because it crashed, this may not happen. The waiting updates and the change to Steam then wait until the next time you quit. DewDrop deletes the mods you uninstalled at the next start instead, unless that session loads them again.
 
 ### The Load your profile? box
 
@@ -215,12 +234,13 @@ DewDrop compares the mods SMAPI loaded with the mods a restart into your active 
 These don't count as a difference:
 
 * **DewDrop itself.** It always loads, and it's always linked.
+* **Mods you uninstalled,** unless another copy of them stays installed. While one is still loaded, the bottom bar says so on its own line instead, such as "Some Mod, which you uninstalled, is still loaded. Restart to finish uninstalling."
 * **Mods SMAPI refused to load.** If a mod is on in your profile but SMAPI skipped it as the game started, for example because it's broken, needs a mod you don't have or needs another game version, a restart wouldn't load it either. A mod you copy in or install after the game started is different. SMAPI hasn't had a chance to load it yet, so it counts, and the **Installed** tab says **On after restart**.
 
 These do count:
 
 * **Mods from outside DewDrop's mods folder.** If SMAPI loaded mods from your game's `Mods` folder while Stardrop is set to use another mods folder, nothing links those mods, so a restart leaves them out. They count as off.
-* **Two copies of one mod in your `Mods` folder.** SMAPI loads neither, but a restart links only one. If the mod is on in your profile, it counts as one that didn't load.
+* **Two copies of one mod in your `Mods` folder.** SMAPI loads neither, but a restart links only one. If the mod is on in your profile, it counts as one that didn't load. The **Installed** tab marks both copies **Installed twice**.
 
 A `Mods` folder moved to another drive with a junction or symbolic link counts as the same folder, so a launch from it is still a normal launch.
 
@@ -251,6 +271,8 @@ DewDrop never restarts the game unless you click **Apply & Restart** or **Restar
 DewDrop checks for mod updates with smapi.io, the same service SMAPI uses for its own update alerts. It checks when the game starts (unless you turned off **Check for updates at startup**), and whenever you click **Check for updates** on the **Installed** tab.
 
 Only mods whose `manifest.json` lists update keys and a valid version can be checked. Mods from Stardrop collections are never checked, because the collection decides their version. smapi.io gets each mod's ID, version and update keys, plus your SMAPI version, game version and operating system.
+
+DewDrop also asks about loose mods without update keys, but only to learn which Nexus mod smapi.io's list says each one is. It never offers updates from those answers. It keeps the Nexus IDs in `mod-sources.json`, for [Knowing what you have](#knowing-what-you-have).
 
 DewDrop checks for updates to itself the same way: its own manifest's update key points at its GitHub releases. See [Updating DewDrop](../getting-started/updating-dewdrop.md).
 
@@ -290,8 +312,21 @@ When an update does go in while the game is running (on macOS and Linux, and on 
 * A mod you already have is updated in its existing folder, which keeps its location and name.
 * A new mod never overwrites another mod's folder. If the name is taken, it gets one like `Name (2)`.
 * DewDrop doesn't download required mods for you. When it turns a new mod on, it also turns on required mods you already have.
+* Installing a mod into a folder that's waiting to be uninstalled cancels the uninstall.
 
 See [A mod's page and installing files](../guides/mod-page.md) and [Downloads](../guides/downloads.md).
+
+### Knowing what you have
+
+The tags on Browse's cards, and the **Installed** marks on a mod's page, need to know which Nexus mod each of your mods is. DewDrop counts a mod as belonging to a Nexus mod when any of these says so:
+
+* **The Nexus update key** in the mod's `manifest.json`.
+* **DewDrop's install record.** Each time DewDrop installs a download, it notes in `mod-sources.json` which Nexus mod and file every mod in it came from, and the version that file put in. A mod whose own update key names a different Nexus mod, such as a framework bundled in another mod's download, is left to its own page.
+* **smapi.io's mod list,** from the update check (see [Finding updates](#finding-updates)). It covers code mods, not content packs.
+
+On a mod's page, a file counts as installed when DewDrop's record names it and you still have that version, as long as every mod that file installed is still there. If one is gone, no file is marked for that copy, so the file can be installed again. A copy without a record, or whose version changed since, is compared by version instead: the one file with your copy's version, or, when several share it, the single **MAIN** one. If it can't tell, it marks none. A Premium download of a file the record says you have doesn't start again. A website link for it still installs it.
+
+Mods you uninstalled don't count, even before the game closes.
 
 ## Website download links on Windows
 
@@ -320,7 +355,7 @@ The [`dewdrop_export_title`](console-commands.md) command saves the built button
 | --- | --- | --- |
 | `api.nexusmods.com` | Browsing and searching, checking your login, getting download links. | Your searches and filters. When you're logged in, your API key goes with each request. |
 | Nexus Mods' file servers | Downloading mod files and pictures. | Only the file request; no API key. |
-| `smapi.io` | Checking for mod updates. | Mod IDs, versions and update keys, plus your SMAPI version, game version and operating system. Nothing about your Nexus Mods account. |
+| `smapi.io` | Checking for mod updates, and which Nexus mod each of your mods is. | Mod IDs, versions and update keys, plus your SMAPI version, game version and operating system. Nothing about your Nexus Mods account. |
 
 That's the full list. Every request says it comes from DewDrop and which version.
 
@@ -328,5 +363,5 @@ That's the full list. Every request says it comes from DewDrop and which version
 
 * **Your game's files and SMAPI's files.** DewDrop doesn't change either, or SMAPI's settings.
 * **Steam**, unless you turn on **Start in my profile from Steam** on Windows. Then DewDrop changes only Stardew Valley's launch option, for the Steam account that's signed in, when you quit the game; see [How DewDrop changes Steam's launch option](#how-dewdrop-changes-steams-launch-option). The installer can set the launch option too: on Windows only if you say yes (see [Install with the installer](../getting-started/installing/installer.md)), and on a Steam Deck, or on Linux with `--steam-setup`, to DewDrop's Steam launcher (see [Steam on Linux and the Steam Deck](installer-options.md#steam-on-linux-and-the-steam-deck)).
-* **Your mod folders**, except when you update a mod (the folder is replaced, keeping your settings) or install a new one.
+* **Your mod folders**, except when you update a mod (the folder is replaced, keeping your settings), install a new one, or uninstall one (the folder is deleted once the game closes).
 * **Stardrop's other settings.** DewDrop shares `Settings.json` but only changes the parts it uses. See [config.json options](config.md#settings-dewdrop-reads-from-stardrop).

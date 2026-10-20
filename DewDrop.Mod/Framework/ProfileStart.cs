@@ -315,9 +315,10 @@ namespace DewDrop.Framework
         }
 
         /// <summary>
-        /// The game is closing: with the Steam setting on, bring the links up to date for the next launch, then hand the
-        /// waiting mod updates and any launch option change to the script that runs once the game has closed. Runs once,
-        /// and never after Apply &amp; Restart (that restart does its own).
+        /// The game is closing: move the uninstalled mods out of the Mods folder, then, with the Steam setting on, bring
+        /// the links up to date for the next launch, and hand the waiting mod updates and uninstalls and any launch option
+        /// change to the script that runs once the game has closed. Runs once; after Apply &amp; Restart only the first
+        /// step runs (that restart does the rest).
         /// </summary>
         public static void OnExiting()
         {
@@ -330,7 +331,15 @@ namespace DewDrop.Framework
             try
             {
                 var mods = ModEntry.Mods;
-                if (mods is null || mods.RestartScheduled || !(OperatingSystem.IsWindows() || UsesSteamLauncher))
+                if (mods is null)
+                {
+                    return;
+                }
+
+                // On every system and before a restart too: the game no longer reads the uninstalled mods' files
+                mods.FinishRemovalsOnExit();
+
+                if (mods.RestartScheduled || !(OperatingSystem.IsWindows() || UsesSteamLauncher))
                 {
                     return;
                 }
@@ -364,7 +373,8 @@ namespace DewDrop.Framework
                     }
                 }
 
-                if (job is not null || mods.PendingUpdateCount > 0)
+                // An uninstalled mod still listed here had a file held open as the game closed
+                if (job is not null || mods.PendingUpdateCount > 0 || mods.PendingRemovalCount > 0)
                 {
                     Relauncher.ScheduleAfterExit(Constants.GamePath, mods.Paths.SelectedModsFolder, mods.Pending.FilePath, ScriptFolder, ModEntry.Log, job);
                 }

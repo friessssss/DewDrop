@@ -16,6 +16,8 @@ DewDrop asks smapi.io, the same update service SMAPI itself uses. It checks:
 
 A mod can only be checked if its author said where its updates are published (its "update keys") and gave it a normal version number such as `1.2.3`. Mods from Stardrop collections are never checked, because the collection decides their version. DewDrop checks itself the same way; see [Updating DewDrop](../getting-started/updating-dewdrop.md).
 
+The same check also asks smapi.io about mods without update keys, only to learn which Nexus mod each one is. That's one way [Browse](browse.md#how-dewdrop-knows-you-have-a-mod) knows you have a mod. They still aren't offered updates.
+
 DewDrop sends smapi.io only each mod's ID, version and update keys, plus your SMAPI version, game version and operating system. Nothing about your Nexus Mods account is sent. If a check you started fails, a red message says why, for example "Couldn't reach smapi.io to check for updates." Check your internet connection and try again later.
 
 ## See which mods have updates
@@ -25,6 +27,7 @@ DewDrop sends smapi.io only each mod's ID, version and update keys, plus your SM
 * The tab's name shows a count, for example **Installed (2 new)**.
 * Click the filter button until it reads **Show: Updates** to list only those mods.
 * Each of them has a green **Update to** button with the new version number, for example **Update to 2.1.0**.
+* On Browse, the mod's card has an orange **Update** tag instead of **Installed**.
 * On a mod's page in Browse, the bar at the top shows **Update available:** and the new version next to the version you have.
 
 ## Install an update
@@ -68,7 +71,7 @@ An update marked **Update ready, restart to finish** goes in once the game has c
 * **Apply & Restart.** DewDrop swaps in the new version after the game closes and before it starts again. See [Apply & Restart](apply-and-restart.md).
 * **Quitting the game.** A moment after the game closes, DewDrop swaps in the new version. It loads the next time you start the game.
 
-If an update still can't go in, for example because one of its files is open in another program, it keeps waiting and DewDrop tries again next time. Nothing is lost: the note stays until the update is in.
+If an update still can't go in, for example because one of its files is open in another program, it keeps waiting and DewDrop tries again next time. Nothing is lost: the note stays until the update is in. The one exception: if you [uninstall the mod](installed.md#uninstall-a-mod) while its update waits, the update is thrown away with it.
 
 Some updates go in straight away and show **Updated**, for example content packs (mods made only of files, with no code), and most updates on macOS and Linux. Either way, the new version only loads after a restart.
 

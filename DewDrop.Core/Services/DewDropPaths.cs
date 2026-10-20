@@ -35,6 +35,9 @@ namespace DewDrop.Core.Services
         /// <summary>What DewDrop remembers between sessions about restarts and mods it has seen (see <see cref="StartupState"/>).</summary>
         public string StartupStatePath => Path.Combine(CacheFolder, "DewDrop", "startup.json");
 
+        /// <summary>Which Nexus mod and file installed mods came from (see <see cref="ModSources"/>).</summary>
+        public string ModSourcesPath => Path.Combine(CacheFolder, "DewDrop", "mod-sources.json");
+
         /// <summary>DewDrop's own folder in the cache: scripts the game runs or Steam starts, and their logs.</summary>
         public string ScriptFolder => Path.Combine(CacheFolder, "DewDrop");
 

@@ -42,7 +42,8 @@ namespace DewDrop.UI.Pages
         // Shared by every opening of the menu this session; entries go stale after CacheLifetime
         private static readonly Dictionary<SearchKey, (NexusSearchPage Page, DateTime Fetched)> _cache = new();
         private static readonly TimeSpan CacheLifetime = TimeSpan.FromMinutes(10);
-        private readonly HashSet<int> _installedIds = new();
+        /// <summary>By Nexus mod ID: the installed version to show, and the new update's version when one was found.</summary>
+        private readonly Dictionary<int, (string Version, string? Update)> _installed = new();
         private ModDetailView? _detail;
         private string _query = "";
         private NexusSort _sort = NexusSort.Trending;
@@ -54,6 +55,7 @@ namespace DewDrop.UI.Pages
         private bool _started;
         private bool _adult;
         private int _installedVersion = -1;
+        private int _installedChanges = -1;
         private Rectangle _strip;
         private Rectangle _prevArrow;
         private Rectangle _nextArrow;
@@ -251,25 +253,34 @@ namespace DewDrop.UI.Pages
             Load(page);
         }
 
-        /// <summary>Nexus IDs of installed mods, for the "Installed" tag on cards.</summary>
+        /// <summary>
+        /// Nexus IDs of installed mods, for the "Installed" tag on cards: from their update keys, from what DewDrop
+        /// installed, and from what smapi.io knows them by. Uninstalled mods waiting to be deleted aren't installed.
+        /// </summary>
         private void RefreshInstalled()
         {
-            var installed = ModEntry.Mods.Installed;
-            _installedVersion = installed.GetHashCode();
-            _installedIds.Clear();
-            foreach (var mod in installed)
+            var mods = ModEntry.Mods;
+            _installedVersion = mods.Installed.GetHashCode();
+            _installedChanges = mods.ChangeCount;
+            _installed.Clear();
+
+            // Loose copies first, so a collection copy's version only shows when there's nothing else
+            foreach (var mod in mods.Installed.OrderBy(m => m.SourceId is null ? 0 : 1))
             {
-                if (NexusIdOf(mod) is { } id)
+                var update = mods.HasNewUpdate(mod) ? mod.Update?.Version : null;
+                foreach (var id in mods.Sources.NexusIdsOf(mod))
                 {
-                    _installedIds.Add(id);
+                    if (!_installed.TryGetValue(id, out var shown))
+                    {
+                        _installed[id] = (mod.Version, update);
+                    }
+                    else if (shown.Update is null && update is not null)
+                    {
+                        // Any copy with an update makes the card say so
+                        _installed[id] = (mod.Version, update);
+                    }
                 }
             }
-        }
-
-        /// <summary>An installed mod's Nexus ID. A manifest with "UpdateKeys": null deserializes to a null array, which NexusId would throw on.</summary>
-        internal static int? NexusIdOf(InstalledMod mod)
-        {
-            return mod.Manifest.UpdateKeys is null ? null : mod.NexusId;
         }
 
         // ---------- detail view ----------
@@ -296,8 +307,9 @@ namespace DewDrop.UI.Pages
         {
             _search.Tick();
 
-            // The installed list object is replaced on rescan (e.g. after a download finishes)
-            if (ModEntry.Mods.Installed.GetHashCode() != _installedVersion)
+            // The installed list object is replaced on rescan (e.g. after a download finishes), and an update check can
+            // bring updates and Nexus IDs
+            if (ModEntry.Mods.Installed.GetHashCode() != _installedVersion || ModEntry.Mods.ChangeCount != _installedChanges)
             {
                 RefreshInstalled();
             }
@@ -449,11 +461,28 @@ namespace DewDrop.UI.Pages
             return Tooltip(mod);
         }
 
-        private static string Tooltip(NexusMod mod)
+        private string Tooltip(NexusMod mod)
         {
             var summary = Ui.PlainText(mod.Summary);
             var name = ModDetailView.Clean(mod.Name);
-            return summary.Length > 0 ? $"{name}\n{summary}" : name;
+            var text = summary.Length > 0 ? $"{name}\n{summary}" : name;
+            if (_installed.TryGetValue(mod.ModId, out var installed))
+            {
+                var version = installed.Version.Length > 0 ? $" v{installed.Version}" : "";
+                text += installed.Update is { } update ? $"\n\nInstalled{version}. Update available: v{update}" : $"\n\nInstalled{version}.";
+            }
+            return text;
+        }
+
+        /// <summary>The tag over a card: Installed, or Update when a new version of the installed mod was found.</summary>
+        private (string Text, Color Color)? Tag(NexusMod mod)
+        {
+            if (!_installed.TryGetValue(mod.ModId, out var installed))
+            {
+                return null;
+            }
+
+            return installed.Update is not null ? ("Update", Ui.Attention) : ("Installed", Ui.Good);
         }
 
         // ---------- drawing ----------
@@ -569,7 +598,10 @@ namespace DewDrop.UI.Pages
                 Ui.Fill(b, new Rectangle(cell.X + 8, cell.Y + 8, cell.Width - 16, cell.Height - 16), Ui.Hover);
             }
 
-            var tagWidth = (int)Ui.Small.MeasureString("Installed").X + 24;
+            // The panel's border is 12px deep and its corners bevel in to 20px, so the label keeps 24px from each
+            // side and a border's depth above and below its line
+            var tagWidth = (int)Ui.Small.MeasureString("Installed").X + 48;
+            var tagHeight = Ui.LineHeight() + 24;
             Rectangle picture;
             Rectangle tag;
             int textX, textY, textWidth;
@@ -577,7 +609,7 @@ namespace DewDrop.UI.Pages
             {
                 // Tall card: picture on top, tag over its top-right corner
                 picture = new Rectangle(cell.X + 12, cell.Y + 12, cell.Width - 24, cell.Height - 12 - CardTextHeight);
-                tag = new Rectangle(cell.Right - 8 - tagWidth, cell.Y + 8, tagWidth, 44);
+                tag = new Rectangle(cell.Right - 8 - tagWidth, cell.Y + 8, tagWidth, tagHeight);
                 textX = picture.X + 4;
                 textY = picture.Bottom + 6;
                 textWidth = picture.Width - 8;
@@ -588,7 +620,7 @@ namespace DewDrop.UI.Pages
                 var height = Math.Max(0, cell.Height - 24);
                 var width = Math.Min(Math.Max(cell.Width / 3, tagWidth + 8), height * 16 / 9);
                 picture = new Rectangle(cell.X + 12, cell.Y + 12, width, height);
-                tag = new Rectangle(picture.Center.X - tagWidth / 2, picture.Bottom - 40, tagWidth, 44);
+                tag = new Rectangle(picture.Center.X - tagWidth / 2, picture.Bottom + 4 - tagHeight, tagWidth, tagHeight);
                 textX = picture.Right + 12;
                 textY = cell.Y + 10;
                 textWidth = Math.Max(40, cell.Right - 16 - textX);
@@ -617,10 +649,11 @@ namespace DewDrop.UI.Pages
                 DrawStats(b, mod, textX, textY, textWidth);
             }
 
-            if (_installedIds.Contains(mod.ModId) && tag.X >= cell.X && tag.Bottom <= cell.Bottom)
+            // Sized for "Installed", the longer label, so cards keep their layout either way
+            if (Tag(mod) is { } label && tag.X >= cell.X && tag.Bottom <= cell.Bottom)
             {
                 Ui.Panel(b, tag);
-                Ui.LabelCentered(b, "Installed", tag, Ui.Good);
+                Ui.LabelCentered(b, label.Text, tag, label.Color);
             }
         }
 

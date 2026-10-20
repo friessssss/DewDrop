@@ -18,7 +18,7 @@ namespace DewDrop.Framework
     ///
     /// Commands: skipintro | open | back | click X Y | rclick X Y | hover X Y | key KEYNAME | type TEXT |
     /// scroll N | wait MS | shot PATH | status | quit | ask on|off | steam on|off | steamcheck | marker restarting|arrived|clear |
-    /// unsee ID... | diff
+    /// unsee ID... | diff | uninstall ID | undo ID | removals | sources ID
     /// </summary>
     internal static class DebugBridge
     {
@@ -241,6 +241,50 @@ namespace DewDrop.Framework
                     var d = ModEntry.Mods.Difference();
                     return $"matches={d.Matches} turnedOff=[{string.Join(", ", d.TurnedOff.Select(m => m.UniqueId))}] notLoaded=[{string.Join(", ", d.NotLoaded.Select(m => m.UniqueId))}] " +
                            $"otherCopy=[{string.Join(", ", d.OtherCopy.Select(m => m.UniqueId))}] rejected=[{string.Join(", ", d.Rejected)}]";
+                }
+
+                case "uninstall":
+                {
+                    // The first loose copy, as the Installed tab's trash can would (without the dialog)
+                    var mods = ModEntry.Mods;
+                    var mod = mods.Installed.FirstOrDefault(m => m.SourceId is null && m.UniqueId.Equals(arg.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (mod is null)
+                    {
+                        return "not installed";
+                    }
+                    return mods.Uninstall(mod, out var error) ? $"uninstalled {mod.Folder.FullName}" : $"refused: {error}";
+                }
+
+                case "undo":
+                {
+                    var mods = ModEntry.Mods;
+                    var mod = mods.Removing.FirstOrDefault(m => m.UniqueId.Equals(arg.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (mod is null)
+                    {
+                        return "not uninstalled";
+                    }
+                    return mods.Undo(mod, out var message) ? $"kept {mod.Folder.FullName}: {message}" : message;
+                }
+
+                case "removals":
+                {
+                    var mods = ModEntry.Mods;
+                    return $"removing=[{string.Join(", ", mods.Removing.Select(m => m.UniqueId))}] stillLoaded=[{string.Join(", ", mods.RemovingLoaded().Select(m => m.UniqueId))}] " +
+                           $"queued=[{string.Join(", ", mods.Pending.Removals().Select(s => $"{s.UniqueId}@{s.Target}"))}]";
+                }
+
+                case "sources":
+                {
+                    // What DewDrop knows about where a mod came from on Nexus
+                    var mods = ModEntry.Mods;
+                    var mod = mods.Installed.FirstOrDefault(m => m.UniqueId.Equals(arg.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (mod is null)
+                    {
+                        return "not installed";
+                    }
+                    var install = mods.Sources.InstallOf(mod.UniqueId);
+                    return $"nexus=[{string.Join(", ", mods.Sources.NexusIdsOf(mod))}] install={(install is null ? "none" : $"{install.ModId}/{install.FileId} v{install.Version}")} " +
+                           $"copies={mods.OtherLooseCopies(mod).Count + 1}";
                 }
 
                 default:

@@ -23,12 +23,21 @@ namespace DewDrop.UI.Pages
         private const int CompactRowHeight = 64;
         private const string ReadOnlyNotice = "This collection profile is read-only. Duplicate it on the Profiles tab to change it.";
 
+        /// <summary>The trash can is drawn at half the inventory's size, which fits the slimmer rows.</summary>
+        private const float TrashScale = 2f;
+        private const int TrashWidth = 44;
+
         private readonly TextInput _search = new("Search installed mods");
         private readonly UiButton _filterButton;
         private readonly UiButton _checkUpdates;
         private readonly UiButton _rescan;
         private readonly ScrollList<InstalledMod> _list = new(RowHeight);
         private readonly Dictionary<InstalledMod, UiButton> _updateButtons = new();
+        private readonly Dictionary<InstalledMod, UiButton> _undoButtons = new();
+
+        /// <summary>Where each row's trash can was last drawn, for clicks and hover.</summary>
+        private readonly Dictionary<InstalledMod, Rectangle> _trashCans = new();
+        private InstalledMod? _hoveredTrash;
         private Filter _filter = Filter.All;
         private int _listVersion = -1;
         private Rectangle _noticeBanner;
@@ -133,9 +142,7 @@ namespace DewDrop.UI.Pages
 
             if (query.Length > 0)
             {
-                items = items.Where(m => m.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
-                    || m.Author.Contains(query, StringComparison.OrdinalIgnoreCase)
-                    || m.UniqueId.Contains(query, StringComparison.OrdinalIgnoreCase));
+                items = items.Where(m => Matches(m, query));
             }
 
             items = _filter switch
@@ -143,13 +150,30 @@ namespace DewDrop.UI.Pages
                 Filter.Enabled => items.Where(mods.IsEnabled),
                 Filter.Disabled => items.Where(m => !mods.IsEnabled(m)),
                 Filter.Updates => items.Where(m => HasNewUpdate(m)),
-                Filter.Problems => items.Where(m => mods.IsEnabled(m) && mods.MissingDependencies(m).Count > 0),
+                Filter.Problems => items.Where(m => (mods.IsEnabled(m) && mods.MissingDependencies(m).Count > 0) || mods.OtherLooseCopies(m).Count > 0),
                 _ => items
             };
+
+            // Uninstalled mods stay listed in every view, with Undo, until the game closes and their folders go, so a
+            // row doesn't vanish from the filter it was uninstalled in
+            var removing = mods.Removing.Where(m => query.Length == 0 || Matches(m, query)).ToList();
+            if (removing.Count > 0)
+            {
+                items = items.Concat(removing).OrderBy(m => m.Name, StringComparer.OrdinalIgnoreCase);
+            }
 
             _list.SetItems(items, resetScroll);
             _listVersion = mods.Installed.GetHashCode();
             _updateButtons.Clear();
+            _undoButtons.Clear();
+            _trashCans.Clear();
+        }
+
+        private static bool Matches(InstalledMod mod, string query)
+        {
+            return mod.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || mod.Author.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || mod.UniqueId.Contains(query, StringComparison.OrdinalIgnoreCase);
         }
 
         private void CycleFilter()
@@ -267,6 +291,25 @@ namespace DewDrop.UI.Pages
                 return;
             }
 
+            if (_undoButtons.TryGetValue(mod, out var undo) && undo.TryClick(x, y))
+            {
+                return;
+            }
+
+            // An uninstalled mod's row only offers Undo; its checkbox is gone
+            if (ModEntry.Mods.Removing.Contains(mod))
+            {
+                ModEntry.Toast($"{mod.Name} is uninstalled. Click Undo to keep it.");
+                Game1.playSound("cancel");
+                return;
+            }
+
+            if (_trashCans.TryGetValue(mod, out var trash) && trash.Contains(x, y))
+            {
+                UninstallPrompt.Show(Menu, new[] { mod }, onDone: () => Refresh());
+                return;
+            }
+
             if (_updateButtons.TryGetValue(mod, out var update) && update.TryClick(x, y))
             {
                 return;
@@ -274,6 +317,16 @@ namespace DewDrop.UI.Pages
 
             Toggle(mod);
         }
+
+        private void Undo(InstalledMod mod)
+        {
+            var kept = ModEntry.Mods.Undo(mod, out var message);
+            ModEntry.Toast(message, error: !kept);
+            Refresh();
+        }
+
+        /// <summary>Rows that get a trash can: not DewDrop itself, and not a copy a Stardrop collection owns.</summary>
+        private static bool OffersUninstall(InstalledMod mod) => mod.SourceId is null && !ModEntry.Mods.IsLocked(mod);
 
         private void Toggle(InstalledMod mod)
         {
@@ -343,11 +396,12 @@ namespace DewDrop.UI.Pages
             _checkUpdates.Hover(x, y);
             _rescan.Hover(x, y);
             _list.Hover(x, y);
-            foreach (var button in _updateButtons.Values)
+            foreach (var button in _updateButtons.Values.Concat(_undoButtons.Values))
             {
                 button.Hover(x, y);
             }
 
+            _hoveredTrash = null;
             if (_rescan.HoverText(x, y) is { } rescanTip)
             {
                 return rescanTip;
@@ -363,6 +417,17 @@ namespace DewDrop.UI.Pages
                 return null;
             }
 
+            if (_undoButtons.TryGetValue(mod, out var undo) && undo.Contains(x, y))
+            {
+                return undo.Tooltip;
+            }
+
+            if (_trashCans.TryGetValue(mod, out var trash) && trash.Contains(x, y))
+            {
+                _hoveredTrash = mod;
+                return ModEntry.Mods.UninstallBlockedReason(mod) ?? $"Uninstall {mod.Name}. Its folder is deleted when the game closes.";
+            }
+
             if (_updateButtons.TryGetValue(mod, out var update) && update.Contains(x, y))
             {
                 return update.Tooltip;
@@ -373,7 +438,12 @@ namespace DewDrop.UI.Pages
 
         private static string Tooltip(InstalledMod mod)
         {
+            var mods = ModEntry.Mods;
             var lines = new List<string> { mod.Name };
+            if (mods.Removing.Contains(mod))
+            {
+                lines.Add("Uninstalled. Its folder is deleted when the game closes.");
+            }
             var description = Ui.PlainText(mod.Description);
             if (description.Length > 0)
             {
@@ -390,6 +460,12 @@ namespace DewDrop.UI.Pages
                 lines.Add($"From collection {mod.SourceId}");
             }
             lines.Add($"Folder: {mod.Folder.Name}");
+
+            // SMAPI loads neither copy, so the player needs to know where the other one is to remove it
+            foreach (var other in mods.OtherLooseCopies(mod))
+            {
+                lines.Add($"Also installed in: {other.Folder.Name}{(other.Version.Length > 0 ? $" (v{other.Version})" : "")}");
+            }
             return string.Join("\n", lines);
         }
 
@@ -403,6 +479,13 @@ namespace DewDrop.UI.Pages
 
             var enabledCount = mods.Installed.Count(mods.IsEnabled);
             var summary = $"{mods.Installed.Count} installed, {enabledCount} on";
+
+            // The uninstalled count only when it fits; the rows themselves say so too
+            var longer = $"{summary}, {mods.Removing.Count} to delete";
+            if (mods.Removing.Count > 0 && _rescan.Bounds.X - 24 - Ui.Small.MeasureString(longer).X > _filterButton.Bounds.Right + 16)
+            {
+                summary = longer;
+            }
             var summarySize = Ui.Small.MeasureString(summary);
             var summaryX = _rescan.Bounds.X - 24 - summarySize.X;
             if (summaryX > _filterButton.Bounds.Right + 16)
@@ -421,13 +504,32 @@ namespace DewDrop.UI.Pages
         private void DrawRow(SpriteBatch b, InstalledMod mod, Rectangle cell, bool hovered)
         {
             var mods = ModEntry.Mods;
+            if (mods.Removing.Contains(mod))
+            {
+                DrawRemovingRow(b, mod, cell);
+                return;
+            }
+
             var enabled = mods.IsEnabled(mod);
             var locked = mods.IsLocked(mod) || !mods.CanEditActiveProfile;
 
             Ui.Checkbox(b, new Vector2(cell.X + 12, cell.Center.Y - Ui.CheckboxSize / 2), enabled, !locked);
 
-            // Right-hand side: update button, then status notes, measured first so the name can use the rest
+            // Right-hand side: the trash can in a column of its own (left empty where there's none, so they line up),
+            // then the update button and status notes, measured first so the name can use the rest
             var right = cell.Right - 12;
+            if (OffersUninstall(mod) && cell.Height >= Ui.TrashCan.Height * TrashScale)
+            {
+                var trash = new Rectangle(right - TrashWidth, cell.Center.Y - (int)(Ui.TrashCan.Height * TrashScale) / 2, TrashWidth, (int)(Ui.TrashCan.Height * TrashScale));
+                _trashCans[mod] = trash;
+                Ui.TrashCanIcon(b, new Vector2(trash.X + (TrashWidth - Ui.TrashCan.Width * TrashScale) / 2, trash.Y), TrashScale, open: _hoveredTrash == mod);
+            }
+            else
+            {
+                _trashCans.Remove(mod);
+            }
+            right -= TrashWidth + 16;
+
             if (mods.HasNewUpdate(mod) && mod.Update is { } update)
             {
                 if (!_updateButtons.TryGetValue(mod, out var button))
@@ -464,7 +566,43 @@ namespace DewDrop.UI.Pages
             var textWidth = Math.Max(80, right - textX);
             var nameColor = enabled ? Ui.Text : Ui.Muted;
             Ui.Label(b, Ui.Ellipsize(mod.Name, textWidth), new Vector2(textX, cell.Y + (compact ? 2 : 8)), nameColor);
+            DrawDetails(b, mod, cell, textX, textWidth);
+        }
 
+        /// <summary>An uninstalled mod waiting for the game to close: no checkbox, a note, and Undo.</summary>
+        private void DrawRemovingRow(SpriteBatch b, InstalledMod mod, Rectangle cell)
+        {
+            _trashCans.Remove(mod);
+            _updateButtons.Remove(mod);
+            if (!_undoButtons.TryGetValue(mod, out var undo))
+            {
+                undo = new UiButton("Undo", () => Undo(mod))
+                {
+                    Tooltip = "Keep this mod. If uninstalling turned it off, it's turned back on."
+                };
+                _undoButtons[mod] = undo;
+            }
+
+            var right = cell.Right - 12;
+            undo.AtRight(right, cell.Center.Y - undo.PreferredHeight / 2);
+            undo.Draw(b);
+            right = undo.Bounds.X - 16;
+
+            const string note = "Deleted when the game closes";
+            var size = Ui.Small.MeasureString(note);
+            Ui.Label(b, note, new Vector2(right - size.X, cell.Center.Y - size.Y / 2), Ui.Attention);
+            right -= (int)size.X + 16;
+
+            var compact = cell.Height < RowHeight;
+            var textX = cell.X + 12 + Ui.CheckboxSize + 20;
+            var textWidth = Math.Max(80, right - textX);
+            Ui.Label(b, Ui.Ellipsize(mod.Name, textWidth), new Vector2(textX, cell.Y + (compact ? 2 : 8)), Ui.Muted);
+            DrawDetails(b, mod, cell, textX, textWidth);
+        }
+
+        private static void DrawDetails(SpriteBatch b, InstalledMod mod, Rectangle cell, int textX, int textWidth)
+        {
+            var compact = cell.Height < RowHeight;
             var details = new List<string>();
             if (mod.Author.Length > 0)
             {
@@ -492,6 +630,12 @@ namespace DewDrop.UI.Pages
             if (mods.HasPendingUpdate(mod))
             {
                 return ("Update ready, restart to finish", Ui.Good);
+            }
+
+            // SMAPI skips every copy of a mod that's in the Mods folder twice; the tooltip says where the other one is
+            if (mods.OtherLooseCopies(mod).Count > 0)
+            {
+                return ("Installed twice", Ui.Bad);
             }
 
             if (enabled)
