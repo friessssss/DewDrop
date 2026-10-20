@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>DewDrop</AssemblyName>
     <RootNamespace>DewDrop</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <EnableHarmony>true</EnableHarmony>
     <ModFolderName>DewDrop</ModFolderName>
     <BundleExtraAssemblies>ThirdParty</BundleExtraAssemblies>
