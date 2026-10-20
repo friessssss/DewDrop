@@ -9,17 +9,31 @@ The installer does the fiddly parts for you. It finds your game, installs or upd
 
 Before you start, check [What you need](../requirements.md). The installer has been tested on Windows and Linux, but not on macOS yet (see [Platform support](../../reference/platform-support.md)).
 
-## The quick way on macOS and Linux
+## The quick way: one line
 
+Paste one line and the installer does everything else. It downloads the installer for your system and the latest DewDrop release, and runs it in that window. Nothing is blocked this way, so there's no **Windows protected your PC** or **Privacy & Security** step. Then [answer the questions](#answer-the-questions) and [start the game](#start-the-game) as in the steps below.
+
+{% tabs %}
+{% tab title="Windows" %}
+Open **PowerShell** (click **Start**, type `PowerShell` and press **Enter**), paste this line and press **Enter**:
+
+```powershell
+irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex
+```
+
+From Command Prompt instead: `powershell -c "irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex"`.
+{% endtab %}
+
+{% tab title="macOS and Linux" %}
 Open **Terminal** (on a Mac, press **Command + Space**, type `Terminal` and press **Return**), paste this line and press **Return**:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
 ```
+{% endtab %}
+{% endtabs %}
 
-It checks whether you're on macOS or Linux, downloads the installer and the latest DewDrop release, and runs the installer in that window. macOS doesn't block it, so there's nothing to allow in **Privacy & Security**. Then [answer the questions](#answer-the-questions) and [start the game](#start-the-game) as in the steps below.
-
-To pass [installer options](../../reference/installer-options.md), put them after `bash -s --`, for example `... | bash -s -- --dry-run`.
+To pass [installer options](../../reference/installer-options.md), see [Running it from the command line](../../reference/installer-options.md).
 
 ## Install in five steps
 

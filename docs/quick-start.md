@@ -31,7 +31,7 @@ Download `DewDrop-<version>-installer.zip` from the [latest DewDrop release](htt
 
 Open the `DewDrop <version> installer` folder (on Windows, it's inside the `DewDrop-<version>-installer` folder) and double-click the file for your computer:
 
-* **Windows:** **Install on Windows** (`Install on Windows.bat`). If you see **Windows protected your PC**, click **More info**, then **Run anyway**.
+* **Windows:** **Install on Windows** (`Install on Windows.bat`). Or skip the download: open **PowerShell**, paste `irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex` and press **Enter**. If you see **Windows protected your PC**, click **More info**, then **Run anyway**.
 * **macOS:** `Install on macOS.command`. Or skip the download: open **Terminal**, paste `curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash` and press **Return**. If macOS won't open the `.command`, click **Done** (not **Move to Trash**). Then go to **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. (Older macOS: right-click it and choose **Open**.)
 * **Linux:** `Install on Linux.sh`. If it opens in a text editor, right-click an empty spot in the folder, choose **Open in Terminal**, type `bash "Install on Linux.sh"` and press **Enter**.
 

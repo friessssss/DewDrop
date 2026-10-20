@@ -10,9 +10,13 @@ you don't have it yet, and puts DewDrop in your Mods folder.
 
 How to install
 --------------
-On macOS or Linux, the quickest way is to skip this zip: open Terminal, paste this line and press Return.
+The quickest way is to skip this zip and paste one line:
 
-  curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
+  Windows (in PowerShell)
+    irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex
+
+  macOS or Linux (in Terminal)
+    curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
 
 Otherwise, first extract this zip (right-click > Extract All on Windows; double-click on macOS). Then:
 

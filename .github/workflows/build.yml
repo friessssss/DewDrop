@@ -72,13 +72,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Check install.ps1 parses in Windows PowerShell and is plain ASCII
+    - name: Check the install.ps1 scripts parse in Windows PowerShell and are plain ASCII
       shell: powershell
       run: |
-        $errors = $null
-        [void][System.Management.Automation.Language.Parser]::ParseFile("$PWD\installer\internal\install.ps1", [ref]$null, [ref]$errors)
-        if ($errors) { $errors; exit 1 }
-        if ([IO.File]::ReadAllBytes("$PWD\installer\internal\install.ps1") | Where-Object { $_ -gt 127 }) { 'install.ps1 must be plain ASCII'; exit 1 }
+        foreach ($file in @("$PWD\installer\internal\install.ps1", "$PWD\install.ps1")) {
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$null, [ref]$errors)
+          if ($errors) { $errors; exit 1 }
+          if ([IO.File]::ReadAllBytes($file) | Where-Object { $_ -gt 127 }) { "$file must be plain ASCII"; exit 1 }
+        }
     - name: Test install.ps1
       shell: powershell
       run: .\installer\tests\install-ps1.test.ps1
