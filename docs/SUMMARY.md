@@ -59,6 +59,7 @@
 
 * [Contributing](contributing/README.md "Overview")
 * [Building from source](contributing/building.md)
+* [Releasing](contributing/releasing.md)
 * [The debug bridge](contributing/debug-bridge.md)
 * [Docs and art style](contributing/docs-and-art.md)
 * [Latest release](https://github.com/friessssss/DewDrop/releases/latest)

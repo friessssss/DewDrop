@@ -7,7 +7,10 @@
 // The installer zip is written by hand rather than with Compress-Archive so the macOS and Linux launchers keep
 // their executable bit; without it, double-clicking them fails.
 //
-// Usage: node tools/package-release.mjs [--no-build]
+// Usage: node tools/package-release.mjs [--no-build] [--game-path=<folder>]
+//
+// --game-path builds against another game folder than the one DewDrop.Mod.csproj finds, such as the reference
+// assemblies CI uses in place of a game install (see docs/contributing/releasing.md).
 
 import { spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
@@ -18,6 +21,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = new Set(process.argv.slice(2));
+// On Windows dotnet runs through the shell, which splits an argument at its spaces unless it's quoted
+const shellArg = (arg) => (process.platform === 'win32' && arg.includes(' ') ? `"${arg}"` : arg);
+const gamePath = process.argv.find((a) => a.startsWith('--game-path='))?.slice('--game-path='.length);
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'DewDrop.Mod/manifest.json'), 'utf8'));
 const version = manifest.Version;
@@ -30,7 +36,7 @@ if (csprojVersion && csprojVersion !== version) {
 
 if (!args.has('--no-build')) {
   console.log(`Building DewDrop ${version} (Release, no deploy)...`);
-  const build = spawnSync('dotnet', ['build', 'DewDrop.Mod/DewDrop.Mod.csproj', '-c', 'Release', '-p:EnableModDeploy=false', '-nologo', '-v:q'], {
+  const build = spawnSync('dotnet', ['build', 'DewDrop.Mod/DewDrop.Mod.csproj', '-c', 'Release', '-p:EnableModDeploy=false', ...(gamePath ? [shellArg(`-p:GamePath=${path.resolve(gamePath)}`)] : []), '-nologo', '-v:q'], {
     cwd: root,
     stdio: 'inherit',
     shell: process.platform === 'win32',

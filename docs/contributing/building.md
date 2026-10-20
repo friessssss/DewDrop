@@ -115,17 +115,20 @@ The bridge lets any program on your computer control the title screen, and that 
 
 ## What CI checks
 
-The workflow in `.github/workflows/build.yml` runs on every push to `development`, on every pull request, and when started by hand. It has three jobs:
+The workflow in `.github/workflows/build.yml` runs on every push to `development`, on every pull request, and when started by hand. It has four jobs:
 
-* **`build`** builds **only `DewDrop.Core`**, on Ubuntu with .NET 6, because `DewDrop.Mod` can't build without a Stardew Valley install. Then it runs the [unit tests](#run-the-unit-tests). On Ubuntu, `RelauncherScriptTests` pass without running the script.
+* **`build`** builds `DewDrop.Core` on Ubuntu with .NET 6 and runs the [unit tests](#run-the-unit-tests). On Ubuntu, `RelauncherScriptTests` pass without running the script.
+* **`build-mod`** builds and packages `DewDrop.Mod` exactly as a release is, against metadata-only reference assemblies of the game and SMAPI (the runner has no game install), and attaches both zips to the run. See [Releasing](releasing.md#how-ci-builds-the-mod-without-the-game).
 * **`installer-unix`** runs on Ubuntu and on macOS (which ships bash 3.2). It checks the syntax of `install.sh` and both launchers, then runs `installer/tests/install-sh.test.sh`.
 * **`installer-windows`** checks that `install.ps1` parses in Windows PowerShell and is plain ASCII, then runs `installer/tests/install-ps1.test.ps1`.
 
-So CI doesn't catch mistakes in `DewDrop.Mod`. Build the whole solution and test in the game before you open a pull request. CI doesn't make release zips either; you make them on your own computer, as described below.
+CI can't play the game, though, so still test your change in the game before you open a pull request. Pull requests into `master` also run a version check, and merging one publishes a release: see [Releasing](releasing.md).
 
 ## Packaging a release
 
-1. Set the new version in **both** `DewDrop.Mod/manifest.json` (`"Version"`) and `DewDrop.Mod/DewDrop.Mod.csproj` (`<Version>`). Nothing syncs them for you, and the packaging script stops if they differ.
+Releases are built and published by CI (see [Releasing](releasing.md)), with the same script you can run yourself, for example to test the installer zip:
+
+1. To change the version, run `node tools/bump-version.mjs patch` (or `minor`, `major`, or an exact version). It sets `DewDrop.Mod/manifest.json` and `DewDrop.Mod/DewDrop.Mod.csproj` together; the packaging script stops if they differ.
 2. Run the packaging script from the repo folder:
 
    ```bash
@@ -139,7 +142,7 @@ The script:
 * writes two files to `artifacts/release/<version>/`, a folder git ignores;
 * prints each file's path, size and SHA-256 hash.
 
-Add `--no-build` to reuse the Release zip you already built. The fresh Release `DewDrop.dll` must still be next to it, or the script stops.
+Add `--no-build` to reuse the Release zip you already built. The fresh Release `DewDrop.dll` must still be next to it, or the script stops. Add `--game-path=<folder>` to build against another game folder than the one the project finds, such as the reference assemblies CI uses.
 
 | File | What's inside | Who it's for |
 | --- | --- | --- |
@@ -160,11 +163,11 @@ The script builds the installer zip byte by byte rather than with `Compress-Arch
 
 ### Publishing
 
-1. Create a release at [github.com/friessssss/DewDrop/releases](https://github.com/friessssss/DewDrop/releases) and attach both zips.
-2. Keep the plain zip's name in the form `DewDrop-<version>.zip`. When `install.ps1` or `install.sh` runs without a bundled copy, it downloads the mod from the latest release and looks for an asset with that name.
-3. Publish it as a normal release, not a draft or pre-release. GitHub's "latest release", which the installer asks for, skips both.
+CI publishes releases when `development` is merged into `master`: see [Releasing](releasing.md). It keeps the conventions the installer and the update check rely on:
 
-DewDrop's manifest has the update key `GitHub:friessssss/DewDrop`, so SMAPI and DewDrop's own update check (both through smapi.io) tell players about a new release. Tag each release with its version number, the same as `Version` in `manifest.json` (for example `0.2.0`), so the check can compare versions. See [Updating DewDrop](../getting-started/updating-dewdrop.md).
+* The plain zip is named `DewDrop-<version>.zip`. When `install.ps1` or `install.sh` runs without a bundled copy, it downloads the mod from the latest release and looks for an asset with that name.
+* Releases are normal releases, not drafts. GitHub's "latest release", which the installer asks for, skips drafts and pre-releases.
+* The tag is the version number, the same as `Version` in `manifest.json` (for example `0.2.0`). DewDrop's manifest has the update key `GitHub:friessssss/DewDrop`, so SMAPI and DewDrop's own update check (both through smapi.io) compare that tag with installed versions. See [Updating DewDrop](../getting-started/updating-dewdrop.md).
 
 ### Testing the installer
 
