@@ -1102,7 +1102,7 @@ namespace DewDrop.Framework
             }
 
             // Checked before any link is cleared: without SMAPI the game would close and never come back
-            if (!File.Exists(Relauncher.LauncherPath(Constants.GamePath)))
+            if (!File.Exists(ProfileStart.RestartLauncherPath))
             {
                 error = "Didn't restart: SMAPI isn't in your game folder. Run the DewDrop installer (or SMAPI's) to put it back.";
                 return false;
@@ -1133,7 +1133,14 @@ namespace DewDrop.Framework
 
             try
             {
-                Relauncher.Schedule(Constants.GamePath, Paths.SelectedModsFolder, Pending.FilePath, Path.Combine(Paths.CacheFolder, "DewDrop"), _log, record.Id);
+                if (ProfileStart.UsesSteamLauncher)
+                {
+                    Relauncher.ScheduleThroughLauncher(Paths.SteamLauncherPath, Constants.GamePath, Paths.ScriptFolder, record.Id, _log);
+                }
+                else
+                {
+                    Relauncher.Schedule(Constants.GamePath, Paths.SelectedModsFolder, Pending.FilePath, Paths.ScriptFolder, _log, record.Id);
+                }
             }
             catch (Exception ex)
             {

@@ -27,4 +27,9 @@
     <ProjectReference Include="..\DewDrop.Core\DewDrop.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Steam's launcher on Linux and the Steam Deck; the installer and the mod copy it to the data folder -->
+    <None Include="assets\steam-launch.sh" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

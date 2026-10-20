@@ -5,22 +5,22 @@ icon: users
 
 # Profiles
 
-A profile is a list of which of your installed mods are turned on. You can keep several, for example one for your main farm, one for co-op with friends and one with almost nothing turned on, and switch between them on the **Profiles** tab.
+A profile is a list of which of your installed mods are turned on. You can keep several, for example one for your main farm, one for co-op with friends and one with almost nothing on, and switch between them on the **Profiles** tab.
 
-Profiles never move or delete mods. Every mod stays installed in your `Mods` folder. A profile only decides which of them load when the game starts in it, such as after **Apply & Restart**, or from Steam's **Play** button with [**Start in my profile from Steam**](start-in-your-profile.md) on.
+Profiles never move or delete mods. Every mod stays installed in your `Mods` folder. A profile only decides which of them load when the game starts in it: after **Apply & Restart**, or from Steam's **Play** button with [**Start in my profile from Steam**](start-in-your-profile.md) on.
 
 <figure><img src="../.gitbook/assets/shot-profiles.png" alt="The Profiles tab of the DewDrop menu: a name box, a Create button and the list of profiles on the left, and the selected profile's buttons and mods on the right"><figcaption><p>The Profiles tab.</p></figcaption></figure>
 
 ## The Profiles tab
 
-The left side has a **New profile name** box, a **Create** button and your profiles, with **Default** at the top and collection profiles at the bottom. A gold star marks the active profile, the one the bottom bar names after **Profile:**. Under each name you'll see how many mods it turns on, plus tags such as **active**, **protected** or **collection, read-only**.
+The left side has a **New profile name** box, a **Create** button and your profiles, with **Default** at the top and collection profiles at the bottom. A gold star marks the active profile, the one the bottom bar names after **Profile:**. Under each name is how many mods it turns on, plus tags such as **active**, **protected** or **collection, read-only**.
 
-Click a profile, or move through the list with **Up** and **Down**, to see it on the right: whether it's active, the buttons **Use this profile**, **Duplicate**, **Rename** and **Delete**, and the mods it turns on. That mod list is only for looking; you change a profile's mods on the [Installed tab](installed.md). If a button is grayed out, hover over it to see why.
+Click a profile, or move through the list with **Up** and **Down**, to see it on the right: whether it's active, the buttons **Use this profile**, **Duplicate**, **Rename** and **Delete**, and the mods it turns on. That list is only for looking: you change a profile's mods on the [Installed](installed.md) tab. If a button is grayed out, point at it to see why.
 
 ## Make a new profile
 
 1. Type a name in the **New profile name** box.
-2. Click **Create**, or press **Enter**.
+2. Click **Create**, or press **Enter**. A message says "Created '*name*'. Use it, then pick its mods on the Installed tab."
 3. With the new profile selected, click **Use this profile**.
 4. Go to the **Installed** tab and tick the mods you want.
 5. Click [**Apply & Restart**](apply-and-restart.md) to load them.
@@ -28,16 +28,16 @@ Click a profile, or move through the list with **Up** and **Down**, to see it on
 A new profile starts with only DewDrop turned on, so the **Mods** button is still there after the restart.
 
 {% hint style="info" %}
-You can only change the mods of the active profile. To change a different profile, select it and click **Use this profile** first.
+You can only change the mods of the active profile. To change another profile, select it and click **Use this profile** first.
 {% endhint %}
 
 ## Switch profiles
 
-Select a profile and click **Use this profile**. DewDrop remembers your choice straight away, but the mods you're playing with don't change until you click **Apply & Restart**. A message tells you whether a restart is needed.
+Select a profile and click **Use this profile**. DewDrop remembers your choice straight away, but the mods you're playing with don't change until you click **Apply & Restart**. The message says which applies: "Switched to *name*. Restart to load its mods." or "Switched to *name*. Its mods are already loaded."
 
 ## Duplicate a profile
 
-**Duplicate** makes a copy you can change without touching the original. It's also the way to get an editable version of a collection profile.
+**Duplicate** makes a copy you can change without touching the original. It's also how you get an editable version of a collection profile.
 
 1. Select the profile you want to copy.
 2. Type a name for the copy in the **New profile name** box, or leave the box empty to get a name like "Default copy".
@@ -56,7 +56,7 @@ You can't rename **Default**, collection profiles, or a profile whose file could
 Select the profile, click **Delete**, then click **Delete** again in the dialog. You can't delete the active profile (switch to another one first), **Default**, or collection profiles.
 
 {% hint style="danger" %}
-Deleting a profile is permanent. It doesn't go to the Recycle Bin, and there's no undo. Only the profile's file is deleted: the mods themselves stay installed. Stardrop shares your profiles, so the profile is gone there too.
+Deleting a profile is permanent. It doesn't go to the Recycle Bin or Trash, and there's no undo. Only the profile's file is deleted: the mods themselves stay installed. Stardrop shares your profiles, so the profile is gone there too.
 {% endhint %}
 
 ## The Default profile
@@ -77,7 +77,7 @@ DewDrop keeps itself turned on in every profile, so the **Mods** button is alway
 
 ## Profiles are shared with Stardrop
 
-Each profile is one `.json` file in Stardrop's data folder. On Windows that's `%AppData%\Stardrop\Data\Profiles`. DewDrop and Stardrop read the same files, so a profile you make or change in one shows up in the other. See [Where DewDrop keeps files](../reference/file-locations.md).
+Each profile is one `.json` file in the `Profiles` folder of Stardrop's data folder: `%AppData%\Stardrop\Data\Profiles` on Windows, and `~/.config/Stardrop/Data/Profiles` on macOS and Linux. DewDrop and Stardrop read the same files, so a profile you make or change in one shows up in the other. See [Where DewDrop keeps files](../reference/file-locations.md).
 
 Notes you added to mods in Stardrop show in the tooltips of a profile's mod list. DewDrop can't edit them.
 
@@ -85,6 +85,6 @@ Notes you added to mods in Stardrop show in the tooltips of a profile's mod list
 
 <summary>A profile says some mods are "not installed". What does that mean?</summary>
 
-The profile turns on mods that aren't in your `Mods` folder, maybe because you deleted them or the profile came from someone else. They show in red in the profile's mod list. DewDrop skips them when it restarts the game, and the others load as normal. Install them again if you want them back.
+The profile turns on mods that aren't in your `Mods` folder, maybe because you deleted or uninstalled them, or the profile came from someone else. They show in red in the profile's mod list. DewDrop skips them when it restarts the game, and the others load as normal. Install them again if you want them back.
 
 </details>

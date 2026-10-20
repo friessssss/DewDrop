@@ -5,7 +5,7 @@ icon: list-check
 
 # Managing your mods
 
-The **Installed** tab lists every mod DewDrop found in your `Mods` folder, sorted by name. A tick in a mod's checkbox means it's on in your active profile. This is where the menu opens every time.
+The **Installed** tab lists every mod in your `Mods` folder, sorted by name. A tick means the mod is on in your active profile. The menu always opens on this tab.
 
 <figure><img src="../.gitbook/assets/shot-installed.png" alt="DewDrop's Installed tab: a search box, the Show: All filter button, Rescan and Check for updates along the top, then a list of mods, each with a checkbox, its name, author and version, and a trash can at the right of each row except DewDrop's own"><figcaption><p>The Installed tab.</p></figcaption></figure>
 
@@ -13,21 +13,21 @@ The **Installed** tab lists every mod DewDrop found in your `Mods` folder, sorte
 
 1. Click anywhere on the mod's row. The checkbox ticks or unticks.
 2. Do the same for any other mods you want to change.
-3. When you're done, click **Apply & Restart** in the bottom-right corner to restart the game with your changes.
+3. Click **Apply & Restart** in the bottom-right corner to restart the game with your changes.
 
-DewDrop saves each change to your profile straight away. Nothing is deleted when you turn a mod off: its folder stays where it is, and you can turn it back on any time. To get rid of a mod for good, [uninstall it](#uninstall-a-mod).
+DewDrop saves each change to your profile straight away. Turning a mod off deletes nothing: its folder stays, and you can turn it back on any time. To get rid of a mod, [uninstall it](#uninstall-a-mod).
 
-When you turn a mod on, DewDrop also turns on any mods it needs that you already have installed. A message tells you which, for example "Also turned on what it needs: Content Patcher".
+When you turn a mod on, DewDrop also turns on the installed mods it needs, and says so: "Also turned on what it needs: Content Patcher".
 
-You can't turn DewDrop itself off. If you try, it reminds you: "DewDrop has to stay on so this menu is here next time."
+DewDrop itself always stays on. Clicking its row says "DewDrop has to stay on so this menu is here next time."
 
 {% hint style="info" %}
-Your changes load the next time the game starts in your profile: after **Apply & Restart**, or, with **Start in my profile from Steam** on, from Steam's **Play** button. Any other launch, such as a desktop shortcut, loads every mod in your `Mods` folder, including the ones you turned off. DewDrop then offers on the title screen to restart into your profile, or you can click **Apply & Restart**. See [Start in your profile](start-in-your-profile.md) and [How launching works](../getting-started/launching.md).
+Changes load the next time the game starts in your profile: after **Apply & Restart**, or from Steam's **Play** button with **Start in my profile from Steam** on. A desktop shortcut, for example, loads every mod in your `Mods` folder, including the ones you turned off, and DewDrop then offers on the title screen to restart into your profile. See [How launching works](../getting-started/launching.md) and [Start in your profile](start-in-your-profile.md).
 {% endhint %}
 
 ## Find a mod
 
-**Search.** Type in the **Search installed mods** box. The list filters as you type, and matches a mod's name, author or unique ID. Capital letters don't matter.
+**Search.** Type in the **Search installed mods** box. The list filters as you type, matching a mod's name, author or unique ID. Capital letters don't matter.
 
 **Filter.** Click the **Show:** button to step through these views. The search and the filter work together.
 
@@ -37,85 +37,69 @@ Your changes load the next time the game starts in your profile: after **Apply &
 | **Show: Enabled** | Mods that are on in your profile. |
 | **Show: Disabled** | Mods that are off. |
 | **Show: Updates** | Mods with a new update you haven't downloaded yet. |
-| **Show: Problems** | Mods that are on but need a mod that's missing or turned off, and mods [installed twice](#mods-installed-twice). |
+| **Show: Problems** | Mods that are on but need a mod that's missing or off, and mods [installed twice](#mods-installed-twice). |
 
-Click again after **Show: Problems** to get back to **Show: All**. If nothing matches, the list says "No mods match."
+After **Show: Problems**, the next click goes back to **Show: All**. If nothing matches, the list says "No mods match."
 
-Mods you've uninstalled stay in every **Show:** view until the game closes, and in a search when they match it. See [Uninstall a mod](#uninstall-a-mod).
-
-When there's room, the toolbar also shows a count, such as "42 installed, 30 on". While mods you uninstalled are waiting to be deleted, it can add how many, such as "36 installed, 11 on, 1 to delete".
-
-## Added or removed a mod by hand?
-
-DewDrop looks through your `Mods` folder when the game starts. A mod you copied in while the game was closed is turned **on** in your active profile then, as long as **Turn on mods when installed** is on, which it is by default. The next time you open the menu, a message lists them: "Turned on *mods*, new in your Mods folder." If a mod didn't load this time, for example because the game started in your profile, its row says **On after restart**.
-
-If you copy a mod in (or delete one) while the game is running, click **Rescan**. New mods are turned on the same way, and a message says what changed, for example "Found 1 new mod: *name*. Restart to load it." If a new mod is still off, for example because **Turn on mods when installed** is off, the message says "Turn it on, then restart to load it." instead.
-
-* Only mods DewDrop has never seen before are turned on. A mod you've turned on or off before keeps your choice, even if you move it to another folder or extract it again.
-* Mods from Stardrop collections are never turned on this way, and a collection profile is never changed, because it's read-only.
-* With **Turn on mods when installed** off, mods you add by hand stay off. Click them to turn them on, or they won't load the next time the game starts in your profile. See [Settings](settings.md).
-
-**Rescan** waits if DewDrop is in the middle of installing something; try again when it's done.
+When there's room, the toolbar shows a count, such as "42 installed, 30 on". While uninstalled mods wait to be deleted, it adds them: "36 installed, 11 on, 1 to delete".
 
 ## Read a mod's row
 
 Each row has:
 
-* **A checkbox.** Ticked means on. It's dimmed when you can't change it: DewDrop's own row, or every row when the profile is read-only or its file couldn't be read.
-* **The name.** It's grayed out when the mod is off.
-* **A details line** with the author and version, such as "by Pathoschild | v2.5.3". It also says "content pack" when the mod adds content through another mod, and "collection" when Stardrop installed it as part of a Nexus collection.
+* **A checkbox.** Ticked means on. It's dimmed when you can't change it: on DewDrop's own row, and on every row when the profile is read-only or its file couldn't be read.
+* **The name**, grayed out when the mod is off.
+* **A details line**, such as "by Pathoschild | v2.5.3". It adds "content pack" for a mod that adds content through another mod, and "collection" for a copy Stardrop installed from a Nexus collection.
 * **A status note** on the right, when there's something to know (see below).
-* **An Update button,** when there's a new version (see [Updates](#updates)).
-* **A trash can** at the right edge, the one from the game's inventory. Click it to [uninstall the mod](#uninstall-a-mod). Its lid tips open when you point at it. DewDrop's own row and copies from Stardrop collections don't have one.
+* **An Update button** when there's a new version (see [Updates](#updates)).
+* **A trash can** at the right edge, the one from the game's inventory, to [uninstall the mod](#uninstall-a-mod). Its lid tips open when you point at it. DewDrop's row and collection copies don't have one.
 
-Hover over a row to see the mod's description, its unique ID, which mod it's a content pack for, and the name of its folder. For a mod [installed twice](#mods-installed-twice), it also says where the other copy is.
+Point at a row to see the mod's description, unique ID, folder, and which mod it's a content pack for.
 
 ### Status notes
 
 | Note | What it means |
 | --- | --- |
-| **Update ready, restart to finish** (green) | DewDrop downloaded an update, but the game is still using the old files. It goes in when you use **Apply & Restart**, or, on Windows, when you quit the game. See [Updating mods](updating-mods.md). |
-| **Installed twice** (red) | Your `Mods` folder has two copies of this mod, with the same unique ID. See [Mods installed twice](#mods-installed-twice). |
-| **Needs** followed by names (red) | The mod is on, but something it requires is missing or turned off. See below. |
-| **Off after restart** (orange) | The mod is loaded right now, but it's off in your profile, so it won't load the next time the game starts in your profile, such as after **Apply & Restart**. |
-| **On after restart** (orange) | The mod is on in your profile but isn't loaded yet, for example because you turned it on after the game started, or it's new in your `Mods` folder. It loads the next time the game starts in your profile, such as after **Apply & Restart**. When the game was started from your profile, this note also shows for a mod SMAPI skipped when this session started, for example a broken one or one that needs a newer SMAPI. Restarting won't load that one; the SMAPI console window says why. |
-| **Deleted when the game closes** (orange) | You uninstalled the mod. Its row has an **Undo** button instead of a checkbox. See [Uninstall a mod](#uninstall-a-mod). |
+| **Update ready, restart to finish** (green) | An update is downloaded, but the game is still using the old files. It goes in with **Apply & Restart**, or on Windows when you quit. See [Updating mods](updating-mods.md#finish-the-update). |
+| **Installed twice** (red) | Two folders hold this mod. See [Mods installed twice](#mods-installed-twice). |
+| **Needs** and names (red) | The mod is on, but something it requires is missing or off. See [Missing requirements](#missing-requirements). |
+| **Off after restart** (orange) | The mod is loaded now but off in your profile, so it won't load the next time the game starts in your profile. |
+| **On after restart** (orange) | The mod is on in your profile but isn't loaded yet, for example because you turned it on after the game started. It loads the next time the game starts in your profile. |
+| **Deleted when the game closes** (orange) | You uninstalled the mod. See [Until the game closes](#until-the-game-closes). |
 
-If the bottom bar shows a red problem, the two "after restart" notes are hidden until it's fixed.
+If the game started in your profile and SMAPI skipped a mod anyway (a broken one, or one that needs a newer SMAPI), its row also says **On after restart**, but restarting won't load it. The SMAPI log says why.
+
+While the bottom bar shows a red problem, the two "after restart" notes are hidden.
 
 ## Missing requirements
 
-Many mods need another mod to work, such as a framework like Content Patcher. When a mod that's on is missing one, its row says **Needs** and lists what's missing. Use **Show: Problems** to see all of them at once.
+Many mods need another mod to work, such as a framework like Content Patcher. When a mod that's on is missing one, its row says **Needs** and what's missing. **Show: Problems** lists all of them.
 
-* **If the note shows a mod's name,** you have that mod but it's off. Click its row to turn it on.
-* **If the note shows a unique ID** (like `Pathoschild.ContentPatcher`), that mod isn't installed. Search for it on the [Browse](browse.md) tab and install it, then turn it on here.
+* **A mod's name** means you have that mod but it's off. Click its row to turn it on.
+* **A unique ID** (like `Pathoschild.ContentPatcher`) means it isn't installed. Find it on the [Browse](browse.md) tab and install it.
 
 DewDrop doesn't download required mods for you. The mod's Nexus page usually lists what it needs.
 
 ## Updates
 
-DewDrop checks for mod updates each time the game starts, using the same service SMAPI uses (smapi.io). You can turn that off in [Settings](settings.md). To check again, click **Check for updates**. It reads **Checking...** while it works, then a message says "Everything's up to date." or how many updates are available.
-
-Mods with a new version get a green **Update to** button, such as **Update to 1.4.0**, and the tab reads **Installed (1 new)**. What clicking it does depends on your Nexus Mods account. Premium installs the update in the game and keeps the mod's settings. Free opens the file on the Nexus Mods website, where you click **Slow download**. If you're logged out, or the update isn't on Nexus Mods, it opens the update's page in your browser. [Updating mods](updating-mods.md) has the details, including what happens on macOS and Linux.
+DewDrop checks for updates each time the game starts, and when you click **Check for updates**. A mod with a new version gets a green button such as **Update to 1.4.0**, and the tab reads **Installed (1 new)**. With Premium, clicking it installs the update in the game; with a free account, it opens the file on the Nexus Mods website. See [Updating mods](updating-mods.md).
 
 ## Uninstall a mod
 
-Uninstalling deletes a mod's folder from your `Mods` folder, settings included: its `config.json` and everything else in the folder go with it. DewDrop waits until the game closes to delete it, so you can change your mind until then.
+Uninstalling deletes the mod's folder from your `Mods` folder, settings included. DewDrop waits until the game closes to delete it, so you can change your mind until then.
 
 1. Click the trash can at the right edge of the mod's row. Pointing at it says "Uninstall *name*. Its folder is deleted when the game closes."
-2. A dialog asks "Uninstall *name*?" and says what will happen (see below).
+2. A dialog asks "Uninstall *name*?" and says what will happen.
 3. Click **Uninstall**, or press **Enter**. To keep the mod, click **Cancel**.
+
+A message confirms it: "Uninstalled *name*. It's deleted when the game closes."
 
 <figure><img src="../.gitbook/assets/shot-uninstall-dialog.png" alt="The Uninstall Example Mod? dialog over the Installed tab. It says DewDrop deletes its folder, settings included, when the game closes, and that until then you can undo it on the Installed tab. Below are the Uninstall and Cancel buttons."><figcaption><p>The dialog that opens when you click a mod's trash can.</p></figcaption></figure>
 
-A message says "Uninstalled *name*. It's deleted when the game closes."
+The dialog starts with one of these:
 
-Under the question, the dialog says one of these:
-
-| Line | When you see it |
-| --- | --- |
-| "DewDrop turns it off now and deletes its folder, settings included, when the game closes. Until then you can undo it on the Installed tab." | The mod is on in your active profile. |
-| "DewDrop deletes its folder, settings included, when the game closes. Until then you can undo it on the Installed tab." | The mod is off already, or uninstalling leaves your profile as it is (see [What happens to your profiles](#what-happens-to-your-profiles)). |
+* "DewDrop turns it off now and deletes its folder, settings included, when the game closes. Until then you can undo it on the Installed tab." The mod is on in your profile.
+* "DewDrop deletes its folder, settings included, when the game closes. Until then you can undo it on the Installed tab." The mod is off already, or your profile stays as it is (see [What happens to your profiles](#what-happens-to-your-profiles)).
 
 Then it adds any of these that apply:
 
@@ -123,80 +107,93 @@ Then it adds any of these that apply:
 | --- | --- |
 | "*names* need it and won't work without it." | Mods that are on in your profile require this one, and no other copy of it is left. |
 | "The update downloaded for it is thrown away too." | The mod has an update waiting (**Update ready, restart to finish**). |
-| "*name* came with SMAPI, so installing SMAPI again puts it back." | It's one of the small mods SMAPI installs, **Console Commands** or **Save Backup**. |
+| "*name* came with SMAPI, so installing SMAPI again puts it back." | It's one of SMAPI's own small mods, **Console Commands** or **Save Backup**. |
 | "Your other copy, in the '*folder*' folder, stays installed." | The mod is [installed twice](#mods-installed-twice). |
 
 ### Until the game closes
 
 The mod's row stays on the list, so you can change your mind:
 
-* It has no checkbox, its name is grayed out, and it says **Deleted when the game closes** in orange, next to an **Undo** button.
-* It stays in every **Show:** view, and in a search when it matches.
+* It has no checkbox, its name is grayed out, and it says **Deleted when the game closes** next to an **Undo** button.
+* It stays in every **Show:** view, and in a search that matches it.
 * Clicking the row only reminds you: "*name* is uninstalled. Click Undo to keep it."
 
 <figure><img src="../.gitbook/assets/shot-uninstalled.png" alt="The Installed tab with Example Mod uninstalled. Its row has no checkbox and says Deleted when the game closes in orange, next to an Undo button, while the rows around it keep their checkboxes and trash cans. The toolbar reads 36 installed, 11 on, 1 to delete, and the bottom bar says the mods loaded right now match the profile and that uninstalled mods are deleted when the game closes."><figcaption><p>An uninstalled mod stays on the list, with Undo, until the game closes.</p></figcaption></figure>
 
-Everywhere else, DewDrop treats the mod as gone. For example, Browse and the mod's page no longer show it as installed.
+Everywhere else, DewDrop treats the mod as gone: Browse and the mod's page no longer show it as installed.
 
-The bottom bar says whether the game still has the mod loaded:
-
-| Status | What it means |
-| --- | --- |
-| "*name*, which you uninstalled, is still loaded. Restart to finish uninstalling." (orange) | The game is running the mod right now. With more than one, it says "2 mods you uninstalled are still loaded." instead. **Apply & Restart** lights up. |
-| "The mods loaded right now match this profile. Uninstalled mods are deleted when the game closes." (gray) | The game didn't load the mod, and nothing else needs a restart. Its folder goes when you quit. |
+If the game is still running the mod, the bottom bar says "*name*, which you uninstalled, is still loaded. Restart to finish uninstalling." and **Apply & Restart** lights up. Otherwise it says "The mods loaded right now match this profile. Uninstalled mods are deleted when the game closes." See [The bottom bar](the-menu.md#the-bottom-bar).
 
 ### Undo
 
-Click **Undo** on the row to keep the mod. If uninstalling turned it off, Undo turns it back on, in the profile it was turned off in, even if you've switched profiles since. A message says what happened:
+Click **Undo** on the row to keep the mod. If uninstalling turned it off, Undo turns it back on in that profile, even if you've switched profiles since. A message says what happened:
 
 * "Kept *name*."
 * "Kept *name* and turned it back on."
 * "Kept *name* and turned it back on in the '*profile*' profile." You've switched to another profile since.
 * "Kept *name*. Turn it back on yourself: the '*profile*' profile can't be changed now." For example, that profile was deleted or renamed, or its file couldn't be read.
+* "*name* was already deleted." (red) It's too late to keep that copy.
 
-Installing the same mod again before the game closes, for example from its page on **Browse**, keeps it too: the uninstall is cancelled.
+Installing the same mod again before the game closes, for example from its page on **Browse**, also cancels the uninstall.
 
 ### When the folder is deleted
 
-Nothing is deleted straight away, because the game may have the mod loaded. Mods read their files while you play, not only when the game starts. Content Patcher packs, for example, read many of theirs when a save loads. So DewDrop waits:
+The game may still be using the mod's files, so DewDrop moves the folder out of your `Mods` folder when the game closes, whether you quit or click **Apply & Restart**, and deletes it the next time the game starts.
 
-1. When the game closes, whether you quit or click **Apply & Restart**, DewDrop moves each uninstalled mod's folder out of your `Mods` folder, into a hidden `.dewdrop-staging` folder beside it. It also removes the mod's link from `Selected Mods`, the folder your profile loads from.
-2. The next time the game starts, DewDrop deletes them.
+* **On Windows, a file can stay open.** DewDrop then tries again a moment after the game has closed, and at each start. After three starts it gives up: "Couldn't delete '*folder*' (uninstalled): a file stayed open. Delete it yourself." The SMAPI log has the full path. Close the game and anything that might be using the folder, then delete it. Until you do, it's listed as an ordinary mod again.
+* **If the game crashes,** DewDrop deletes the folder at the next start instead, unless that session loads the mod again; then it waits for that session to close. Until then the row still has **Undo**, but Undo can't turn the mod back on, so tick it yourself afterwards.
 
-On Windows, a folder can't be moved while the game still has a file in it open. DewDrop's restart script then finishes the job a moment after the game has closed, or DewDrop does at the next start. If it still can't after three starts, DewDrop gives up and shows "Couldn't delete '*folder*' (uninstalled): a file stayed open. Delete it yourself." The SMAPI log has the folder's full path. Close the game, and any program that might have a file in that folder open, then delete it. Until you do, it's listed as an ordinary mod again.
-
-If the game doesn't close normally, for example because it crashed, DewDrop deletes the folder the next time the game starts instead. If that session loads the mod again, it waits until that session closes. Until then the row still has **Undo**, but it doesn't turn the mod back on, so do that yourself.
+[How DewDrop works](../reference/how-it-works.md#uninstalling-a-mod) has the details.
 
 ### What happens to your profiles
 
-* Uninstalling turns the mod off only in your active profile. Your other profiles still list it, which does no harm once it's gone.
+* Uninstalling turns the mod off only in your active profile. Other profiles still list it, which does no harm once it's gone.
 * It doesn't turn the mod off at all when another copy of it stays in your `Mods` folder, or when your active profile is read-only.
-* If you use Stardrop's profile-specific mod configs, the settings Stardrop saved for the mod in your profiles stay as they are.
+* If you use Stardrop's profile-specific mod configs, the settings Stardrop saved for the mod stay as they are.
 
 ### When you can't uninstall
 
-If a mod can't be uninstalled right now, pointing at its trash can says why, and clicking it shows the same message.
+DewDrop's own row has no trash can: to remove DewDrop, see [Uninstalling DewDrop](../getting-started/uninstalling.md). Copies from a Stardrop collection have none either, because the collection owns them: remove the collection in Stardrop.
+
+When a mod can't be uninstalled right now, pointing at its trash can says why, and clicking it shows the same message:
 
 | Message | What to do |
 | --- | --- |
-| "Wait for *title* to finish installing, then try again." | DewDrop is installing a download. Wait until it no longer says **Installing...** on the [Downloads](downloads.md) tab. |
+| "Wait for *title* to finish installing, then try again." | DewDrop is installing a download. Wait until the [Downloads](downloads.md) tab no longer says **Installing...**. |
 | "*name* is downloading again. Cancel that on the Downloads tab, or wait for it." | A download of this mod is queued or running. Cancel it on the **Downloads** tab, or let it finish. |
-
-DewDrop's own row has no trash can, because DewDrop can't uninstall itself. To remove it, see [Uninstalling DewDrop](../getting-started/uninstalling.md). Copies from a Stardrop collection have none either. The collection owns them, so remove the collection in Stardrop instead.
+| "*name* is already uninstalled." | It's waiting to be deleted. Use **Undo** on its row to keep it. |
+| "DewDrop won't delete the '*folder*' folder: it isn't a mod inside your Mods folder." | The folder holds something DewDrop must keep, such as DewDrop itself, or it isn't a mod's own folder inside `Mods` (its `manifest.json` is gone, say). Close the game and remove what you don't want by hand. |
 
 ## Mods installed twice
 
 If two folders in your `Mods` folder hold the same mod, with the same unique ID, both rows say **Installed twice** in red, and **Show: Problems** lists them. When SMAPI loads your `Mods` folder directly, as a normal launch does, it loads neither copy.
 
-Hover over one of the rows to see where the other copy is, such as "Also installed in: ContentPatcher (v2.5.3)". Then click the trash can on the copy you don't want. The dialog says "Your other copy, in the '*folder*' folder, stays installed.", and the mod stays on in your profile, because the other copy is still there.
+Point at one of the rows to see where the other copy is, such as "Also installed in: ContentPatcher (v2.5.3)". Then click the trash can on the copy you don't want. The dialog says "Your other copy, in the '*folder*' folder, stays installed.", and the mod stays on in your profile.
+
+## Added or removed a mod by hand?
+
+DewDrop looks through your `Mods` folder each time the game starts. A mod you copied in while the game was closed is turned **on** in your active profile then, as long as **Turn on mods when installed** is on (the default). The next time you open the menu, a message lists them: "Turned on *mods*, new in your Mods folder."
+
+If you copy a mod in, or delete one, while the game is running, click **Rescan**. New mods are turned on the same way, and a message says what changed:
+
+* "Found 1 new mod: *name*. Restart to load it."
+* "Found 1 new mod: *name*. Turn it on, then restart to load it." The new mod is still off, for example because **Turn on mods when installed** is off.
+* "1 mod is no longer in your Mods folder: *name*."
+* "No changes: your Mods folder has the same mods as before."
+
+Good to know:
+
+* Only mods DewDrop has never seen are turned on. A mod you've turned on or off before keeps your choice, even if you move it or extract it again.
+* With **Turn on mods when installed** off, new mods stay off until you tick them. Until then they won't load when the game starts in your profile.
+* Mods from Stardrop collections are never turned on this way, and collection profiles never change.
+* **Rescan** waits while DewDrop is installing something: "*title* is still installing. Rescan when it's done."
+* DewDrop finds mods in sub-folders of `Mods` too. Like SMAPI, it skips folders whose names start with a dot, so renaming a folder to `.MyMod` hides it from both.
 
 ## Collection profiles
 
-If your active profile came from a Nexus collection in Stardrop, it's read-only. The tab shows "This collection profile is read-only. Duplicate it on the Profiles tab to change it." To change which mods are on, make a copy on the [Profiles](profiles.md) tab and use the copy.
+If your active profile came from a Nexus collection in Stardrop, it's read-only. The tab says "This collection profile is read-only. Duplicate it on the Profiles tab to change it." To choose which mods are on, make a copy on the [Profiles](profiles.md) tab and use the copy.
 
 ## What the Installed tab can't do yet
 
-* **Install a mod from a file you downloaded.** Unzip it into your `Mods` folder yourself, then click **Rescan**. It shows up here, turned on if **Turn on mods when installed** is on. See [Added or removed a mod by hand?](#added-or-removed-a-mod-by-hand)
+* **Install a mod from a file you downloaded.** Unzip it into your `Mods` folder yourself, then click **Rescan**. See [Added or removed a mod by hand?](#added-or-removed-a-mod-by-hand)
 * **Sort the list.** It's always sorted by name.
-
-DewDrop finds mods inside sub-folders of `Mods` too. Like SMAPI, it skips folders whose names start with a dot, so renaming a folder to `.MyMod` hides it from both.

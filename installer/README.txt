@@ -38,6 +38,12 @@ On Windows with the Steam version, the installer may also ask whether Steam shou
 DewDrop profile. If you say yes, DewDrop finishes this the next time you quit the game: Steam closes and
 opens again once. You can change it any time in the game, in Mods > Account > "Start in my profile from Steam".
 
+On a Steam Deck, run the installer once in Desktop Mode (Linux above). It sets Stardew Valley up in Steam to
+start with DewDrop's launcher, so mods work in Game Mode, and can take your Nexus Mods API key so you don't
+have to type it there. Steam closes for a few seconds for this, after the questions. It doesn't offer to start
+the game: go back to Game Mode, start it there and press Mods on the title screen.
+Steam Deck guide: https://friessssss.gitbook.io/dewdrop/getting-started/steam-deck
+
 
 Prefer to install by hand?
 --------------------------
