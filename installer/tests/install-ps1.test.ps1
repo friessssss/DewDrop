@@ -260,3 +260,6 @@ try {
 
 if ($fail) { Write-Host "$fail failed" -ForegroundColor Red; exit 1 }
 Write-Host 'All passed' -ForegroundColor Green
+# Otherwise the exit code is the last installer run's: the Xbox dry run exits 10 when GitHub can't be reached for
+# the latest SMAPI, and CI's "powershell -command" step turns that 10 into a failing 1.
+exit 0
