@@ -164,5 +164,17 @@ if [ "$(uname -s)" = "Linux" ]; then
     check "stops by default" '[ $code = 1 ] && grep -q "Proton" "$ROOT/out.txt"'
 fi
 
+echo "== the one-line installer (curl ... | bash) downloads install.sh and runs it"
+setup
+# The extra line checks the installer didn't read the rest of the piped script as its answers.
+{ cat "$HERE/../../install.sh"; echo 'echo "still reading the pipe"'; } \
+    | DEWDROP_INSTALLER_BASE="file://$(cd "$HERE/../internal" && pwd)" bash -s -- --yes --no-launch --skip-smapi --mod-source "$MOD_ZIP" \
+    > "$ROOT/out.txt" 2>&1
+code=$?
+check "exit 0" '[ $code = 0 ]' || show
+check "installed" '[ -f "$GAME/Mods/DewDrop/manifest.json" ] && grep -q "All done" "$ROOT/out.txt"'
+check "left the rest of the pipe alone" 'grep -q "still reading the pipe" "$ROOT/out.txt"'
+check "cleaned up its download" '! ls "$TMPDIR" | grep -q dewdrop-get'
+
 echo "== $pass passed, $fail failed"
 [ "$fail" = 0 ]

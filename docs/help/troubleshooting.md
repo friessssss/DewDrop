@@ -69,7 +69,7 @@ PowerShell couldn't run the installer script. The reason is usually just above t
 {% tab title="macOS" %}
 **macOS says the file can't be opened, or "Not Opened"**
 
-macOS shows this for scripts from the internet that Apple hasn't checked. Click **Done** (not **Move to Trash**). Open **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway**, and enter your password. On older macOS, right-click the file, choose **Open**, then click **Open** again.
+macOS shows this for scripts from the internet that Apple hasn't checked. The simplest way round it is to install from Terminal instead: paste `curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash` and press **Return**. Or click **Done** (not **Move to Trash**). Open **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway**, and enter your password. On older macOS, right-click the file, choose **Open**, then click **Open** again.
 
 **"...you do not have appropriate access privileges", or double-clicking does nothing**
 

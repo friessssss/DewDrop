@@ -37,6 +37,12 @@ bash "Install on macOS.command" --dry-run
 ```
 
 Both pass your options on to `internal/install.sh`, which you can also run directly: `bash internal/install.sh --dry-run`.
+
+With the one-line installer, put your options after `bash -s --`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash -s -- --dry-run
+```
 {% endtab %}
 {% endtabs %}
 
@@ -144,6 +150,7 @@ When it's started from `Install on macOS.command` or `Install on Linux.sh` in a 
 
 * **`Install on Windows.bat`** refuses to run from inside the zip (Windows would run it from a temporary folder without the other files), checks that `internal\install.ps1` is there, and runs it with Windows PowerShell.
 * **`Install on macOS.command`** clears macOS's download warning flag from the installer folder, then runs `internal/install.sh`.
+* **`install.sh`** (in the repository root, for `curl ... | bash`) downloads `internal/install.sh` from the `master` branch into a temporary folder and runs it, with its questions read from your terminal rather than the pipe. With no bundled copy next to it, `internal/install.sh` then downloads the latest DewDrop release. In Git Bash on Windows it downloads and runs `install.ps1` instead.
 * **`Install on Linux.sh`** runs `internal/install.sh` in the terminal you started it from. When you double-click it, it opens the first terminal it finds out of: xdg-terminal-exec, Ptyxis, GNOME Console, GNOME Terminal, Konsole, Xfce Terminal, MATE Terminal, Terminator, Tilix, kitty, Alacritty, WezTerm, foot, x-terminal-emulator and xterm. Options are only passed on when you start it from a terminal.
 
 ## Files the installer uses
