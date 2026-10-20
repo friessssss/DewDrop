@@ -1,0 +1,116 @@
+name: Bug report
+description: Something in DewDrop or its installer doesn't work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Before you start, check [Troubleshooting](https://friessssss.gitbook.io/dewdrop/help/troubleshooting) and the [FAQ](https://friessssss.gitbook.io/dewdrop/help/faq); the answer may already be there.
+
+        The most useful thing you can send is your **SMAPI log** from the session where it went wrong. [Reporting issues](https://friessssss.gitbook.io/dewdrop/help/reporting-issues) shows where to find it.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What went wrong, and any message you saw.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen again
+      description: As exactly as you can.
+      placeholder: |
+        1. Start the game from Steam
+        2. Click Mods, then the Installed tab
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: smapi-log
+    attributes:
+      label: SMAPI log link
+      description: Upload `SMAPI-latest.txt` (or `SMAPI-crash.txt`, if there is one) at [smapi.io/log](https://smapi.io/log) and paste the link here. It also lists your DewDrop, SMAPI and game versions.
+      placeholder: https://smapi.io/log/...
+
+  - type: dropdown
+    id: system
+    attributes:
+      label: Your system
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Steam Deck
+    validations:
+      required: true
+
+  - type: dropdown
+    id: store
+    attributes:
+      label: Where you got the game
+      options:
+        - Steam
+        - GOG
+        - Xbox app (PC Game Pass)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: launch
+    attributes:
+      label: How you started the game
+      options:
+        - Steam's Play button
+        - Steam's Play button, with "Start in my profile from Steam" on
+        - A desktop shortcut, or StardewModdingAPI directly
+        - The Xbox app
+        - Stardrop
+        - A restart by DewDrop (Apply & Restart or Restart now)
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: nexus
+    attributes:
+      label: Nexus Mods account (if this is about downloads)
+      options:
+        - Not about downloads
+        - Free
+        - Premium
+        - Not logged in
+
+  - type: textarea
+    id: other-logs
+    attributes:
+      label: Other logs
+      description: For installer problems, `DewDrop-installer.log` from your temp folder. If the game didn't come back after a restart, an update didn't finish, or Steam's launch option wasn't changed, `relaunch.log` from `%AppData%\Stardrop\Data\Cache\DewDrop` (Windows).
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots, other mod managers you use (Stardrop, Vortex...), or anything else that might help.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you post
+      options:
+        - label: I searched the existing issues, and this isn't one of them.
+          required: true
+        - label: I haven't posted my Nexus Mods API key, `Settings.json` or `Notion.json` (they hold my Nexus login).
+          required: true

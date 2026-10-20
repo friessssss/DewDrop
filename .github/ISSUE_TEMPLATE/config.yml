@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Troubleshooting
+    url: https://friessssss.gitbook.io/dewdrop/help/troubleshooting
+    about: Fixes for the most common problems, before you open an issue.
+  - name: FAQ
+    url: https://friessssss.gitbook.io/dewdrop/help/faq
+    about: Quick answers about how DewDrop works.
+  - name: How to report an issue
+    url: https://friessssss.gitbook.io/dewdrop/help/reporting-issues
+    about: Where to find your SMAPI log and what to include.
