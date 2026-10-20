@@ -228,6 +228,9 @@ namespace DewDrop.Core.Tests
             Assert.True(SteamLauncher.Install(Shipped, _launcher, _log));
             Assert.Equal(File.ReadAllText(Shipped).Replace("\r\n", "\n"), File.ReadAllText(_launcher));
 
+            // Swapped in whole, through a copy beside it
+            Assert.False(File.Exists(_launcher + ".tmp"));
+
             // Runnable again: Steam starts it directly
             SetUp();
             Assert.Contains("smapi", Launch(SteamCommand()));

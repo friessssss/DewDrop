@@ -13,6 +13,8 @@ export HOME="$ROOT/home"
 export TMPDIR="$ROOT/tmp"
 # CI runners set these, and the installer follows them (as .NET does), so the throwaway HOME needs them gone
 unset XDG_CONFIG_HOME XDG_CACHE_HOME
+# The installer reads the computer's maker and model to spot a Steam Deck; the tests say what they are
+export DEWDROP_DMI="$ROOT/no-dmi"
 mkdir -p "$TMPDIR"
 
 if [ "$(uname -s)" = "Darwin" ]; then
@@ -189,14 +191,19 @@ if [ "$(uname -s)" = "Linux" ]; then
     # The signed-in account is the MostRecent one, even though the other account's file is newer
     printf '"users"\n{\n\t"76561198000000000"\n\t{\n\t\t"MostRecent"\t\t"0"\n\t}\n\t"76561198012345678"\n\t{\n\t\t"AccountName"\t\t"deck"\n\t\t"MostRecent"\t\t"1"\n\t}\n}\n' > "$STEAM/config/loginusers.vdf"
     printf 'NAME="SteamOS"\nID=steamos\nID_LIKE=arch\nVARIANT_ID=steamdeck\n' > "$ROOT/os-release"
-    # A Steam that runs until it's told to shut down, and logs what it was asked
+    # A Steam that runs until it's told to shut down, and logs what it was asked. As it shuts down, it saves the
+    # settings in steam-saves if there are any, and starts again by itself while steam-restarts is there (as a service
+    # would) until that service is stopped.
     mkdir -p "$FAKE"
     cat > "$FAKE/steam" <<EOF
 #!/bin/sh
 echo "steam \$*" >> "$ROOT/steam.log"
 case "\$1" in
     --fake-running) echo \$\$ > "$ROOT/steam.pid"; while :; do sleep 0.2; done ;;
-    -shutdown) kill "\$(cat "$ROOT/steam.pid")" ;;
+    -shutdown)
+        kill "\$(cat "$ROOT/steam.pid")"
+        [ -f "$ROOT/steam-saves" ] && cp "$ROOT/steam-saves" "$ACCOUNT"
+        if [ -f "$ROOT/steam-restarts" ] && [ ! -f "$ROOT/steam-stopped" ]; then ("$FAKE/steam" --fake-running &); fi ;;
 esac
 EOF
     chmod +x "$FAKE/steam"
@@ -259,6 +266,86 @@ EOF
     deck
     check "exit 0" '[ $code = 0 ]' || show
     check "warns and leaves it" 'grep -q "unexpected layout" "$ROOT/out.txt" && cmp -s "$ACCOUNT" "$ROOT/before.vdf"'
+
+    echo "== Steam Deck: a Steam that its service starts again is stopped through that service"
+    vdf '' > "$ACCOUNT"
+    mkdir -p "$ROOT/fake-systemd"
+    # As procps reports a process the user's systemd runs: the system unit is the user manager itself
+    printf '#!/bin/sh\ncase "$*" in *uunit=*) echo app-steam@autostart.service ;; *unit=*) echo user@1000.service ;; esac\n' > "$ROOT/fake-systemd/ps"
+    cat > "$ROOT/fake-systemd/systemctl" <<EOF
+#!/bin/sh
+echo "systemctl \$*" >> "$ROOT/steam.log"
+case "\$2" in stop) touch "$ROOT/steam-stopped"; kill "\$(cat "$ROOT/steam.pid")" ;; esac
+EOF
+    chmod +x "$ROOT/fake-systemd/"*
+    : > "$ROOT/steam.log"
+    touch "$ROOT/steam-restarts"
+    ("$FAKE/steam" --fake-running &)
+    sleep 0.5
+    PATH="$ROOT/fake-systemd:$PATH" deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "stopped the user service" 'grep -q "systemctl --user stop app-steam@autostart.service" "$ROOT/steam.log"' || show
+    check "set the launch option" '[ "$(option)" = "\\\"$LAUNCHER\\\" %command%" ]' || option
+    check "started the service again" 'grep -q "systemctl --user start app-steam@autostart.service" "$ROOT/steam.log"'
+    rm -f "$ROOT/steam-restarts" "$ROOT/steam-stopped"
+
+    echo "== Steam Deck: launch options Steam saves as it closes are never written over"
+    vdf '' > "$ACCOUNT"
+    vdf 'mangohud %command%' > "$ROOT/steam-saves"
+    : > "$ROOT/steam.log"
+    ("$FAKE/steam" --fake-running &)
+    sleep 0.5
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "left Steam's new options alone" '[ "$(option)" = "mangohud %command%" ] && grep -q "Steam saved different launch options" "$ROOT/out.txt"' || option
+    check "opened Steam again anyway" 'grep -q "steam -silent" "$ROOT/steam.log"'
+    rm -f "$ROOT/steam-saves"
+
+    echo "== Steam Deck: an option that starts SMAPI keeps its wrappers, not SMAPI's own options"
+    vdf 'gamemoderun \"/games/Stardew Valley/StardewModdingAPI\" --mods-path \"Mods-Deck\" %command% -novid' > "$ACCOUNT"
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "launcher in SMAPI's place" '[ "$(option)" = "gamemoderun \\\"$LAUNCHER\\\" %command% -novid" ]' || option
+    check "says which SMAPI options go" 'grep -q "options go: --mods-path \"Mods-Deck\"" "$ROOT/out.txt"'
+
+    echo "== Steam Deck: options left as they are still get a launcher to point at, and no Game Mode promise"
+    vdf '-some-arg' > "$ACCOUNT"
+    rm -f "$LAUNCHER"
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "left them" '[ "$(option)" = "-some-arg" ]' || option
+    check "the manual steps point at a real launcher" '[ -x "$LAUNCHER" ] && grep -q "Launch Options enter" "$ROOT/out.txt"'
+    check "says Steam isn't set up yet" '! grep -q "Return to Gaming Mode" "$ROOT/out.txt" && grep -q "isn.t set to start the game" "$ROOT/out.txt"'
+
+    echo "== Steam Deck: turning the profile setting off in the game survives running the installer again"
+    vdf "\\\"$LAUNCHER\\\" %command%" > "$ACCOUNT"
+    echo '{"StartInProfileFromSteam": false, "AskToLoadProfile": true}' > "$GAME/Mods/DewDrop/config.json"
+    rm -f "$(dirname "$LAUNCHER")/start-in-profile"
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "still off, without asking" '[ ! -f "$(dirname "$LAUNCHER")/start-in-profile" ] && grep -q "\"StartInProfileFromSteam\": false" "$GAME/Mods/DewDrop/config.json" && ! grep -q "when you press Play in Steam?" "$ROOT/out.txt"'
+
+    echo "== Steam Deck: the Nexus key is only skipped when one is saved"
+    mkdir -p "$HOME/.config/Stardrop/Data"
+    printf '{\n  "NexusDetails": null\n}\n' > "$HOME/.config/Stardrop/Data/Settings.json"
+    rm -f "$(dirname "$LAUNCHER")/nexus-key.txt"
+    DEWDROP_NEXUS_KEY="key-two" deck
+    check "asked when Stardrop has no login" '[ "$(cat "$(dirname "$LAUNCHER")/nexus-key.txt" 2>/dev/null)" = "key-two" ]'
+    printf '{\n  "NexusDetails": {\n    "Username": "me",\n    "IsPremium": false,\n    "Key": "c2VjcmV0"\n  }\n}\n' > "$HOME/.config/Stardrop/Data/Settings.json"
+    rm -f "$(dirname "$LAUNCHER")/nexus-key.txt"
+    DEWDROP_NEXUS_KEY="key-three" deck
+    check "skipped when a key is saved" '[ ! -e "$(dirname "$LAUNCHER")/nexus-key.txt" ]'
+    rm -f "$HOME/.config/Stardrop/Data/Settings.json"
+
+    echo "== a Steam Deck running another system is set up as one"
+    printf 'NAME="Bazzite"\nID=bazzite\n' > "$ROOT/os-release"
+    mkdir -p "$ROOT/dmi"
+    echo Valve > "$ROOT/dmi/sys_vendor"
+    echo Jupiter > "$ROOT/dmi/product_name"
+    vdf '' > "$ACCOUNT"
+    DEWDROP_DMI="$ROOT/dmi" deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "set the launch option" '[ "$(option)" = "\\\"$LAUNCHER\\\" %command%" ] && grep -q "Return to Gaming Mode" "$ROOT/out.txt"' || option
 
     echo "== other Linux systems aren't changed unless asked"
     vdf '' > "$ACCOUNT"

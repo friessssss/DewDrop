@@ -72,7 +72,7 @@ namespace DewDrop.Framework
         /// <summary>Whether Steam starts the game in the profile: its launch option points at the profile folder, as of the last read, or the launcher is told to.</summary>
         public static bool SteamOn => UsesSteamLauncher
             ? File.Exists(StartInProfileFile)
-            : SteamLaunchOption.PointsAt(_steamOption, ModEntry.Mods.Paths.SelectedModsFolder);
+            : OperatingSystem.IsWindows() && SteamLaunchOption.PointsAt(_steamOption, ModEntry.Mods.Paths.SelectedModsFolder);
 
         /// <summary>Whether Steam's launch option will change when the game closes (never with DewDrop's launcher, which reads the setting each launch).</summary>
         public static bool SteamPending => SteamUnavailableReason is null && !UsesSteamLauncher && SteamWanted != SteamOn;
@@ -207,7 +207,7 @@ namespace DewDrop.Framework
             {
                 return SteamDeck.Current
                     ? "Set up by the DewDrop installer: run it once in Desktop Mode, and let it set up Steam."
-                    : "Set up by the DewDrop installer: run it again and let it set up Steam's launch option.";
+                    : "Needs DewDrop's Steam launcher: in a terminal, run the DewDrop installer again with --steam-setup.";
             }
 
             if (!SteamLauncher.Install(Path.Combine(ModEntry.ModHelper.DirectoryPath, "assets", SteamLauncher.ScriptName), ModEntry.Mods.Paths.SteamLauncherPath, ModEntry.Log))

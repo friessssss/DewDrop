@@ -41,18 +41,24 @@ namespace DewDrop.Core.Services
                 }
 
                 var wanted = File.ReadAllText(source).Replace("\r\n", "\n");
-                var isNew = !File.Exists(target);
-                if (isNew || File.ReadAllText(target) != wanted)
+                if (File.Exists(target) && File.ReadAllText(target) == wanted)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-
-                    // Written in place: an existing file keeps its permissions
-                    File.WriteAllText(target, wanted);
-                    log.Trace($"Updated DewDrop's Steam launcher at {target}");
+                    // A launcher Steam can't run means the game doesn't start at all, so this is checked every time
+                    return MakeExecutable(target, log);
                 }
 
-                // A launcher Steam can't run means the game doesn't start at all, so this is checked every time
-                return MakeExecutable(target, log);
+                // Written beside it and renamed over it, so Steam finds the old launcher or the new one, never half of one
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                var temp = target + ".tmp";
+                File.WriteAllText(temp, wanted);
+                if (!MakeExecutable(temp, log))
+                {
+                    File.Delete(temp);
+                    return false;
+                }
+                File.Move(temp, target, overwrite: true);
+                log.Trace($"Updated DewDrop's Steam launcher at {target}");
+                return true;
             }
             catch (Exception ex)
             {

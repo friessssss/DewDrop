@@ -701,9 +701,15 @@ launch_game() {
 # Steam on Linux and the Steam Deck
 
 # SteamOS: a Steam Deck, or another device running it. DEWDROP_OS_RELEASE points at another file (the tests use it).
+# A Steam Deck running another system counts too, by its maker and model, as DewDrop sees it in the game (Jupiter is
+# the LCD Deck, Galileo the OLED one). DEWDROP_DMI points at another folder (the tests use it).
 is_steamos() {
     [ "$OS" = "linux" ] || return 1
-    grep -qiE '^ID="?steamos"?[[:space:]]*$' "${DEWDROP_OS_RELEASE:-/etc/os-release}" 2>/dev/null
+    grep -qiE '^ID="?steamos"?[[:space:]]*$' "${DEWDROP_OS_RELEASE:-/etc/os-release}" 2>/dev/null && return 0
+    local dmi="${DEWDROP_DMI:-/sys/devices/virtual/dmi/id}"
+    [ "$(cat "$dmi/sys_vendor" 2>/dev/null)" = "Valve" ] || return 1
+    case "$(cat "$dmi/product_name" 2>/dev/null)" in Jupiter|Galileo) return 0 ;; esac
+    return 1
 }
 
 # Where DewDrop (and Stardrop) keep their data: .NET's ApplicationData folder.
@@ -836,7 +842,9 @@ wait_steam_closed() { # half-seconds
 close_steam() {
     steam_running || return 0
     local unit
-    unit="$(ps -o unit= -p "$(pgrep -x steam | head -n 1)" 2>/dev/null | tr -d '[:space:]')"
+    # The user manager's unit (ps -o unit= gives the system's, user@<uid>.service, for anything the user's systemd runs)
+    unit="$(ps -o uunit= -p "$(pgrep -x steam | head -n 1)" 2>/dev/null | tr -d '[:space:]')"
+    [ "$unit" = "-" ] && unit=""
     note "Closing Steam for a moment (it saves its settings as it exits, so it has to be closed first)..."
     [ "$DECK" = 1 ] && note "The controls and the on-screen keyboard stop until Steam is back, in a few seconds."
     steam -shutdown >/dev/null 2>&1 &
@@ -890,7 +898,7 @@ steam_manual_steps() {
 # when that's wanted, so the game can restart itself in Game Mode and never needs Steam's settings changed again.
 setup_steam_launcher() {
     step "Setting up Steam to start the game with SMAPI and DewDrop"
-    local data folder script source root config current wanted
+    local data folder script source root config current wanted head rest smapi_args tail
     data="$(dewdrop_data)"
     folder="$data/Cache/DewDrop"
     script="$folder/steam-launch.sh"
@@ -908,13 +916,37 @@ setup_steam_launcher() {
     [ -n "$config" ] || { warn "Couldn't find your Steam account's settings. Start Steam and sign in once, then run this again."; return 1; }
     current="$(vdf_launch_option get "$config")" || { warn "Steam's settings file has an unexpected layout, so I won't edit it."; return 1; }
 
+    # In place before anything can point at it, including the manual steps
+    install_launcher_file "$source" "$script" "$folder" || return 1
+
     wanted="\"$script\" %command%"
     case "$current" in
         *"$script"*) wanted="$current" ;;
         "") ;;
         *StardewModdingAPI*)
+            # The launcher starts SMAPI itself: SMAPI's path and its own options go, wrappers like gamemoderun and
+            # variables before it stay, and so does what follows %command%
             note "Steam starts SMAPI directly right now: $current"
-            note "DewDrop's launcher starts SMAPI too, and can also start it in your profile." ;;
+            head="${current%%StardewModdingAPI*}"
+            rest="${current#*StardewModdingAPI}"
+            # Back to where SMAPI's path starts: its opening quote when it's quoted (a quote follows its name), else
+            # the space before it
+            case "$rest" in
+                \"*) head="${head%\"*}"; rest="${rest#\"}" ;;
+                *) case "$head" in *" "*) head="${head% *} " ;; *) head="" ;; esac ;;
+            esac
+            case "$rest" in
+                *%command%*) smapi_args="${rest%%%command%*}"; tail="${rest#*%command%}" ;;
+                *) smapi_args="$rest"; tail="" ;;
+            esac
+            smapi_args="$(printf '%s' "$smapi_args" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+            wanted="$head\"$script\" %command%$tail"
+            if [ -n "$smapi_args" ] || [ "$wanted" != "\"$script\" %command%" ]; then
+                [ -n "$smapi_args" ] && note "DewDrop's launcher picks the mods folder itself (Mods, or your profile), so SMAPI's own options go: $smapi_args"
+                ask_yes_no "Use DewDrop's launcher instead? (they become: $wanted)" y || { steam_manual_steps "\"$script\" %command%"; return 1; }
+            else
+                note "DewDrop's launcher starts SMAPI too, and can also start it in your profile."
+            fi ;;
         *%command%*)
             note "Stardew Valley has launch options in Steam already: $current"
             wanted="${current%%%command%*}\"$script\" %command%${current#*%command%}"
@@ -925,9 +957,12 @@ setup_steam_launcher() {
     esac
 
     # Starting in the profile. The launcher only does it once the profile folder has DewDrop in it, so a profile that
-    # hasn't been linked yet still starts with the whole Mods folder (and the Mods button).
+    # hasn't been linked yet still starts with the whole Mods folder (and the Mods button). A choice made before, here or
+    # in the game, is kept.
     if [ -z "$START_IN_PROFILE" ] && [ -f "$folder/start-in-profile" ]; then
         START_IN_PROFILE=1
+    elif [ -z "$START_IN_PROFILE" ] && grep -Eq '"StartInProfileFromSteam"[[:space:]]*:[[:space:]]*false' "$DEWDROP_DIR/config.json" 2>/dev/null; then
+        START_IN_PROFILE=0
     elif [ -z "$START_IN_PROFILE" ]; then
         note "Steam can start the game in your DewDrop profile, so mods you turn off stay off without an Apply & Restart."
         note "(You can change this any time in the game: Mods > Account > \"Start in my profile from Steam\".)"
@@ -935,14 +970,11 @@ setup_steam_launcher() {
     fi
 
     if [ "$DRY_RUN" = 1 ]; then
-        dry "copy $source to $script"
         if [ "$START_IN_PROFILE" = 1 ]; then dry "turn on Start in my profile from Steam"; else dry "turn off Start in my profile from Steam"; fi
         [ "$wanted" = "$current" ] || dry "close Steam, back up $config and set the launch option to: $wanted"
         return 0
     fi
 
-    mkdir -p "$folder" && cp "$source" "$script.tmp" && chmod 755 "$script.tmp" && mv "$script.tmp" "$script" \
-        || { warn "Couldn't copy DewDrop's launcher to $script."; return 1; }
     if [ "$START_IN_PROFILE" = 1 ]; then
         printf 'Written by DewDrop: Steam starts the game in your profile while this file is here.\n' > "$folder/start-in-profile"
         set_config_value StartInProfileFromSteam true
@@ -959,16 +991,28 @@ setup_steam_launcher() {
     # Steam is closed only for the edit: on a Steam Deck, the controls and the on-screen keyboard go with it, so
     # nothing in between may need an answer
     local status=0
-    write_launch_option "$config" "$script" "$wanted" || status=1
+    write_launch_option "$config" "$script" "$wanted" "$current" || status=1
     reopen_steam
     return "$status"
 }
 
-write_launch_option() { # config script wanted
-    local config="$1" script="$2" wanted="$3" current text backup
-    # Read again: Steam wrote the file as it closed
+install_launcher_file() { # source script folder
+    if [ "$DRY_RUN" = 1 ]; then dry "copy $1 to $2"; return 0; fi
+    mkdir -p "$3" && cp "$1" "$2.tmp" && chmod 755 "$2.tmp" && mv "$2.tmp" "$2" \
+        || { warn "Couldn't copy DewDrop's launcher to $2."; return 1; }
+}
+
+write_launch_option() { # config script wanted before
+    local config="$1" script="$2" wanted="$3" before="$4" current text backup
+    # Read again: Steam wrote the file as it closed. Options it saved just then were never shown or merged, and
+    # nothing can be asked while Steam is closed, so they're left alone.
     current="$(vdf_launch_option get "$config")" || { warn "Steam's settings file has an unexpected layout, so I won't edit it."; return 1; }
-    case "$current" in *"$script"*) wanted="$current" ;; esac
+    case "$current" in
+        *"$script"*) wanted="$current" ;;
+        "$before") ;;
+        *) warn "Steam saved different launch options as it closed ($current), so I left them alone. Run the installer again to add DewDrop's launcher to them."
+           return 1 ;;
+    esac
     text="$(DD_OPTION="$wanted" vdf_launch_option set "$config")" \
         && [ "$(printf '%s\n' "$text" | vdf_launch_option get /dev/stdin)" = "$wanted" ] \
         || { warn "The change to Steam's settings didn't check out, so I left them alone."; steam_manual_steps "$wanted"; return 1; }
@@ -984,8 +1028,9 @@ ask_nexus_key() {
     local data file key
     data="$(dewdrop_data)"
     file="$data/Cache/DewDrop/nexus-key.txt"
-    # Already logged in (DewDrop and Stardrop share the login)
-    grep -q '"NexusDetails"' "$data/Settings.json" 2>/dev/null && return 0
+    # Already logged in (DewDrop and Stardrop share the login). Stardrop writes NexusDetails before anyone logs in, so
+    # it's the saved key that counts.
+    tr -d '\n' < "$data/Settings.json" 2>/dev/null | grep -Eq '"NexusDetails"[[:space:]]*:[[:space:]]*\{[^}]*"Key"[[:space:]]*:[[:space:]]*"[^"]' && return 0
     key="${DEWDROP_NEXUS_KEY:-}"
     if [ -z "$key" ]; then
         { [ "$YES" = 1 ] || [ ! -t 0 ]; } && return 0
@@ -1048,7 +1093,10 @@ fi
 printf '\n%s  ---------------------------------------------------------------%s\n' "$C_CYAN" "$C_RESET"
 printf '   %sAll done!%s\n' "$C_GREEN" "$C_RESET"
 printf '   SMAPI %s and DewDrop %s are installed in:\n   %s\n\n' "$SMAPI_VERSION" "$SOURCE_VERSION" "$GAME"
-if [ "$DECK" = 1 ]; then
+if [ "$DECK" = 1 ] && [ "$STEAM_LAUNCHER" = 0 ]; then
+    printf "   %sSteam isn't set to start the game with DewDrop's launcher yet, so in Game Mode it may show a%s\n" "$C_YELLOW" "$C_RESET"
+    printf '   %sblack screen or a terminal window. See the messages above, then run the installer again.%s\n' "$C_YELLOW" "$C_RESET"
+elif [ "$DECK" = 1 ]; then
     printf '   %sSwitch back to Game Mode (double-click "Return to Gaming Mode" on the desktop),%s\n' "$C_BOLD" "$C_RESET"
     printf '   %sstart Stardew Valley and press Mods on the title screen.%s\n' "$C_BOLD" "$C_RESET"
     printf '   From now on, installing and switching mods happens in the game: no Desktop Mode needed.\n'
