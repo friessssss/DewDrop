@@ -171,7 +171,7 @@ namespace DewDrop.Core.Services
         {
             try
             {
-                return ModsPath(option) is { } path && DewDropPaths.IsSame(path, modsFolder);
+                return ModsPath(option) is { } path && DewDropPaths.IsSame(TrimSeparators(path), TrimSeparators(modsFolder));
             }
             catch (ArgumentException)
             {
@@ -193,8 +193,10 @@ namespace DewDrop.Core.Services
                 return $"\"{smapiExe}\"{argument} %command%";
             }
 
+            // Launch options hold Windows paths, so the name is split off by hand: Path.GetFileName only knows this OS's separator
             var (exe, rest) = SplitProgram(current);
-            if (!Path.GetFileName(exe).StartsWith("StardewModdingAPI", StringComparison.OrdinalIgnoreCase))
+            var name = exe.Substring(exe.LastIndexOfAny(new[] { '\\', '/' }) + 1);
+            if (!name.StartsWith("StardewModdingAPI", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
@@ -247,5 +249,12 @@ namespace DewDrop.Core.Services
         }
 
         private static string Unescape(string value) => value.Replace("\\\"", "\"").Replace("\\\\", "\\");
+
+        /// <summary>A folder without trailing slashes of either kind (a drive root like "C:\" stays as it is).</summary>
+        private static string TrimSeparators(string path)
+        {
+            var trimmed = path.TrimEnd('\\', '/');
+            return trimmed.Length == 0 || trimmed.EndsWith(':') ? path : trimmed;
+        }
     }
 }
