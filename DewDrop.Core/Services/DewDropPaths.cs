@@ -35,6 +35,9 @@ namespace DewDrop.Core.Services
         /// <summary>What DewDrop remembers between sessions about restarts and mods it has seen (see <see cref="StartupState"/>).</summary>
         public string StartupStatePath => Path.Combine(CacheFolder, "DewDrop", "startup.json");
 
+        /// <summary>Which Nexus mod and file installed mods came from (see <see cref="ModSources"/>).</summary>
+        public string ModSourcesPath => Path.Combine(CacheFolder, "DewDrop", "mod-sources.json");
+
         public static bool IsSame(string a, string b)
         {
             return string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);

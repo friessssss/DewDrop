@@ -70,6 +70,7 @@ Any of these works:
 **Installing collections.** DewDrop can't install Nexus collections. Install them in Stardrop (**Nexus Mods** > **Collections**). After that, DewDrop shows them:
 
 * The collection's profile appears on the **Profiles** tab marked "collection, read-only", and its mods carry a "collection" tag.
+* Collection mods have no trash can on the **Installed** tab, because the collection owns them. To remove them, remove the collection in Stardrop.
 * You can switch to it and click **Apply & Restart**. DewDrop always links itself in, so the **Mods** button stays even though collection profiles don't list DewDrop.
 * To change which mods are on, click **Duplicate** first. The copy is a normal profile you can edit.
 * DewDrop doesn't offer updates for collection mods.
@@ -78,7 +79,7 @@ Any of these works:
 
 If DewDrop handles the website's [mod manager links](nexus-mods/mod-manager-links.md), a collection's download button on Nexus Mods sends the link to DewDrop, which answers "That was a Nexus collection. DewDrop installs single mods; collections install through Stardrop." Give the links to Stardrop first (in Stardrop, **View** > **Settings** > **Register NXM Association**).
 
-**Profile-specific mod configs.** If you turned on Stardrop's **Enable Profile Specific Mod Configs**, Stardrop swaps each mod's `config.json` when you switch profiles. DewDrop keeps those saved configs in your profile files but doesn't swap them in. After **Apply & Restart** into another profile, or a **Play** from Steam with **Start in my profile from Steam** on, your mods keep the settings they had last. Starting from Stardrop swaps them as usual.
+**Profile-specific mod configs.** If you turned on Stardrop's **Enable Profile Specific Mod Configs**, Stardrop swaps each mod's `config.json` when you switch profiles. DewDrop keeps those saved configs in your profile files but doesn't swap them in. After **Apply & Restart** into another profile, or a **Play** from Steam with **Start in my profile from Steam** on, your mods keep the settings they had last. Starting from Stardrop swaps them as usual. [Uninstalling a mod](guides/installed.md#uninstall-a-mod) in DewDrop leaves the settings Stardrop saved for it in your profiles alone.
 
 ## If Stardrop uses its own mods folder
 

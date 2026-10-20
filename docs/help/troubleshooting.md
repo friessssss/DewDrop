@@ -35,6 +35,8 @@ Find what you're seeing in this list and click it. If nothing here helps, see [R
 * [Mods I turned off came back](#mods-you-turned-off-came-back)
 * [A mod I added myself is missing or didn't load](#a-mod-you-copied-in-is-missing-or-turned-off)
 * [A mod update says "restart to finish"](#an-update-says-restart-to-finish)
+* [A mod says "Installed twice"](#a-mod-says-installed-twice)
+* [A message says "Couldn't delete ... (uninstalled)"](#an-uninstalled-mod-wasnt-deleted)
 * [I can't log in to Nexus Mods, or my downloads never arrive](#nexus-mods-problems)
 * [There's a red message at the bottom of the menu](#a-red-message-at-the-bottom-of-the-menu)
 
@@ -248,10 +250,10 @@ After you click **Restart**, or **Restart now** when DewDrop asks to load your p
 {% tabs %}
 {% tab title="Windows" %}
 1. Press **Win+R**, paste `%AppData%\Stardrop\Data\Cache\DewDrop`, and press **Enter**.
-2. Open `relaunch.log`. DewDrop empties it each time its helper runs after the game closes, and only writes to it when something went wrong, an update finished, or Steam's launch option changed.
+2. Open `relaunch.log`. DewDrop empties it each time its helper runs after the game closes, and only writes to it when something went wrong, an update or uninstall finished, or Steam's launch option changed.
    * **"Could not start SMAPI: ..."** `StardewModdingAPI.exe` is missing or couldn't start, often because your antivirus removed it. Run the DewDrop installer again: it notices SMAPI is missing and installs it.
    * **"Could not update ... yet: ..."** See [An update says restart to finish](#an-update-says-restart-to-finish).
-   * **Empty (or only "Updated ..." lines), with a "Date modified" that matches your restart.** SMAPI was started, so SMAPI or the game stopped on its own. Check your [SMAPI log](reporting-issues.md#find-your-smapi-log).
+   * **Empty (or only "Updated ..." and "Uninstalled ..." lines), with a "Date modified" that matches your restart.** SMAPI was started, so SMAPI or the game stopped on its own. Check your [SMAPI log](reporting-issues.md#find-your-smapi-log).
    * **Missing, or older than your restart.** The restart helper never ran, most likely because security software or a work or school policy blocks PowerShell scripts.
 3. Start the game the usual way, then try **Apply & Restart** again, or [report the problem](reporting-issues.md) with your `relaunch.log`.
 {% endtab %}
@@ -449,6 +451,22 @@ If the required mod is installed, turn it on. (Turning a mod on also turns on th
 **Update ready, restart to finish** means the new version is downloaded and waiting to be swapped in after the game closes. Click **Apply & Restart**; it's always available while an update is waiting. Quitting the game works too: on Windows, DewDrop finishes waiting updates a moment after the game closes, and the next start loads the new version.
 
 If the update is still waiting after that, open `relaunch.log` (see [above](#the-game-closed-and-never-came-back)) and look for "Could not update". Another program may have a file in that mod's folder open, such as a text editor, a File Explorer window or an antivirus scan. Close it and use **Apply & Restart** again, or quit the game again. See [Updating mods](../guides/updating-mods.md).
+
+### A mod says Installed twice
+
+A red **Installed twice** note means two folders in your mods folder hold the same mod, with the same unique ID. When SMAPI loads the whole `Mods` folder, as a normal launch does, it loads neither copy. **Show: Problems** on the **Installed** tab lists them.
+
+Hover over the row to see where the other copy is, then click the trash can on the copy you don't want. The other copy stays installed, and stays on in your profile. See [Mods installed twice](../guides/installed.md#mods-installed-twice).
+
+### An uninstalled mod wasn't deleted
+
+DewDrop deletes a mod you uninstalled once the game has closed. On Windows, it can't while a program still has a file in the mod's folder open. It tries again a moment after the game closes and at the next few starts. After three starts it gives up and says "Couldn't delete '...' (uninstalled): a file stayed open. Delete it yourself."
+
+1. Find the folder. The message names it, and the SMAPI log has its full path.
+2. Close the game, and any program that might be using a file in that folder, such as a text editor, a File Explorer window or an antivirus scan.
+3. Delete the folder.
+
+Until you do, the mod is listed on the **Installed** tab as an ordinary mod again. See [When the folder is deleted](../guides/installed.md#when-the-folder-is-deleted).
 
 ## Nexus Mods problems
 

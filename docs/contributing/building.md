@@ -81,7 +81,7 @@ dotnet test DewDrop.Core.Tests/DewDrop.Core.Tests.csproj
 
 This builds only `DewDrop.Core` and its tests, so it works without Stardew Valley or SMAPI. `dotnet build DewDrop.sln` builds the tests too, but only `dotnet test` runs them. A pull request needs them to pass, and [CI](#what-ci-checks) runs them as well.
 
-They check the parts of [starting in your profile](../guides/start-in-your-profile.md) that don't need the game:
+They check the parts of [starting in your profile](../guides/start-in-your-profile.md), and of installing and [uninstalling](../guides/installed.md#uninstall-a-mod) mods, that don't need the game:
 
 | File | What it checks |
 | --- | --- |
@@ -90,10 +90,18 @@ They check the parts of [starting in your profile](../guides/start-in-your-profi
 | `DewDropPathsTests.cs` | Comparing folder paths, including a `Mods` folder reached through a symbolic link or a junction. |
 | `SteamLaunchOptionTests.cs` | Reading Stardew Valley's launch option from Steam's `localconfig.vdf`, and adding or removing `--mods-path` the way SMAPI reads it: the rest of the option is kept, an older `--mods-path` is replaced, and an option that starts another program is left alone. |
 | `RelauncherScriptTests.cs` | The PowerShell script that runs after the game closes, tried on a scratch `localconfig.vdf`: it writes the new launch option and keeps a backup, leaves an option that changed meanwhile alone, and adds the game's entry when Steam has none. Steam is never closed, because the test points the script at a `steam.exe` that isn't running. |
+| `PendingRemovalTests.cs` | Uninstalls waiting in `pending-updates.json`: the hidden name a removal reserves, an uninstall and an update for the same folder, Undo, moving the mod aside as the game closes, deleting it at the next start, a folder that now holds another mod, and a blocked removal that's retried, then given up. |
+| `RelauncherRemovalTests.cs` | The script finishing uninstalls after the game closes: it removes the mod and its link, leaves a folder that now holds another mod, and keeps a blocked uninstall while still applying updates. Also removing only the right links from `Selected Mods`. |
+| `ModInstallerTests.cs` | The installer reporting every folder it wrote, and installing a mod again into a folder that's waiting to be uninstalled. |
+| `ModSourcesTests.cs` | Reading and saving `mod-sources.json`: install records, smapi.io's Nexus IDs, a mod bundled in several downloads, and damaged or hand-edited files. |
+| `InstalledFilesTests.cs` | Which of a mod's files its page marks **Installed**: the install record, then matching versions, and comparing versions written in different ways. |
+| `UpdateCheckerTests.cs` | Reading smapi.io's answers: only mods with their own update keys are offered updates, and the Nexus ID is read for the rest. |
 
 The tests only write files inside a `dewdrop-tests` folder in your temp folder, so they never touch your game, your mods or Steam. Some tests pass without checking anything where they can't run:
 
-* `RelauncherScriptTests` run Windows PowerShell, so they only check anything on Windows. If you change the script in `Relauncher.cs`, run the tests on Windows.
+* `RelauncherScriptTests`, and the script tests in `RelauncherRemovalTests`, run Windows PowerShell, so they only check anything on Windows. If you change the script in `Relauncher.cs`, run the tests on Windows.
+* Two tests in `PendingRemovalTests` that hold a file open, on macOS and Linux: only Windows refuses to move a folder while a file in it is open.
+* The two link tests in `RelauncherRemovalTests`, on macOS and Linux when the test runner isn't allowed to make symbolic links.
 * Two path tests: the symbolic-link test on Windows without Developer Mode, and the junction test on macOS and Linux.
 
 ## Debug vs Release

@@ -8,7 +8,7 @@ icon: book
 Everything in DewDrop happens in one menu that you open with the **Mods** button on Stardew Valley's title screen. These guides walk through it tab by tab. If you haven't installed DewDrop yet, start with the [Quick start](../quick-start.md).
 
 * <img src="../.gitbook/assets/icons/window.png" alt="" data-size="line"> [The DewDrop menu](the-menu.md): opening and closing it, the tabs, the bottom bar, messages and controls (mouse, keyboard and controller).
-* <img src="../.gitbook/assets/icons/installed.png" alt="" data-size="line"> [Managing your mods](installed.md): turn mods on and off, search and filter, and fix missing requirements on the **Installed** tab.
+* <img src="../.gitbook/assets/icons/installed.png" alt="" data-size="line"> [Managing your mods](installed.md): turn mods on and off, search and filter, fix missing requirements, and uninstall mods on the **Installed** tab.
 * <img src="../.gitbook/assets/icons/browse.png" alt="" data-size="line"> [Browsing Nexus Mods](browse.md): search, sort and page through mods on the **Browse** tab.
 * <img src="../.gitbook/assets/icons/puzzle.png" alt="" data-size="line"> [A mod's page and installing files](mod-page.md): pick a file and install it, and what each Install button means.
 * <img src="../.gitbook/assets/icons/check.png" alt="" data-size="line"> [Updating mods](updating-mods.md): how DewDrop finds updates and installs them.

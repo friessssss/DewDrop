@@ -76,7 +76,7 @@ When you change this, [Browse](browse.md) reloads its results the next time you 
 
 ### Check for updates at startup
 
-DewDrop asks smapi.io for updates in the background as the game starts. If it finds any, the **Installed** tab shows a count, such as **Installed (2 new)**. If you turn this off, the change applies from your next launch, and you can still click **Check for updates** on the **Installed** tab whenever you like. See [Updating mods](updating-mods.md).
+DewDrop asks smapi.io for updates in the background as the game starts. If it finds any, the **Installed** tab shows a count, such as **Installed (2 new)**. The same check tells DewDrop which Nexus mod some of your mods are, which helps Browse [mark the mods you have](browse.md#how-dewdrop-knows-you-have-a-mod). If you turn this off, the change applies from your next launch, and you can still click **Check for updates** on the **Installed** tab whenever you like. See [Updating mods](updating-mods.md).
 
 ## The lines under the options
 

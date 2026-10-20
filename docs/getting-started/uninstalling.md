@@ -8,7 +8,7 @@ icon: trash-can
 Removing DewDrop mostly means deleting one folder. If Steam starts the game in your profile, there's one step before that. Your other mods, SMAPI and your saves stay as they are. Mods you installed through DewDrop are ordinary mod folders, so they stay too.
 
 {% hint style="warning" %}
-**Mods you turned off will load again.** DewDrop never moves mods out of your `Mods` folder. Turning a mod off only changes your profile. Once DewDrop is gone, a normal launch loads everything in `Mods`, including mods you had turned off.
+**Mods you turned off will load again.** Turning a mod off doesn't move it out of your `Mods` folder. It only changes your profile. Once DewDrop is gone, a normal launch loads everything in `Mods`, including mods you had turned off.
 
 To see which mods those are, open the **Installed** tab before you uninstall and click the filter button until it says **Show: Disabled**. To keep a mod off without DewDrop, move its folder out of `Mods`, or put a `.` at the start of its folder name (SMAPI skips those folders).
 {% endhint %}
@@ -38,6 +38,8 @@ To see them, show hidden files: in Windows 11 File Explorer choose **View** > **
 
 If a mod said **Update ready, restart to finish** when you removed DewDrop, its new version is in `.dewdrop-staging` and won't go in now. That mod stays on its old version, so update it another way if you need to.
 
+If a mod said **Deleted when the game closes**, DewDrop moved it into `.dewdrop-staging` when you quit, in a folder whose name ends in `-removed`. DewDrop would have deleted it at the next start, so it stays there now. SMAPI skips it, and you can delete it. If the mod's folder is still in `Mods`, delete that yourself.
+
 </details>
 
 <details>
@@ -52,7 +54,7 @@ Your DewDrop profiles and saved Nexus Mods login go with it. If you might try St
 
 **If you use Stardrop,** keep the data folder. Stardrop uses the same profiles, settings, Nexus Mods login and `Selected Mods` folder.
 
-* You can delete `Cache\DewDrop` inside it: DewDrop's download queue, restart script and log, `startup.json` and link handler script. If DewDrop handles Nexus download links, sort that out first (next section).
+* You can delete `Cache\DewDrop` inside it: DewDrop's download queue, restart script and log, `startup.json`, `mod-sources.json` and link handler script. If DewDrop handles Nexus download links, sort that out first (next section).
 * Your profiles still list DewDrop (`friessssss.DewDrop`) as turned on. That entry does nothing once the DewDrop folder is gone.
 * Don't log out of Nexus Mods in DewDrop before you remove it. Stardrop uses the same saved key, so it would be logged out too.
 

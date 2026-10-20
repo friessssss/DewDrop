@@ -95,8 +95,9 @@ These are the files DewDrop uses inside `Stardrop/Data`:
 | `Cache/DewDrop/downloads/` | Downloads waiting to be installed. Emptied every time the game starts. | Yes, while the game is closed. |
 | `Cache/DewDrop/nxm/` | Download links from the website that haven't started yet (Windows). | Yes, but those downloads won't start. |
 | `Cache/DewDrop/nxm-handler.ps1` | The small script Windows runs for website download links, once you've clicked **Use DewDrop for these links**. | No, while DewDrop handles those links. |
-| `Cache/DewDrop/pending-updates.json` | Updates waiting for a restart, or on Windows for you to quit the game. | No, while an update shows **Update ready, restart to finish**. |
-| `Cache/DewDrop/relaunch.ps1`, `relaunch.log` | The script that runs after the game closes, and its log (Windows). It restarts the game for **Apply & Restart**, finishes waiting updates, and changes Steam's launch option for **Start in my profile from Steam**. | Yes, while the game is closed. DewDrop writes them again when it needs them. |
+| `Cache/DewDrop/pending-updates.json` | Updates waiting for a restart, or on Windows for you to quit the game, and mods you uninstalled, waiting for the game to close. | No, while a mod shows **Update ready, restart to finish** or **Deleted when the game closes**. Without it, DewDrop forgets the update or the uninstall. |
+| `Cache/DewDrop/mod-sources.json` | Which Nexus mod and file DewDrop installed each mod from, and which Nexus mod smapi.io says each of your mods is. Browse and a mod's page use it to show what you have installed. See [How DewDrop knows you have a mod](../guides/browse.md#how-dewdrop-knows-you-have-a-mod). | Yes. DewDrop fills it in again as you install mods and check for updates. Until then, some mods you have may not show as installed on Browse. |
+| `Cache/DewDrop/relaunch.ps1`, `relaunch.log` | The script that runs after the game closes, and its log (Windows). It restarts the game for **Apply & Restart**, finishes waiting updates and uninstalls, and changes Steam's launch option for **Start in my profile from Steam**. | Yes, while the game is closed. DewDrop writes them again when it needs them. |
 | `Cache/DewDrop/steam-job.json`, `steam-result.json` | A change to Steam's launch option, and how it went (Windows). `steam-job.json` only exists for a moment after you quit the game. `steam-result.json` stays until the next start, when DewDrop reads it, removes it and tells you how the change went. | Yes. If the change didn't happen, DewDrop tries again the next time you quit. You only miss the message about it. |
 | `Cache/DewDrop/startup.json` | What DewDrop remembers between launches: a restart that's in progress, if any, and the mods DewDrop has already seen, so it can tell which ones you copied in by hand. See [How DewDrop works](how-it-works.md#mods-you-copy-in-by-hand). | Yes, while the game is closed. DewDrop starts a new one, and every mod installed then counts as seen. |
 
@@ -105,6 +106,7 @@ You may also see backup copies:
 * `Settings.json.bak-<date>-<time>`: DewDrop found `Settings.json` damaged, kept this copy and started again from defaults.
 * `Profiles/Default.json.bak-<date>-<time>`: the same, for a damaged `Default` profile.
 * `Cache/DewDrop/startup.json.bak`: DewDrop found `startup.json` damaged, kept this copy and started a new one. Safe to delete.
+* `Cache/DewDrop/mod-sources.json.bak`: the same, for `mod-sources.json`. Safe to delete.
 
 {% hint style="warning" %}
 `Selected Mods` holds **links**, not copies. Opening it looks as if your mods are inside, but they really live in your `Mods` folder. Some tools follow links when they delete, and would delete your real mods. For example, Windows PowerShell's `Remove-Item -Recurse` can do this. Don't clean the folder out with scripts or cleanup tools; DewDrop clears and rebuilds it safely itself.
@@ -118,14 +120,14 @@ You may also see backup copies:
 
 Besides the mods themselves, you might notice these folders. Their names start with a dot, which tells SMAPI to skip them.
 
-* **`.dewdrop-staging`**: holds a mod's new copy, next to the mod's folder, while DewDrop installs or updates it. On Windows, an update waiting for a restart stays here until **Apply & Restart**, or quitting the game, finishes it, so don't delete it while a mod shows **Update ready, restart to finish**. DewDrop removes leftovers when the game starts. See [How DewDrop works](how-it-works.md#updates-that-wait-for-a-restart).
+* **`.dewdrop-staging`**: holds a mod's new copy, next to the mod's folder, while DewDrop installs or updates it. On Windows, an update waiting for a restart stays here until **Apply & Restart**, or quitting the game, finishes it, so don't delete it while a mod shows **Update ready, restart to finish**. Mods you [uninstall](../guides/installed.md#uninstall-a-mod) are moved in here as the game closes, in a folder whose name ends in `-removed`, and deleted the next time the game starts. DewDrop removes leftovers when the game starts. See [How DewDrop works](how-it-works.md#updates-that-wait-for-a-restart).
 * **A folder name with a dot in front and `-duplicate` at the end**, such as `.DewDrop-duplicate`: an extra copy of DewDrop that the installer turned off for you. Safe to delete.
 * **`.dewdrop-installer-…`** and **`.dewdrop-old-…`**: temporary folders the installer uses while it swaps in a new DewDrop. They're removed when it finishes. If one is left behind after an interrupted install, you can delete it.
 
 ## Logs
 
 * **SMAPI log** (`SMAPI-latest.txt`): everything DewDrop reports, including errors, goes here, together with SMAPI's own messages. It's rewritten each time the game starts. To share it, upload it at [smapi.io/log](https://smapi.io/log). See [Reporting issues](../help/reporting-issues.md).
-* **`relaunch.log`** (Windows only): written by the script that runs after the game closes, for **Apply & Restart**, waiting updates and **Start in my profile from Steam**. It's emptied each time that script runs, and only gets lines when it finished updates, changed Steam's launch option or something went wrong. macOS and Linux have no restart log.
+* **`relaunch.log`** (Windows only): written by the script that runs after the game closes, for **Apply & Restart**, waiting updates and uninstalls, and **Start in my profile from Steam**. It's emptied each time that script runs, and only gets lines when it finished updates or uninstalls, changed Steam's launch option or something went wrong. macOS and Linux have no restart log.
 * **`DewDrop-installer.log`**: a record of the installer's last run, replaced each time you run it. On Windows, it holds everything the installer printed. On macOS and Linux, it holds the installer's steps, warnings and errors, but not your answers to its questions or the output of SMAPI's own installer.
 
 ## Other changes on Windows

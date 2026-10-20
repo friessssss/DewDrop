@@ -38,7 +38,7 @@ Click a **Done** row to jump to the **Installed** tab and see the mod. While dow
 * **Retry** appears on failed downloads for Premium accounts and downloads the file again. Free accounts see **Get on Nexus** instead, which opens the file on the website so you can click **Slow download** again.
 * **View on Nexus** opens the mod's page in your browser.
 
-For Premium accounts, **Retry** isn't offered when trying again can't help, for example when Nexus Mods no longer has the file.
+For Premium accounts, **Retry** isn't offered when trying again can't help, for example when Nexus Mods no longer has the file. If DewDrop has installed the file since it failed, for example from the mod's page, **Retry** removes the row instead and says "*title* is already installed."
 
 ## What happens to a download
 
@@ -47,6 +47,7 @@ DewDrop unpacks each file straight into your `Mods` folder, then deletes the dow
 * If the file holds several mods, each one gets its own folder.
 * If you already have the mod, DewDrop updates it in its existing folder and keeps your settings. See [Updating mods](updating-mods.md).
 * A new mod never overwrites another mod's folder. If the name is taken, it gets a name like `Name (2)`.
+* If you [uninstalled the mod](installed.md#uninstall-a-mod) and the game hasn't closed yet, installing it again puts it back and cancels the uninstall.
 
 With **Turn on mods when installed** on, which is the default, new mods are turned on in your active profile straight away. Click [**Apply & Restart**](apply-and-restart.md) to load them.
 

@@ -707,6 +707,41 @@ export function icon(name) {
 
 export const LEGEND = L;
 
+/**
+ * A metal trash can with its lid on, 18x26 like the one on the Installed tab (which the game draws at 2x). Drawn
+ * here in the icon style, since the game's own sprite can't be used in the docs art.
+ */
+export function trashCan() {
+  return Canvas.sprite([
+    '......kkkkkk......',
+    '.....kUUUTTtk.....',
+    '.....kTkkkktk.....',
+    '.kkkkkkkkkkkkkkkk.',
+    'kUUUUUUUUUUUUUUUTk',
+    'kUTTTTTTTTTTTTTTtk',
+    'kkkkkkkkkkkkkkkkkk',
+    '.kttttttttttttttk.',
+    '.kUUUUUUUUUUUUTtk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kUTUtTUtTUtTTttk.',
+    '.kttttttttttttttk.',
+    '.kUUUUUUUUUUUUTtk.',
+    '.kTTTTTTTTTTTTttk.',
+    '.kttttttttttttttk.',
+    '..kkkkkkkkkkkkkk..',
+  ], L);
+}
+
 // ---------------------------------------------------------------------------------------------------------------
 // Screenshot frames and diagram cards
 

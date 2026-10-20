@@ -15,7 +15,7 @@ import { Canvas } from './lib/canvas.mjs';
 import { P } from './lib/palette.mjs';
 import { measure } from './lib/font.mjs';
 import { encodeAPNG } from './lib/png.mjs';
-import { ICON_NAMES, icon, logoMark, panel, plaque, card, arrow, framedShot, stackedNode, nodeHeight } from './lib/components.mjs';
+import { ICON_NAMES, icon, logoMark, panel, plaque, card, arrow, framedShot, stackedNode, nodeHeight, trashCan } from './lib/components.mjs';
 import { banner, meadow, ribbon, divider } from './lib/scenes.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -105,9 +105,18 @@ const MENU_CROP = [140, 8, 1640, 964];
 // Personal details to hide, in capture coordinates: [file, x, y, w, h]
 const REDACT = [['account.png', 428, 296, 192, 40]];
 
+// Small UI added after a capture was taken, drawn in at the spot the game draws it until that screenshot is captured
+// again: [file, draw(capture)]. Delete an entry when you replace its capture.
+const OVERLAYS = [
+  // The Installed tab's trash cans: the game draws an 18x26 can at 2x, centered in a 44px column 12px in from each
+  // row's right edge (x 1676). Rows are 64px tall every 76px from y 300; DewDrop's own row (the sixth) has none.
+  ['installed.png', (c) => { for (const rowY of [300, 376, 452, 528, 604]) c.blit(trashCan(), 1624, rowY + 6, 2); }],
+];
+
 function loadShot(file) {
   const c = Canvas.fromPNG(path.join(shotsDir, file));
   for (const [f, x, y, w, h] of REDACT) if (f === file) pixelate(c, x, y, w, h, 10);
+  for (const [f, draw] of OVERLAYS) if (f === file) draw(c);
   return c;
 }
 

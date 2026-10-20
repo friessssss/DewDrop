@@ -100,7 +100,7 @@ When this is `true`, DewDrop asks smapi.io for newer versions of your mods each 
 
 When it's `false`, nothing is checked at startup. You can still click **Check for updates** on the **Installed** tab whenever you like. Changing this setting takes effect the next time the game starts.
 
-The check sends smapi.io your mods' IDs, versions and update keys, plus your SMAPI version, game version and operating system. It doesn't send anything about your Nexus Mods account. Mods from Stardrop collections are never checked.
+The check sends smapi.io your mods' IDs, versions and update keys, plus your SMAPI version, game version and operating system. It doesn't send anything about your Nexus Mods account. Mods from Stardrop collections are never checked. Mods without update keys are asked about too, only to learn which Nexus mod each one is, for Browse's **Installed** tag.
 
 ### NexusSsoSlug
 
