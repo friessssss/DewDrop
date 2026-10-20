@@ -31,6 +31,7 @@ Found a bug but don't want to write code? [Reporting issues](../help/reporting-i
 | `DewDrop.Core.Tests/` | Unit tests for `DewDrop.Core`. They run without the game. |
 | `DewDrop.Mod/` | The SMAPI mod itself. It holds the title-screen button (Harmony patches on `TitleMenu`), the menu and its tabs, the **Load your profile?** box, background downloads and the debug bridge. |
 | `installer/` | The installer: `internal/install.ps1` for Windows, `internal/install.sh` for macOS and Linux, the double-click launchers, and its tests in `tests/`. |
+| `install.ps1`, `install.sh` | The one-line installers (`irm ... \| iex` and `curl ... \| bash`). They download the installer from `master` and run it. See [Installer options](../reference/installer-options.md#what-the-launchers-do). |
 | `tools/package-release.mjs` | Builds the two release zips. |
 | `tools/docs-art/` | Draws every image in these docs. |
 | `docs/` | This guide. |

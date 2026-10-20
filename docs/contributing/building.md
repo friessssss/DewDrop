@@ -119,8 +119,8 @@ The workflow in `.github/workflows/build.yml` runs on every push to `development
 
 * **`build`** builds `DewDrop.Core` on Ubuntu with .NET 6 and runs the [unit tests](#run-the-unit-tests). On Ubuntu, `RelauncherScriptTests` pass without running the script.
 * **`build-mod`** builds and packages `DewDrop.Mod` exactly as a release is, against metadata-only reference assemblies of the game and SMAPI (the runner has no game install), and attaches both zips to the run. See [Releasing](releasing.md#how-ci-builds-the-mod-without-the-game).
-* **`installer-unix`** runs on Ubuntu and on macOS (which ships bash 3.2). It checks the syntax of `install.sh` and both launchers, then runs `installer/tests/install-sh.test.sh`.
-* **`installer-windows`** checks that `install.ps1` parses in Windows PowerShell and is plain ASCII, then runs `installer/tests/install-ps1.test.ps1`.
+* **`installer-unix`** runs on Ubuntu and on macOS (which ships bash 3.2). It checks the syntax of `install.sh`, both launchers and the one-line `install.sh` in the repository root, then runs `installer/tests/install-sh.test.sh`, which also runs the one-line installer against this checkout.
+* **`installer-windows`** checks that `install.ps1` and the one-line `install.ps1` in the repository root parse in Windows PowerShell and are plain ASCII, then runs `installer/tests/install-ps1.test.ps1`, which also runs the one-line installer against this checkout.
 
 CI can't play the game, though, so still test your change in the game before you open a pull request. Pull requests into `master` also run a version check, and merging one publishes a release: see [Releasing](releasing.md).
 

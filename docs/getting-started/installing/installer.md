@@ -7,7 +7,7 @@ icon: box-open
 
 The installer does the fiddly parts for you. It finds your game, installs or updates SMAPI (the mod loader DewDrop runs on) if you need it, and copies DewDrop into your `Mods` folder. It asks before it changes anything important.
 
-Before you start, check [What you need](../requirements.md). The installer has been tested on Windows and Linux, but not on macOS yet (see [Platform support](../../reference/platform-support.md)).
+Before you start, check [What you need](../requirements.md). The installer has been tested on Windows, Linux and an Apple Silicon Mac (see [Platform support](../../reference/platform-support.md)).
 
 ## The quick way: one line
 
@@ -35,7 +35,9 @@ curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.s
 
 To pass [installer options](../../reference/installer-options.md), see [Running it from the command line](../../reference/installer-options.md).
 
-## Install in five steps
+## Or download it: five steps
+
+Prefer to download the installer and double-click it? These steps do the same as the one line.
 
 {% stepper %}
 {% step %}
@@ -63,7 +65,7 @@ Open the `DewDrop <version> installer` folder and double-click the file for your
 * **macOS:** `Install on macOS.command`.
 * **Linux:** `Install on Linux.sh`.
 
-A window full of text opens. That's the installer. If your computer warns you about it, see [Running the installer on your computer](#running-the-installer-on-your-computer).
+A window full of text opens. That's the installer. If your computer warns you about it, use [the one line](#the-quick-way-one-line) instead, or see [Running the installer on your computer](#running-the-installer-on-your-computer).
 {% endstep %}
 
 {% step %}
@@ -109,7 +111,7 @@ If no SMAPI window opens, the game started without mods. One exception: on macOS
 
 {% tabs %}
 {% tab title="Windows" %}
-**"Windows protected your PC":** click **More info**, then **Run anyway**. Windows shows this for new downloads it doesn't recognize yet.
+**"Windows protected your PC":** click **More info**, then **Run anyway**. Windows shows this for new downloads it doesn't recognize yet. [The one line](#the-quick-way-one-line) avoids it.
 
 **A message that starts with "Oops!":** the installer couldn't start, and the message says why. See [Troubleshooting](../../help/troubleshooting.md#the-installer-fails-to-start).
 
@@ -119,7 +121,7 @@ If no SMAPI window opens, the game started without mods. One exception: on macOS
 {% endtab %}
 
 {% tab title="macOS" %}
-**"Install on macOS.command" Not Opened:** macOS shows this for downloaded scripts that Apple hasn't checked. The easiest fix is to use [the Terminal line](#the-quick-way-on-macos-and-linux) instead. Click **Done** (not **Move to Trash**). Open **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. On older macOS, right-click the file and choose **Open** instead.
+**"Install on macOS.command" Not Opened:** macOS shows this for downloaded scripts that Apple hasn't checked. The easiest fix is to use [the Terminal line](#the-quick-way-one-line) instead. Click **Done** (not **Move to Trash**). Open **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. On older macOS, right-click the file and choose **Open** instead.
 
 **Double-clicking does nothing:** open Terminal, type `bash` and a space, drag `Install on macOS.command` into the window, and press **Return**.
 

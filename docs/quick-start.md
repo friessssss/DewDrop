@@ -17,25 +17,38 @@ The installer puts DewDrop in your game and also sets up SMAPI, the free tool th
 
 {% stepper %}
 {% step %}
-### Download the installer
+### Start the installer
 
-Download `DewDrop-<version>-installer.zip` from the [latest DewDrop release](https://github.com/friessssss/DewDrop/releases/latest), then extract it:
+Paste one line, and it downloads the installer and the latest DewDrop for you.
 
-* **Windows:** right-click the zip and choose **Extract All**.
-* **macOS:** Safari usually unzips it for you. If you only see the zip in **Downloads**, double-click it.
-* **Linux:** use your file manager's extract option.
+* **Windows:** open **PowerShell** (click **Start**, type `PowerShell` and press **Enter**), paste this and press **Enter**:
+
+  ```powershell
+  irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex
+  ```
+* **macOS or Linux:** open **Terminal** (on a Mac, press **Command + Space**, type `Terminal` and press **Return**), paste this and press **Return**:
+
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
+  ```
+
+<details>
+
+<summary>Prefer to download the installer?</summary>
+
+Download `DewDrop-<version>-installer.zip` from the [latest DewDrop release](https://github.com/friessssss/DewDrop/releases/latest) and extract it (on Windows, right-click it and choose **Extract All**; on macOS, Safari usually unzips it for you). Open the `DewDrop <version> installer` folder and double-click the file for your computer:
+
+* **Windows:** **Install on Windows** (`Install on Windows.bat`). If you see **Windows protected your PC**, click **More info**, then **Run anyway**.
+* **macOS:** `Install on macOS.command`. If macOS won't open it, click **Done** (not **Move to Trash**). Then go to **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. (Older macOS: right-click it and choose **Open**.)
+* **Linux:** `Install on Linux.sh`. If it opens in a text editor, right-click an empty spot in the folder, choose **Open in Terminal**, type `bash "Install on Linux.sh"` and press **Enter**.
+
+</details>
 {% endstep %}
 
 {% step %}
-### Run the installer
+### Answer the questions
 
-Open the `DewDrop <version> installer` folder (on Windows, it's inside the `DewDrop-<version>-installer` folder) and double-click the file for your computer:
-
-* **Windows:** **Install on Windows** (`Install on Windows.bat`). Or skip the download: open **PowerShell**, paste `irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex` and press **Enter**. If you see **Windows protected your PC**, click **More info**, then **Run anyway**.
-* **macOS:** `Install on macOS.command`. Or skip the download: open **Terminal**, paste `curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash` and press **Return**. If macOS won't open the `.command`, click **Done** (not **Move to Trash**). Then go to **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. (Older macOS: right-click it and choose **Open**.)
-* **Linux:** `Install on Linux.sh`. If it opens in a text editor, right-click an empty spot in the folder, choose **Open in Terminal**, type `bash "Install on Linux.sh"` and press **Enter**.
-
-A window full of text opens: that's the installer. For each question, press **Enter** to pick the recommended answer. On Windows, a second window (SMAPI's own installer) may open and close by itself.
+The installer runs in that window. For each question, press **Enter** to pick the recommended answer. On a Mac with an Apple chip, it may first offer to install Rosetta, which SMAPI's installer needs: press **Enter** and type your Mac password. On Windows, a second window (SMAPI's own installer) may open and close by itself.
 
 With Steam on Windows, it offers to change one Steam setting, the game's launch option, so **Play** starts the game with mods. Steam closes for this and opens again when the installer starts the game. It also asks **Start the game in your DewDrop profile when you press Play in Steam?** Press **Enter** for yes. You'll see what that does in step 5.
 
