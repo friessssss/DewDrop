@@ -14,26 +14,30 @@ namespace DewDrop.Core.Services
 
         /// <param name="modsFolder">The real mods folder (not the linked Selected Mods folder).</param>
         /// <param name="collectionsFolder">Stardrop's collection install root; each child is one collection's SourceId.</param>
-        public List<InstalledMod> Scan(string modsFolder, string? collectionsFolder, bool ignoreHidden = true)
+        /// <param name="stagingParents">
+        /// Gets every folder holding a staging folder, so leftovers there are cleaned up even once no mod is left beside
+        /// them (an uninstalled mod that was alone in a group folder).
+        /// </param>
+        public List<InstalledMod> Scan(string modsFolder, string? collectionsFolder, bool ignoreHidden = true, ICollection<string>? stagingParents = null)
         {
             var mods = new List<InstalledMod>();
             if (Directory.Exists(modsFolder))
             {
-                Walk(new DirectoryInfo(modsFolder), null, ignoreHidden, mods);
+                Walk(new DirectoryInfo(modsFolder), null, ignoreHidden, mods, stagingParents);
             }
 
             if (collectionsFolder is not null && Directory.Exists(collectionsFolder) && !DewDropPaths.IsSameOrUnder(collectionsFolder, modsFolder))
             {
                 foreach (var collection in new DirectoryInfo(collectionsFolder).EnumerateDirectories())
                 {
-                    Walk(collection, collection.Name, ignoreHidden, mods);
+                    Walk(collection, collection.Name, ignoreHidden, mods, stagingParents);
                 }
             }
 
             return mods;
         }
 
-        private void Walk(DirectoryInfo folder, string? sourceId, bool ignoreHidden, List<InstalledMod> found)
+        private void Walk(DirectoryInfo folder, string? sourceId, bool ignoreHidden, List<InstalledMod> found, ICollection<string>? stagingParents)
         {
             IEnumerable<DirectoryInfo> children;
             try
@@ -52,6 +56,7 @@ namespace DewDrop.Core.Services
                 // hidden-folder setting says; listing them would link a staged copy instead of the real one
                 if (child.Name.Equals(PendingUpdates.StagingFolderName, StringComparison.OrdinalIgnoreCase))
                 {
+                    stagingParents?.Add(folder.FullName);
                     continue;
                 }
 
@@ -64,7 +69,7 @@ namespace DewDrop.Core.Services
                 var manifestPath = Path.Combine(child.FullName, "manifest.json");
                 if (!File.Exists(manifestPath))
                 {
-                    Walk(child, sourceId, ignoreHidden, found);
+                    Walk(child, sourceId, ignoreHidden, found, stagingParents);
                     continue;
                 }
 

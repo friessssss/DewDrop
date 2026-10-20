@@ -84,6 +84,10 @@ The command name isn't case-sensitive. Everything after the first space is the a
 | `marker STAGE` | Leaves a restart note in `startup.json` for the next launch to find, as if a restart were in progress. `STAGE` is `restarting` or `arrived`. `marker clear` (or any other word) removes the note. | `marker Restarting`, `marker Arrived` or `marker cleared`, or `couldn't save` |
 | `unsee ID` | Takes mods off the list of mods DewDrop has seen, so they count as new in your `Mods` folder at the next launch. Give one or more unique IDs, separated by spaces. | `forgotten`, even for an ID that wasn't on the list, or `couldn't save` |
 | `diff` | Reports how the mods SMAPI loaded differ from the active profile (see below). | the difference line |
+| `uninstall ID` | Uninstalls the first loose copy of the mod with that unique ID, as its trash can on the **Installed** tab does, without the dialog. The folder really is deleted when the game closes, unless you send `undo` first. | `uninstalled <folder>` with the folder's full path, `refused: <reason>` with the reason the trash can would give, or `not installed` (also for a mod that's already uninstalled, or only in a collection) |
+| `undo ID` | Keeps an uninstalled mod, as its **Undo** button does. | `kept <folder>: <message>`, with the message **Undo** shows. Otherwise the message on its own, such as `<name> was already deleted.`, or `not uninstalled` |
+| `removals` | Reports the uninstalls waiting for the game to close. | `removing=[ids] stillLoaded=[ids] queued=[id@folder, ...]` (see below) |
+| `sources ID` | Reports what DewDrop knows about where a mod came from on Nexus Mods. | `nexus=[ids] install=<mod>/<file> v<version> copies=<n>` (see below), or `not installed` |
 | anything else |  | `unknown command` |
 
 The comment at the top of `DebugBridge.cs` doesn't list `window`, `borderless` or `uiscale`, but all three work.
@@ -163,6 +167,34 @@ problem=none option="C:\Program Files (x86)\Steam\steamapps\common\Stardew Valle
 | `option` | Stardew Valley's launch option, exactly as Steam stores it. It's empty when the game has no launch option, and `(unknown)` when DewDrop couldn't read it. |
 | `on` and `pending` | The same as `steamOn` and `steamPending` in the status line. |
 
+### The removals line
+
+`removals` replies with one line, for example:
+
+```
+removing=[Author.ModA] stillLoaded=[Author.ModA] queued=[Author.ModA@C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\ModA]
+```
+
+| Field | Meaning |
+| --- | --- |
+| `removing` | Unique IDs of the mods uninstalled and waiting for the game to close: the rows that say **Deleted when the game closes**. |
+| `stillLoaded` | The ones of those the game has loaded, which make the bottom bar say "... still loaded. Restart to finish uninstalling." |
+| `queued` | The uninstalls listed in `pending-updates.json`, each as the unique ID, `@`, and the mod's folder. Usually the same mods as `removing`. |
+
+### The sources line
+
+`sources` replies with one line, for example:
+
+```
+nexus=[1915] install=1915/12345 v2.5.3 copies=1
+```
+
+| Field | Meaning |
+| --- | --- |
+| `nexus` | The Nexus mod IDs the mod belongs to, from its update key, DewDrop's install record and smapi.io's list. Browse tags these mods' cards. See [How DewDrop knows you have a mod](../guides/browse.md#how-dewdrop-knows-you-have-a-mod). |
+| `install` | The Nexus mod and file DewDrop last installed it from, and the version that file put in, from `mod-sources.json`. `none` when DewDrop didn't install it. |
+| `copies` | How many loose copies of the mod are installed. It's 1 for a mod that's only in a collection. More than 1 means the **Installed** tab says **Installed twice**. |
+
 ### Screenshots
 
 `shot` draws the current menu into an image the size of the UI and saves it as a PNG. It creates the folder if needed and overwrites an existing file. Use a full path; forward slashes and spaces are fine.
@@ -220,6 +252,11 @@ At 3840×2160 the frame is at x 1120, y 501, 1600 × 1150.
 * `scroll` only moves a list when your real mouse is over it. Use `key Down` and `key Up` instead.
 * The tooltip box and the tab highlight are drawn at your real mouse position. The game also re-hovers at the real mouse every tick, so put `hover` and `shot` in the same file with no `wait` between them.
 
+**The game window in the background**
+
+* When `pauseWhenOutOfFocus` is `true` in the game's `startup_preferences` file, the game skips its own update while its window isn't in front. The bridge still runs commands, and clicks, keys and `shot` still work, but the menu stops updating itself. For example, the **Profiles** tab's buttons keep the state they had, so **Use this profile** stays grayed out after **Duplicate** until you click another tab and back. A mod's page never shows its **Installed** note or its **Uninstall** button.
+* So keep the game window in front, or close the game, set `pauseWhenOutOfFocus` to `false` and start it again. Back up `startup_preferences` first and put it back afterward.
+
 **Clean screenshots**
 
 * Info messages stay for 5 seconds and error messages for 8. Wait for them to clear, or click one to dismiss it.
@@ -231,7 +268,7 @@ At 3840×2160 the frame is at x 1120, y 501, 1600 × 1150.
 * A `wait` on the last line doesn't hold back `DONE`.
 * A line starting with `#` isn't a comment. It gets `unknown command`.
 
-**Not tested yet:** whether `uiscale` is saved between sessions, how the bridge behaves while the window is minimized or in the background, and sending `open` while the menu is already open.
+**Not tested yet:** whether `uiscale` is saved between sessions, how the bridge behaves while the window is minimized, and sending `open` while the menu is already open.
 
 ## Testing starting in your profile
 

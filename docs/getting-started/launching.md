@@ -26,7 +26,7 @@ A session starts in your profile in one of three ways:
 * **Steam's Play button, with Start in my profile from Steam on.** This is for Windows and the Steam version of the game. Steam starts SMAPI on `Selected Mods` from the start, so there's no restart. See [Two settings that help](#two-settings-that-help) below.
 * **Stardrop starts the game.** Stardrop fills the same `Selected Mods` folder with your profile's mods and starts SMAPI on it. See [Using DewDrop with Stardrop](../stardrop.md).
 
-DewDrop never moves anything out of your `Mods` folder, so a normal launch still sees every mod. That's why a mod you turned off in DewDrop loads again the next time you start the game from a shortcut. It stays off in every session that starts in your profile. For the details, see [How DewDrop works](../reference/how-it-works.md).
+Turning a mod off doesn't move it out of your `Mods` folder, so a normal launch still sees every mod. That's why a mod you turned off in DewDrop loads again the next time you start the game from a shortcut. It stays off in every session that starts in your profile. For the details, see [How DewDrop works](../reference/how-it-works.md).
 
 ## Two settings that help
 

@@ -19,6 +19,7 @@ namespace DewDrop.UI.Pages
         private const int FileRowHeight = 84;
         private const int CellGap = 12;        // ScrollList's gap between rows
         private const int CompactHeight = 360; // below this the header shrinks to make room for files
+        private const string InstalledLabel = "Installed";
 
         private readonly DewDropMenu _menu;
         private readonly NexusMod _mod;
@@ -26,6 +27,7 @@ namespace DewDrop.UI.Pages
         private readonly UiButton _back;
         private readonly UiButton _openOnNexus;
         private readonly UiButton _toggleOld;
+        private readonly UiButton _uninstall;
         private readonly UiButton _retryFiles;
         private readonly ScrollList<string> _description;
         private readonly ScrollList<NexusModFile> _files = new(FileRowHeight);
@@ -38,6 +40,10 @@ namespace DewDrop.UI.Pages
         private bool _closed;
         private List<InstalledMod> _installed = new();
         private int _installedVersion = -1;
+        private int _installedChanges = -1;
+
+        /// <summary>IDs of this mod's files that are installed now; their rows say so instead of offering Install.</summary>
+        private HashSet<int> _installedFiles = new();
         private Rectangle _bounds;
         private Rectangle _picture;
         private Rectangle _right;
@@ -57,6 +63,7 @@ namespace DewDrop.UI.Pages
             _back = new UiButton("Back", onBack);
             _openOnNexus = new UiButton("Open on Nexus", () => DownloadManager.OpenUrl(mod.PageUrl)) { Tooltip = "Open this mod's page in your browser." };
             _toggleOld = new UiButton("Show old files", ToggleOldFiles) { Tooltip = "Old versions are hidden unless you ask for them.", Visible = false };
+            _uninstall = new UiButton("Uninstall", Uninstall) { Color = Ui.Bad, Visible = false };
             _retryFiles = new UiButton("Try again", LoadFiles) { Visible = false };
 
             // Rows are a line tall less the list's gap, so lines sit at the font's own spacing (each line's text runs into the gap below it)
@@ -88,6 +95,7 @@ namespace DewDrop.UI.Pages
             _openOnNexus.AtRight(bounds.Right, bounds.Y);
             var toggleWidth = (int)Math.Max(Ui.Small.MeasureString("Show old files").X, Ui.Small.MeasureString("Hide old files").X) + 40;
             _toggleOld.Bounds = new Rectangle(_openOnNexus.Bounds.X - 12 - toggleWidth, bounds.Y, toggleWidth, _toggleOld.PreferredHeight);
+            PlaceUninstall();
             _downloadingWidth = (int)Ui.Small.MeasureString("Downloading 100%").X + 40;
 
             var bodyTop = _back.Bounds.Bottom + 8;
@@ -130,6 +138,16 @@ namespace DewDrop.UI.Pages
                 _retryFiles.AtRight(filesArea.Right, Math.Max(_statsY + Ui.LineHeight(), Math.Min(filesArea.Y, _bounds.Bottom - _retryFiles.PreferredHeight)));
             }
         }
+
+        /// <summary>Uninstall sits left of the other toolbar buttons, which come and go as the files load.</summary>
+        private void PlaceUninstall()
+        {
+            var left = _toggleOld.Visible ? _toggleOld.Bounds.X : _openOnNexus.Bounds.X;
+            _uninstall.AtRight(left - 12, _openOnNexus.Bounds.Y);
+        }
+
+        /// <summary>The leftmost toolbar button on the right, which the installed status stops short of.</summary>
+        private int ToolbarRightEdge => _uninstall.Visible ? _uninstall.Bounds.X : _toggleOld.Visible ? _toggleOld.Bounds.X : _openOnNexus.Bounds.X;
 
         /// <summary>The name in the big font, wrapped to at most a few lines with the last one cut short.</summary>
         private List<string> NameLines(int width, int maxLines)
@@ -219,6 +237,8 @@ namespace DewDrop.UI.Pages
 
                     _allFiles = files;
                     _toggleOld.Visible = files.Any(f => !f.IsCurrent);
+                    PlaceUninstall();
+                    RefreshInstalledFiles();
                     RefreshFiles(resetScroll: true);
                 },
                 ex =>
@@ -269,6 +289,7 @@ namespace DewDrop.UI.Pages
         private void UpdateFileButton(NexusModFile file, UiButton button)
         {
             button.Enabled = true;
+            button.Visible = true;
             button.Color = null;
 
             if (ActiveJob(file) is { } job)
@@ -281,6 +302,13 @@ namespace DewDrop.UI.Pages
                     _ => $"Downloading {(int)(Math.Clamp(job.Progress, 0, 1) * 100)}%"
                 };
                 button.Tooltip = "DewDrop is getting this file. Progress is on the Downloads tab.";
+            }
+            else if (_installedFiles.Contains(file.FileId))
+            {
+                // Drawn as a green "Installed" in the button's place (see DrawFileRow), so the same file isn't installed again
+                button.Visible = false;
+                button.Label = InstalledLabel;
+                button.Tooltip = "You have this file. To install it again, uninstall it first.";
             }
             else if (!ModEntry.Nexus.IsLoggedIn)
             {
@@ -303,7 +331,7 @@ namespace DewDrop.UI.Pages
         /// <summary>Decides what a click does at click time, so a login or download that changed since the last draw is respected.</summary>
         private void FileAction(NexusModFile file)
         {
-            if (ActiveJob(file) is not null)
+            if (ActiveJob(file) is not null || _installedFiles.Contains(file.FileId))
             {
                 return;
             }
@@ -323,22 +351,57 @@ namespace DewDrop.UI.Pages
             UpdateActions.OpenForFreeAccount(_mod.ModId, file.FileId);
         }
 
+        /// <summary>The copies the toolbar's Uninstall removes: every loose one that belongs to this Nexus mod.</summary>
+        private List<InstalledMod> UninstallTargets()
+        {
+            var mods = ModEntry.Mods;
+            return _installed.Where(m => m.SourceId is null && !mods.IsLocked(m)).ToList();
+        }
+
+        private void Uninstall()
+        {
+            var targets = UninstallTargets();
+            UninstallPrompt.Show(_menu, targets, targets.Count > 1 ? _name : null);
+        }
+
+        private void RefreshInstalledFiles()
+        {
+            _installedFiles = _allFiles is null ? new HashSet<int>() : ModEntry.Mods.InstalledFileIds(_mod.ModId, _allFiles);
+        }
+
         // ---------- input ----------
 
         public void Update(GameTime time)
         {
-            // The installed list object is replaced on rescan (e.g. after this mod's download finishes)
-            var installed = ModEntry.Mods.Installed;
-            if (installed.GetHashCode() != _installedVersion)
+            // The installed list object is replaced on rescan (e.g. after this mod's download finishes), and an uninstall
+            // or update check changes what's known without one
+            var mods = ModEntry.Mods;
+            if (mods.Installed.GetHashCode() != _installedVersion || mods.ChangeCount != _installedChanges)
             {
-                _installedVersion = installed.GetHashCode();
-                _installed = installed.Where(m => BrowsePage.NexusIdOf(m) == _mod.ModId).ToList();
+                _installedVersion = mods.Installed.GetHashCode();
+                _installedChanges = mods.ChangeCount;
+                _installed = mods.CopiesOfNexusMod(_mod.ModId);
+                RefreshInstalledFiles();
+                _uninstall.Visible = UninstallTargets().Count > 0;
+                _uninstall.Tooltip = UninstallTooltip();
+                PlaceUninstall();
             }
+        }
+
+        private string UninstallTooltip()
+        {
+            var targets = UninstallTargets();
+            return targets.Count switch
+            {
+                0 => "",
+                1 => $"Uninstall {targets[0].Name}. Its folder is deleted when the game closes.",
+                _ => $"Uninstall the {targets.Count} mods that make up {_name}: {UninstallPrompt.Names(targets.Select(m => m.Name).ToList())}."
+            };
         }
 
         public void ReceiveLeftClick(int x, int y)
         {
-            if (_back.TryClick(x, y) || _toggleOld.TryClick(x, y) || _openOnNexus.TryClick(x, y) || _retryFiles.TryClick(x, y))
+            if (_back.TryClick(x, y) || _toggleOld.TryClick(x, y) || _uninstall.TryClick(x, y) || _openOnNexus.TryClick(x, y) || _retryFiles.TryClick(x, y))
             {
                 return;
             }
@@ -399,6 +462,7 @@ namespace DewDrop.UI.Pages
         {
             _back.Hover(x, y);
             _toggleOld.Hover(x, y);
+            _uninstall.Hover(x, y);
             _openOnNexus.Hover(x, y);
             _retryFiles.Hover(x, y);
             _files.Hover(x, y);
@@ -409,7 +473,14 @@ namespace DewDrop.UI.Pages
                 other.Hover(-1, -1);
             }
 
-            var tooltip = _openOnNexus.HoverText(x, y) ?? _toggleOld.HoverText(x, y);
+            // Says why not when it can't uninstall right now (a download of it running, say), like the Installed tab
+            if (_uninstall.Contains(x, y))
+            {
+                var targets = UninstallTargets();
+                _uninstall.Tooltip = targets.Select(ModEntry.Mods.UninstallBlockedReason).FirstOrDefault(r => r is not null) ?? UninstallTooltip();
+            }
+
+            var tooltip = _openOnNexus.HoverText(x, y) ?? _toggleOld.HoverText(x, y) ?? _uninstall.HoverText(x, y);
             if (tooltip is not null)
             {
                 return tooltip;
@@ -423,7 +494,9 @@ namespace DewDrop.UI.Pages
             if (_fileButtons.TryGetValue(file, out var button))
             {
                 button.Hover(x, y);
-                if (button.Contains(x, y))
+
+                // An installed file's button is hidden behind its green label, which still explains itself
+                if (button.Contains(x, y) || (!button.Visible && button.Bounds.Contains(x, y)))
                 {
                     return button.Tooltip;
                 }
@@ -444,6 +517,7 @@ namespace DewDrop.UI.Pages
         {
             _back.Draw(b);
             _toggleOld.Draw(b);
+            _uninstall.Draw(b);
             _openOnNexus.Draw(b);
             DrawInstalledStatus(b);
 
@@ -478,7 +552,7 @@ namespace DewDrop.UI.Pages
             }
 
             var left = _back.Bounds.Right + 24;
-            var right = (_toggleOld.Visible ? _toggleOld.Bounds.X : _openOnNexus.Bounds.X) - 24;
+            var right = ToolbarRightEdge - 24;
             if (right - left < 40)
             {
                 return;
@@ -596,6 +670,10 @@ namespace DewDrop.UI.Pages
             var height = Math.Min(button.PreferredHeight, cell.Height);
             button.Bounds = new Rectangle(cell.Right - 8 - width, cell.Center.Y - height / 2, width, height);
             button.Draw(b);
+            if (!button.Visible && button.Label == InstalledLabel)
+            {
+                Ui.LabelCentered(b, InstalledLabel, button.Bounds, Ui.Good);
+            }
 
             // A row too short for two lines (very small window) keeps just the name; PerformHover adds the details to the tooltip
             var textX = cell.X + 12;

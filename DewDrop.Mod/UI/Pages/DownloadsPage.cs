@@ -217,6 +217,16 @@ namespace DewDrop.UI.Pages
             }
 
             var downloads = ModEntry.Downloads;
+
+            // Installed meanwhile (from the mod's page, say): there's nothing left to retry
+            if (ModEntry.Mods.IsFileInstalled(job.ModId, job.FileId))
+            {
+                downloads.Jobs.Remove(job);
+                Refresh();
+                ModEntry.Toast($"{job.Title} is already installed.");
+                return;
+            }
+
             var before = downloads.Jobs.Count;
             downloads.Start(job.ModId, job.FileId, job.Title);
             if (downloads.Jobs.Count > before)

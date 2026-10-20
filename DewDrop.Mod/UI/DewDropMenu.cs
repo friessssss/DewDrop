@@ -503,6 +503,12 @@ namespace DewDrop.UI
                 message += $"\n\nThis turns off {turnedOff.Count} mod{(turnedOff.Count == 1 ? "" : "s")} loaded right now: {names}.";
             }
 
+            if (mods.Removing.Count > 0)
+            {
+                var n = mods.Removing.Count;
+                message += $"\n\nThis also deletes the {(n == 1 ? "mod" : $"{n} mods")} you uninstalled: {UninstallPrompt.Names(mods.Removing.Select(m => m.Name).ToList())}.";
+            }
+
             var downloads = ModEntry.Downloads.ActiveCount;
             if (downloads > 0)
             {
@@ -635,6 +641,13 @@ namespace DewDrop.UI
                 status = "This session didn't start from a DewDrop profile. Restart to load this profile.";
                 color = Ui.Attention;
             }
+            else if (mods.RemovingLoaded() is { Count: > 0 } stillLoaded)
+            {
+                // Gone from the lists, but running until the game restarts
+                var n = stillLoaded.Count;
+                status = $"{(n == 1 ? $"{stillLoaded[0].Name}, which you uninstalled, is" : $"{n} mods you uninstalled are")} still loaded. Restart to finish uninstalling.";
+                color = Ui.Attention;
+            }
             else if (mods.NeedsRestart())
             {
                 // With Steam starting the game in the profile, closing the game brings the links up to date
@@ -642,6 +655,12 @@ namespace DewDrop.UI
                     ? "Changes load the next time you start the game from Steam, or restart now."
                     : "Changes are ready. Restart the game to load them.";
                 color = Ui.Attention;
+            }
+            else if (mods.Removing.Count > 0)
+            {
+                // Not loaded, so nothing needs a restart; their folders go when the game closes
+                status = "The mods loaded right now match this profile. Uninstalled mods are deleted when the game closes.";
+                color = Ui.Muted;
             }
             else
             {

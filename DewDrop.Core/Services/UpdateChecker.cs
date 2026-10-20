@@ -6,7 +6,8 @@ using DewDrop.Core.Models;
 namespace DewDrop.Core.Services
 {
     /// <summary>What smapi.io said about one mod, for the version that was checked.</summary>
-    public record UpdateCheckResult(string UniqueId, string CheckedVersion, ModUpdate? Update);
+    /// <param name="NexusId">The Nexus mod smapi.io's compatibility list has for it, if any (it lists code mods, not content packs).</param>
+    public record UpdateCheckResult(string UniqueId, string CheckedVersion, ModUpdate? Update, int? NexusId = null);
 
     /// <summary>Asks smapi.io's update API for newer versions of installed mods, the same service SMAPI uses.</summary>
     public class UpdateChecker
@@ -44,9 +45,10 @@ namespace DewDrop.Core.Services
         {
             var results = new Dictionary<string, UpdateCheckResult>(StringComparer.OrdinalIgnoreCase);
 
-            // Collection mods are pinned by their collection, so they're never offered updates
+            // Collection mods are pinned by their collection, so they're never offered updates. Mods without update keys
+            // are asked about too, only for the Nexus ID smapi.io knows them by (Browse uses it to mark them installed)
             var candidates = mods
-                .Where(m => m.SourceId is null && m.Manifest.UpdateKeys.Length > 0 && !string.IsNullOrEmpty(m.Version))
+                .Where(m => m.SourceId is null && !string.IsNullOrEmpty(m.Version))
                 .GroupBy(m => m.UniqueId, StringComparer.OrdinalIgnoreCase)
                 .Select(g => g.First())
                 .ToList();
@@ -69,12 +71,12 @@ namespace DewDrop.Core.Services
                 {
                     ["id"] = m.UniqueId,
                     ["installedVersion"] = m.Version.Trim(),
-                    ["updateKeys"] = new JsonArray(m.Manifest.UpdateKeys.Select(k => (JsonNode)JsonValue.Create(k)!).ToArray())
+                    ["updateKeys"] = new JsonArray(KeysOf(m).Select(k => (JsonNode)JsonValue.Create(k)!).ToArray())
                 }).ToArray()),
                 ["apiVersion"] = smapiVersion,
                 ["gameVersion"] = gameVersion,
                 ["platform"] = platform,
-                ["includeExtendedMetadata"] = false
+                ["includeExtendedMetadata"] = true
             };
 
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
@@ -94,23 +96,70 @@ namespace DewDrop.Core.Services
                 throw new Exception("smapi.io didn't return any results, so the update check couldn't finish.");
             }
 
-            var checkedVersions = candidates.ToDictionary(m => m.UniqueId, m => m.Version, StringComparer.OrdinalIgnoreCase);
+            results = ReadResults(entries, candidates);
+            _log.Info($"Update check: {results.Values.Count(r => r.Update is not null)} of {candidates.Count(m => KeysOf(m).Length > 0)} mods have updates");
+            return results;
+        }
+
+        /// <summary>
+        /// Reads smapi.io's answers for the mods that were asked about. Only mods with update keys of their own are offered
+        /// updates, as before: for the rest smapi.io guesses the keys from its compatibility list, and those answers are
+        /// only used for the Nexus ID.
+        /// </summary>
+        internal static Dictionary<string, UpdateCheckResult> ReadResults(JsonArray entries, IReadOnlyList<InstalledMod> asked)
+        {
+            var results = new Dictionary<string, UpdateCheckResult>(StringComparer.OrdinalIgnoreCase);
+            var byId = asked
+                .GroupBy(m => m.UniqueId, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
             foreach (var entry in entries)
             {
                 var id = entry?["id"]?.GetValue<string>();
-                if (id is null || !checkedVersions.TryGetValue(id, out var version))
+                if (id is null || !byId.TryGetValue(id, out var mod))
                 {
                     continue;
                 }
 
+                ModUpdate? update = null;
                 var suggested = entry?["suggestedUpdate"];
-                var update = suggested?["version"] is null ? null : new ModUpdate(suggested["version"]!.GetValue<string>(), suggested["url"]?.GetValue<string>());
-                results[id] = new UpdateCheckResult(id, version, update);
+                if (KeysOf(mod).Length > 0 && suggested?["version"] is { } version)
+                {
+                    update = new ModUpdate(version.GetValue<string>(), suggested["url"]?.GetValue<string>());
+                }
+
+                results[id] = new UpdateCheckResult(id, mod.Version, update, ReadNexusId(entry?["metadata"]?["nexusID"]));
             }
 
-            _log.Info($"Update check: {results.Values.Count(r => r.Update is not null)} of {candidates.Count} mods have updates");
             return results;
         }
+
+        /// <summary>The Nexus ID in an answer's metadata: a number, though read leniently in case it ever comes as text.</summary>
+        private static int? ReadNexusId(JsonNode? node)
+        {
+            try
+            {
+                if (node is JsonValue value)
+                {
+                    if (value.TryGetValue<long>(out var number))
+                    {
+                        return number is > 0 and <= int.MaxValue ? (int)number : null;
+                    }
+                    if (value.TryGetValue<string>(out var text) && int.TryParse(text, out var parsed) && parsed > 0)
+                    {
+                        return parsed;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Only the Installed mark on Browse depends on it
+            }
+
+            return null;
+        }
+
+        /// <summary>A manifest's update keys; a hand-built one can hold null.</summary>
+        private static string[] KeysOf(InstalledMod mod) => mod.Manifest.UpdateKeys ?? Array.Empty<string>();
 
         /// <summary>Sets each loose mod's update from a check's results, skipping mods whose version changed since that check.</summary>
         public static void Apply(IReadOnlyDictionary<string, UpdateCheckResult> results, IEnumerable<InstalledMod> mods)

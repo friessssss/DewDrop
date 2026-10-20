@@ -1,17 +1,45 @@
 using System.Text.Json;
+using DewDrop.Core.Models;
 
 namespace DewDrop.Core.Services
 {
     /// <summary>
-    /// Mod updates that couldn't be swapped in while the game was running. SMAPI keeps a mod's extra DLLs open,
-    /// so replacing a loaded mod's folder fails on Windows; the new copy waits in a hidden staging folder and is
-    /// swapped in by the relauncher after the game exits, or at the next startup if that mod isn't loaded then.
+    /// Mod updates that couldn't be swapped in while the game was running, and mods waiting to be uninstalled. On
+    /// Windows a file the game holds open (a mod's own log, streamed music) stops a loaded mod's folder from being
+    /// renamed, and a DLL it loaded can't be deleted; the new copy waits in a hidden staging folder and is swapped in
+    /// by the relauncher after the game exits, or at the next startup if that mod isn't loaded then. Removals always
+    /// wait for the game to close, since the mods it loaded still read their files.
     /// </summary>
     public class PendingUpdates
     {
         public const string StagingFolderName = ".dewdrop-staging";
 
-        public record Swap(string UniqueId, string Target, string Staged);
+        /// <summary>Ends the name reserved for a mod being removed, inside the staging folder beside it.</summary>
+        public const string RemovedSuffix = "-removed";
+
+        /// <summary>Startups a removal may fail before DewDrop gives up and asks the player to delete the folder.</summary>
+        public const int MaxRemovalAttempts = 3;
+
+        /// <param name="Remove">
+        /// An uninstall rather than an update: the mod at <paramref name="Target"/> is moved to <paramref name="Staged"/>
+        /// (a name reserved for it, created only by the move) and deleted. An older DewDrop skips the record, since nothing
+        /// is staged, and the mod stays.
+        /// </param>
+        /// <param name="Attempts">Startups that couldn't remove it; see <see cref="MaxRemovalAttempts"/>.</param>
+        public record Swap(string UniqueId, string Target, string Staged, bool Remove = false, int Attempts = 0);
+
+        /// <summary>What happened to a mod queued for removal.</summary>
+        public enum RemoveResult
+        {
+            /// <summary>Moved out of the Mods folder (and deleted, when that was asked for).</summary>
+            Removed,
+
+            /// <summary>The folder is gone, or now holds some other mod, so there's nothing to remove.</summary>
+            Gone,
+
+            /// <summary>Something still holds a file in it; the record stays for the next try.</summary>
+            Blocked
+        }
 
         private static readonly JsonSerializerOptions _json = new() { WriteIndented = true };
         private readonly ILog _log;
@@ -87,20 +115,88 @@ namespace DewDrop.Core.Services
             }
         }
 
+        /// <summary>Whether an update for this folder is waiting for a restart.</summary>
         public bool IsPending(string modFolder)
         {
-            var full = Path.GetFullPath(modFolder).TrimEnd(Path.DirectorySeparatorChar);
-            return Load().Any(s => Path.GetFullPath(s.Target).TrimEnd(Path.DirectorySeparatorChar).Equals(full, StringComparison.OrdinalIgnoreCase));
+            return Load().Any(s => !s.Remove && IsSameFolder(s.Target, modFolder));
         }
 
-        /// <summary>Tries every waiting swap; the ones still blocked stay queued. Returns how many are left.</summary>
-        public int ApplyAll()
+        /// <summary>
+        /// Queues a mod folder to be uninstalled once the game no longer has it loaded. An update waiting for the same
+        /// folder is dropped with its downloaded copy, since nothing would use it.
+        /// </summary>
+        public Swap AddRemoval(string uniqueId, string modFolder)
+        {
+            var target = Path.GetFullPath(modFolder).TrimEnd(Path.DirectorySeparatorChar);
+            var swap = new Swap(uniqueId, target, NewStagingFolder(target) + RemovedSuffix, Remove: true);
+            Add(swap);
+            return swap;
+        }
+
+        /// <summary>Takes a folder off the removal list (an undo, or a new copy installed there); returns whether it was on it.</summary>
+        public bool CancelRemoval(string modFolder)
+        {
+            lock (_lock)
+            {
+                var all = Load();
+                if (all.RemoveAll(s => s.Remove && IsSameFolder(s.Target, modFolder)) == 0)
+                {
+                    return false;
+                }
+
+                Save(all);
+                return true;
+            }
+        }
+
+        /// <summary>Mod folders waiting to be uninstalled.</summary>
+        public List<Swap> Removals() => Load().Where(s => s.Remove).ToList();
+
+        /// <summary>
+        /// Tries every waiting swap and removal; the ones still blocked stay queued. Returns how many are left.
+        /// </summary>
+        /// <param name="isLoaded">
+        /// Whether this session loaded a mod queued for removal (a crash kept its record, then a plain launch loaded it
+        /// again). Those wait for this session to end, since the game still reads their files.
+        /// </param>
+        /// <param name="gaveUp">Gets the removals dropped after <see cref="MaxRemovalAttempts"/> startups, for the player to finish by hand.</param>
+        public int ApplyAll(Func<Swap, bool>? isLoaded = null, List<Swap>? gaveUp = null)
         {
             lock (_lock)
             {
                 var remaining = new List<Swap>();
                 foreach (var swap in Load())
                 {
+                    // Before the staged-copy check below: a removal has no staged copy until it's moved
+                    if (swap.Remove)
+                    {
+                        if (isLoaded?.Invoke(swap) == true)
+                        {
+                            remaining.Add(swap);
+                            continue;
+                        }
+
+                        var result = TryRemove(swap, _log, delete: true);
+                        if (result == RemoveResult.Blocked)
+                        {
+                            var next = swap with { Attempts = swap.Attempts + 1 };
+                            if (next.Attempts < MaxRemovalAttempts)
+                            {
+                                remaining.Add(next);
+                            }
+                            else
+                            {
+                                _log.Warn($"Gave up removing {swap.Target}: something keeps a file in it open");
+                                gaveUp?.Add(next);
+                            }
+                        }
+                        else if (result == RemoveResult.Removed)
+                        {
+                            _log.Info($"Finished uninstalling {swap.UniqueId}");
+                        }
+                        continue;
+                    }
+
                     if (!Directory.Exists(swap.Staged))
                     {
                         continue;
@@ -119,6 +215,154 @@ namespace DewDrop.Core.Services
                 Save(remaining);
                 return remaining.Count;
             }
+        }
+
+        /// <summary>
+        /// For the game closing: moves every mod waiting to be uninstalled out of the Mods folder, without deleting it
+        /// (deleting a big mod would hold up the exit; the next start clears the staging folder). Returns the folders
+        /// that moved. A move that's blocked stays queued for the relaunch script or the next start.
+        /// </summary>
+        public List<string> MoveRemovalsAside()
+        {
+            lock (_lock)
+            {
+                var moved = new List<string>();
+                var remaining = new List<Swap>();
+                foreach (var swap in Load())
+                {
+                    if (!swap.Remove)
+                    {
+                        remaining.Add(swap);
+                        continue;
+                    }
+
+                    var result = TryRemove(swap, _log, delete: false);
+                    if (result == RemoveResult.Blocked)
+                    {
+                        remaining.Add(swap);
+                    }
+                    else if (result == RemoveResult.Removed)
+                    {
+                        moved.Add(swap.Target);
+                    }
+                }
+
+                Save(remaining);
+                return moved;
+            }
+        }
+
+        /// <summary>
+        /// Moves a mod queued for removal to the hidden name reserved for it, then deletes it if asked. Checks first that
+        /// the folder still holds that mod, since the player (or Stardrop) may have replaced it since: anything else at
+        /// the target is left alone.
+        /// </summary>
+        public static RemoveResult TryRemove(Swap swap, ILog log, bool delete)
+        {
+            try
+            {
+                if (!IsReservedRemovalName(swap))
+                {
+                    log.Warn($"Left {swap.Target} alone: its removal record doesn't look like one DewDrop made");
+                    return RemoveResult.Gone;
+                }
+
+                // An earlier move went through but the record outlived it (the game closed before it was saved)
+                if (!Directory.Exists(swap.Target))
+                {
+                    if (delete && Directory.Exists(swap.Staged))
+                    {
+                        TryDelete(swap.Staged, log);
+                        TryDeleteIfEmpty(Path.GetDirectoryName(swap.Staged)!);
+                    }
+                    return RemoveResult.Gone;
+                }
+
+                if (!HoldsMod(swap.Target, swap.UniqueId))
+                {
+                    log.Info($"Didn't remove {swap.Target}: it no longer holds {swap.UniqueId}");
+                    return RemoveResult.Gone;
+                }
+
+                var root = Path.GetDirectoryName(swap.Staged)!;
+                Directory.CreateDirectory(root);
+                try
+                {
+                    new DirectoryInfo(root).Attributes |= FileAttributes.Hidden;
+                }
+                catch
+                {
+                    // Only cosmetic
+                }
+
+                // A single rename: on Windows it fails as a whole while a file inside is open, so a blocked removal never
+                // leaves half a mod behind (a recursive delete would get as far as the first file in use)
+                Directory.Move(swap.Target, swap.Staged);
+                log.Info($"Uninstalled {swap.UniqueId} from {swap.Target}");
+                if (delete)
+                {
+                    TryDelete(swap.Staged, log);
+                    TryDeleteIfEmpty(root);
+                }
+                return RemoveResult.Removed;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                log.Trace($"Couldn't remove {swap.Target} yet: {ex.Message}");
+                return RemoveResult.Blocked;
+            }
+        }
+
+        /// <summary>
+        /// Whether a removal moves the folder only to a name DewDrop reserves: "&lt;guid&gt;-removed" in the staging folder
+        /// beside it. The list is a file anyone can edit, and a removal deletes what it moves.
+        /// </summary>
+        internal static bool IsReservedRemovalName(Swap swap)
+        {
+            if (string.IsNullOrEmpty(swap.Target) || string.IsNullOrEmpty(swap.Staged))
+            {
+                return false;
+            }
+
+            var target = Path.GetFullPath(swap.Target).TrimEnd(Path.DirectorySeparatorChar);
+            var staged = Path.GetFullPath(swap.Staged).TrimEnd(Path.DirectorySeparatorChar);
+            var name = Path.GetFileName(staged);
+            var root = Path.GetDirectoryName(staged);
+            return name.Length == 32 + RemovedSuffix.Length
+                && name.EndsWith(RemovedSuffix, StringComparison.Ordinal)
+                && name[..32].All(Uri.IsHexDigit)
+                && root is not null
+                && Path.GetFileName(root).Equals(StagingFolderName, StringComparison.OrdinalIgnoreCase)
+                && Path.GetDirectoryName(target) is { } parent
+                && IsSameFolder(Path.GetDirectoryName(root)!, parent);
+        }
+
+        /// <summary>Whether a folder's manifest.json names this unique ID.</summary>
+        private static bool HoldsMod(string folder, string uniqueId)
+        {
+            var path = Path.Combine(folder, "manifest.json");
+            if (!File.Exists(path))
+            {
+                return false;
+            }
+
+            // A file that can't be opened right now throws on to the caller, which tries again later
+            var text = File.ReadAllText(path);
+            try
+            {
+                return Manifest.Parse(text) is { } manifest
+                    && string.Equals(manifest.UniqueID, uniqueId, StringComparison.OrdinalIgnoreCase);
+            }
+            catch (JsonException)
+            {
+                // A manifest that can't be read can't be checked, so the folder stays
+                return false;
+            }
+        }
+
+        private static bool IsSameFolder(string a, string b)
+        {
+            return Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar).Equals(Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
