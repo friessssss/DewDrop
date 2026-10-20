@@ -1,0 +1,37 @@
+name: Feature request
+description: An idea to make DewDrop better.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. Search the existing issues first, in case someone has already asked; if so, add a 👍 or a comment there.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: The problem or annoyance behind the idea, from a player's point of view.
+      placeholder: When I ..., I have to ..., which is a pain because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could DewDrop help?
+      description: What you imagine it doing. Rough is fine.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you do now?
+      description: Workarounds, or how another tool (Stardrop, Vortex...) handles it.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots, mockups, links.
