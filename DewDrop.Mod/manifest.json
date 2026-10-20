@@ -1,7 +1,7 @@
 {
   "Name": "DewDrop",
   "Author": "friessssss",
-  "Version": "0.1.0",
+  "Version": "0.2.0",
   "Description": "Browse, install, enable and organise mods from a Mods button on the title screen. Shares profiles with Stardrop.",
   "UniqueID": "friessssss.DewDrop",
   "EntryDll": "DewDrop.dll",
