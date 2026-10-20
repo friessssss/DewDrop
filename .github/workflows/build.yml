@@ -16,11 +16,38 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
-    # DewDrop.Mod needs a Stardew Valley install to build, so CI only builds the game-independent library.
     - name: Build DewDrop.Core
       run: dotnet build DewDrop.Core/DewDrop.Core.csproj
     - name: Test DewDrop.Core
       run: dotnet test DewDrop.Core.Tests/DewDrop.Core.Tests.csproj
+
+  # The mod itself, built and packaged exactly as a release is (release.yml), against metadata-only copies of the
+  # game's and SMAPI's DLLs since the runner has no game install. The zips are attached to the run for testing.
+  build-mod:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    # Pinned to a commit; when the game or SMAPI updates, see docs/contributing/releasing.md.
+    - name: Get the Stardew Valley and SMAPI reference assemblies
+      uses: actions/checkout@v4
+      with:
+        repository: StardewModders/mod-reference-assemblies
+        ref: 0141355fecb8536715ecff22f99374b5e632cbed
+        path: .game-refs
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+    - name: Check the version
+      run: node tools/check-version.mjs
+    - name: Build and package
+      run: node tools/package-release.mjs --game-path="$GITHUB_WORKSPACE/.game-refs"
+    - name: Attach the zips
+      uses: actions/upload-artifact@v4
+      with:
+        name: DewDrop-zips
+        path: artifacts/release/
 
   # The macOS/Linux installer, on Linux and on macOS (which ships bash 3.2).
   installer-unix:

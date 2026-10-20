@@ -16,5 +16,7 @@ For a pull request, make sure `dotnet build DewDrop.sln` succeeds and the unit t
 - **Docs** live in `docs/` and sync to the GitBook. Every image in them is generated: change
   `tools/docs-art/` and run `node tools/docs-art/build.mjs` rather than editing PNGs by hand. See
   `docs/contributing/docs-and-art.md`.
-- **Releases** are packaged with `node tools/package-release.mjs`, which builds in Release and writes both
-  downloads to `artifacts/release/<version>/`.
+- **Releases** are published by CI when `development` is merged into `master` (pull requests into `master`
+  only come from `development`, and need a version higher than the last release: `node tools/bump-version.mjs
+  patch|minor|major`). See `docs/contributing/releasing.md`. To package by hand, run `node tools/package-release.mjs`,
+  which builds in Release and writes both downloads to `artifacts/release/<version>/`.

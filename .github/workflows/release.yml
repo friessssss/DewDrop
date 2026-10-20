@@ -1,0 +1,56 @@
+name: Release
+
+# Merging development into master publishes a release: the mod is built against the Stardew Valley and SMAPI
+# reference assemblies and packaged by tools/package-release.mjs. The release is tagged with the bare version (0.2.0,
+# the form SMAPI's update check compares), gets both zips, and lists the pull requests since the last release.
+# A version that's already released stops it (release-check.yml should have caught that on the pull request).
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Version not released yet
+      id: version
+      run: echo "version=$(node tools/check-version.mjs --unreleased)" >> "$GITHUB_OUTPUT"
+
+    # Metadata-only copies of the game's and SMAPI's DLLs, so the mod builds without a game install. Pinned to a
+    # commit; when the game or SMAPI updates, see docs/contributing/releasing.md.
+    - name: Get the Stardew Valley and SMAPI reference assemblies
+      uses: actions/checkout@v4
+      with:
+        repository: StardewModders/mod-reference-assemblies
+        ref: 0141355fecb8536715ecff22f99374b5e632cbed
+        path: .game-refs
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Build and package
+      run: node tools/package-release.mjs --game-path="$GITHUB_WORKSPACE/.game-refs"
+
+    - name: Publish the release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        prerelease=""
+        case "$VERSION" in *-*) prerelease="--prerelease" ;; esac
+        gh release create "$VERSION" artifacts/release/"$VERSION"/*.zip \
+          --target "$GITHUB_SHA" --title "DewDrop $VERSION" --generate-notes $prerelease

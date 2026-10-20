@@ -54,6 +54,9 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# The game's reference assemblies CI checks out to build the mod (see docs/contributing/releasing.md)
+.game-refs/
+
 # StyleCop
 StyleCopReport.xml
 
