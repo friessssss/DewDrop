@@ -9,16 +9,28 @@ Updating DewDrop means swapping the files in its mod folder for newer ones. Your
 
 ## Is there a new version?
 
-DewDrop checks for its own updates along with your other mods. When a new version is out, SMAPI's window mentions it as the game starts, and DewDrop's row on the **Installed** tab gets an **Update to** button that opens the [Releases page](https://github.com/friessssss/DewDrop/releases/latest). Download the new version there and follow one of the ways below.
+DewDrop checks for its own updates along with your other mods. When a new version is out, SMAPI's window mentions it as the game starts, and DewDrop's row on the **Installed** tab gets an **Update to** button that opens the [Releases page](https://github.com/friessssss/DewDrop/releases/latest). DewDrop can't update itself from the menu, so use one of the ways below.
 
-To see which version you have, find **DewDrop** on the **Installed** tab. Its row shows the version, for example **v0.1.0**.
+To see which version you have, find **DewDrop** on the **Installed** tab. Its row shows the version, for example **v0.2.0**.
 
-## Option 1: run the new installer (easiest)
+## Option 1: run the installer again (easiest)
 
 1. Close the game. If you forget, the installer waits for you.
-2. Download `DewDrop-<version>-installer.zip` from the [Releases page](https://github.com/friessssss/DewDrop/releases/latest) and extract it.
-3. Double-click `Install on Windows.bat`, `Install on macOS.command` or `Install on Linux.sh`, the same as the first time.
-4. Answer the questions. At a yes/no question, pressing **Enter** picks the recommended answer.
+2. Paste the same line as the first time. It always gets the latest DewDrop.
+
+   * **Windows**, in PowerShell:
+
+     ```powershell
+     irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex
+     ```
+   * **macOS or Linux**, in Terminal:
+
+     ```bash
+     curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
+     ```
+
+   Or download `DewDrop-<version>-installer.zip` from the [Releases page](https://github.com/friessssss/DewDrop/releases/latest), extract it, and double-click `Install on Windows.bat`, `Install on macOS.command` or `Install on Linux.sh`.
+3. Answer the questions. At a yes/no question, pressing **Enter** picks the recommended answer.
 
 The installer finds your current DewDrop wherever it is in your `Mods` folder, even inside a folder you use to group mods, and updates it in place. It keeps your `config.json`, and it removes the old copy only once the new one is in place, so an update that fails halfway leaves your old DewDrop working. Along the way:
 
@@ -28,6 +40,17 @@ The installer finds your current DewDrop wherever it is in your `Mods` folder, e
 * **It offers to turn off extra copies of DewDrop** by putting a `.` in front of their folder names. SMAPI skips those folders.
 
 More about what the installer does: [Install with the installer](installing/installer.md).
+
+## On a Steam Deck
+
+Updating on a Deck means a short trip to Desktop Mode, the same way you installed DewDrop:
+
+1. Quit the game. Press the **Steam** button, open **Power** and choose **Switch to Desktop**.
+2. Open **Konsole**, paste the macOS and Linux line from Option 1 (**Ctrl+Shift+V**) and press **Enter**.
+3. Answer the questions. The installer doesn't ask again for things it already has: your Nexus Mods API key once you're logged in, or your answer about starting in your profile. Steam is already set up, so it says "Steam already starts the game with DewDrop's launcher." and doesn't close Steam.
+4. Double-click **Return to Gaming Mode** on the desktop.
+
+DewDrop keeps its Steam launcher up to date by itself. See [DewDrop on the Steam Deck](steam-deck.md#updating-dewdrop).
 
 ## Option 2: replace the folder by hand
 
@@ -56,11 +79,11 @@ Open the new `DewDrop` folder, select everything inside it, and copy it into you
 Finally, start the game and check the version on the **Installed** tab. That's it!
 
 {% hint style="warning" %}
-**Keep exactly one DewDrop.** If two folders in `Mods` both contain DewDrop (for example `DewDrop` and `DewDrop old`), SMAPI refuses to load either one, and the Mods button disappears. Move any backup copy out of `Mods`, or put a `.` at the start of its folder name.
+**Keep exactly one DewDrop.** If two folders in `Mods` both contain DewDrop (for example `DewDrop` and `DewDrop old`), SMAPI refuses to load either one, and the **Mods** button disappears. Move any backup copy out of `Mods`, or put a `.` at the start of its folder name.
 {% endhint %}
 
 ## Good to know
 
-* **Keep DewDrop in the same folder** when you update. If you do move it, the next **Apply & Restart** links the new place. If Steam starts the game in your profile, though, the next **Play** in Steam may start without the **Mods** button, because `Selected Mods` still links the old place. Start the game once from `StardewModdingAPI.exe` in your game folder (or the desktop shortcut) and quit it: DewDrop links the new place as the game closes. See [Start in your profile](../guides/start-in-your-profile.md).
+* **Keep DewDrop in the same folder** when you update. If you do move it, the next **Apply & Restart** links the new place. If Steam starts the game in your profile on Windows, though, the next **Play** in Steam may start without the **Mods** button, because `Selected Mods` still links the old place. Start the game once from `StardewModdingAPI.exe` in your game folder (or the desktop shortcut) and quit it: DewDrop links the new place as the game closes. See [Start in your profile](../guides/start-in-your-profile.md).
 * **Updating SMAPI** is a separate job. Running the DewDrop installer again offers it, or see [About SMAPI](installing/smapi.md).
 * **Something went wrong?** The installer saves a log called `DewDrop-installer.log` in your temp folder. See [Troubleshooting](../help/troubleshooting.md#the-installer) and [Reporting issues](../help/reporting-issues.md).

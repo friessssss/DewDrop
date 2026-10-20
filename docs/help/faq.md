@@ -12,16 +12,21 @@ Click a question to see the answer. For step-by-step fixes, see [Troubleshooting
 <details>
 <summary>What does DewDrop do?</summary>
 
-DewDrop is a mod manager that lives inside Stardew Valley. It adds a **Mods** button to the title screen. From there you can turn mods on and off, keep different mod lists as profiles, browse and install mods from Nexus Mods, and update the mods you have. It's a mod itself, so it needs [SMAPI](../getting-started/installing/smapi.md), the free tool that loads Stardew Valley mods.
+DewDrop is a mod manager that lives inside Stardew Valley. It adds a **Mods** button to the title screen. From there you can turn mods on and off, keep different mod lists as profiles, browse and install mods from Nexus Mods, update your mods, and uninstall the ones you don't want. It's a mod itself, so it needs [SMAPI](../getting-started/installing/smapi.md), the free tool that loads Stardew Valley mods.
 
 </details>
 
 <details>
 <summary>What's the black window next to my game?</summary>
 
-That's SMAPI's console. It opens when the game starts with mods and lists what's loading. Yellow lines and messages about mod updates are normal. On macOS and Linux it's a Terminal window.
+That's SMAPI's console. It opens when the game starts with mods and lists what's loading. Yellow lines and messages about mod updates are normal. On macOS and Linux it's a Terminal window. Leave it open while you play: closing it closes the game.
 
-Leave it open while you play: closing it closes the game. If it doesn't open at all, the game started without mods. (On macOS, it usually doesn't come back after **Apply &#x26; Restart** or **Restart now**. That's fine: if the **Mods** button is there, your mods loaded.)
+Sometimes there's no console, and that's fine as long as the **Mods** button is there:
+
+* On a Steam Deck, and on Linux after the installer's `--steam-setup`, DewDrop's Steam launcher starts SMAPI without one.
+* On macOS, it usually doesn't come back after **Apply &#x26; Restart** or **Restart now**.
+
+No console and no **Mods** button means the game started without mods. See [No Mods button on the title screen](troubleshooting.md#no-mods-button-on-the-title-screen).
 
 </details>
 
@@ -49,13 +54,13 @@ No. DewDrop works on its own. It keeps its data in a folder named `Stardrop` so 
 <details>
 <summary>Is DewDrop safe to use?</summary>
 
-DewDrop is open source (GPL-3.0), so anyone can read its code on [GitHub](https://github.com/friessssss/DewDrop). A few things it's careful about:
+DewDrop is open source (GPL-3.0), so anyone can read its code on [GitHub](https://github.com/friessssss/DewDrop). It's careful with your things:
 
-* Turning mods off never moves or deletes them.
-* The installer gets SMAPI only from SMAPI's official GitHub page, and never deletes your mods, saves or settings.
-* The installer asks before it changes Steam's settings, changes them only for the Steam account you're signed in to, and backs them up first.
-* **Start in my profile from Steam** is the same: it's off until you or the installer turn it on, it only changes the signed-in account's settings, and it backs them up first. It never writes over launch options you changed while the game was running.
-* Your Nexus Mods API key is only sent to Nexus Mods.
+* **Your mods.** Turning a mod off never moves or deletes it. DewDrop deletes a mod's folder only when you uninstall that mod.
+* **The installer** gets SMAPI only from SMAPI's official GitHub page, and never deletes your mods, saves or settings.
+* **Steam's settings.** The installer and **Start in my profile from Steam** change them only for the Steam account you're signed in to, and back them up first. On Windows, the installer asks before it changes them. On a Steam Deck (or on Linux with `--steam-setup`), setting up Steam is part of the install, and it asks before it changes launch options you already have, except one that only starts SMAPI.
+* **Start in my profile from Steam** is off until you or the installer turn it on. It never writes over launch options you changed while the game was running. On Linux and the Steam Deck, it doesn't change Steam's settings at all: DewDrop's Steam launcher reads it each time.
+* **Your Nexus Mods API key** is only sent to Nexus Mods.
 
 If you turn on "Mod manager download" links on Windows, any website can try to send DewDrop a Nexus Mods download, and with Premium, DewDrop installs it without asking. Your browser usually asks first, so only allow prompts you expect. See ["Mod manager download" links](../nexus-mods/mod-manager-links.md).
 
@@ -64,14 +69,16 @@ If you turn on "Mod manager download" links on Windows, any website can try to s
 <details>
 <summary>Does DewDrop move or delete my mods?</summary>
 
-No. Your mods stay in your `Mods` folder. Turning a mod off only changes your profile, and **Apply &#x26; Restart** loads your profile through links, not copies. Deleting a profile never deletes mods. The one time DewDrop replaces a mod's folder is when you update that mod, and it keeps the mod's `config.json`. See [How DewDrop works](../reference/how-it-works.md).
+Only when you ask it to. Your mods stay in your `Mods` folder. Turning a mod off only changes your profile, and **Apply &#x26; Restart** loads your profile through links, not copies. Deleting a profile never deletes mods.
+
+DewDrop replaces a mod's folder when you update that mod, and keeps the mod's `config.json`. It deletes a mod's folder only when you [uninstall the mod](../guides/installed.md#uninstall-a-mod), and only once the game has closed. See [How DewDrop works](../reference/how-it-works.md).
 
 </details>
 
 <details>
 <summary>Will DewDrop affect my saves?</summary>
 
-DewDrop doesn't read or change your save files. But turning off a mod that a save uses can still affect that save, the same as removing the mod by hand. For example, items a mod added may disappear. Keep **Save Backup** on so you have backups.
+DewDrop doesn't read or change your save files. But turning off or uninstalling a mod that a save uses can still affect that save, the same as removing the mod by hand. For example, items a mod added may disappear. Keep **Save Backup** on so you have backups.
 
 </details>
 
@@ -98,8 +105,9 @@ The game started the normal way: from a shortcut, another launcher, or Steam wit
 
 * "... off in this profile loaded anyway": mods you turned off are loaded right now.
 * "... in this profile didn't load": mods that are on in your profile aren't loaded, such as one you installed since the game started.
+* "... loaded from a different copy than this profile uses": you have a mod twice, and the game loaded the other copy.
 
-Click **Apply &#x26; Restart** to load exactly your profile. By default, DewDrop also offers this restart with a **Load your profile?** box on the title screen. On Windows with the Steam version, **Start in my profile from Steam** makes **Play** load your profile from the start.
+Click **Apply &#x26; Restart** to load exactly your profile. By default, DewDrop also offers this restart with a **Load your profile?** box on the title screen.
 
 If every mod in your `Mods` folder is on in your profile, a normal launch already loads the same mods, and the line says "The mods loaded right now match this profile." See [How launching works](../getting-started/launching.md).
 
@@ -110,39 +118,45 @@ If it says "This session didn't start from a DewDrop profile. Restart to load th
 <details>
 <summary>Can DewDrop start the game in my profile by itself?</summary>
 
-On Windows with the Steam version, yes: tick **Start in my profile from Steam** on the **Account** tab. SMAPI picks which mods to load as the game starts, before DewDrop runs, so DewDrop can't change what the current launch loads. Instead, it adds SMAPI's `--mods-path` option to Stardew Valley's launch options in Steam, pointing at your profile's links. From then on, **Play** starts the game straight in your profile. DewDrop makes the change when you quit the game, and Steam closes and opens again once to save it.
+With the Steam version of the game, yes: tick **Start in my profile from Steam** on the **Account** tab. From then on, Steam's **Play** button starts the game straight in your profile.
 
-Everywhere else, and when you start the game from a shortcut, DewDrop asks **Load your profile?** on the title screen, and **Restart now** restarts the game into your profile. If every mod in your `Mods` folder is on in your profile, there's nothing to restart for, because a normal launch already matches. See [Start in your profile](../guides/start-in-your-profile.md).
+* **On Windows,** DewDrop adds SMAPI's `--mods-path` option to Stardew Valley's launch options in Steam. It makes the change when you quit the game, and Steam closes and opens again once to save it.
+* **On Linux and the Steam Deck,** it works with DewDrop's Steam launcher, which the installer sets up (on Linux other than the Deck, with its [`--steam-setup`](../reference/installer-options.md#steam-on-linux-and-the-steam-deck) option). The launcher reads the setting each time it starts the game, so a change counts at once and Steam never closes.
+
+It isn't available with GOG or the Xbox app (no Steam launch options), on macOS (SMAPI's launcher there doesn't pass them on), on Linux without DewDrop's Steam launcher, or with Proton and Wine. There, DewDrop asks **Load your profile?** on the title screen, and **Restart now** restarts the game into your profile. On Windows, you can also add `--mods-path` to a desktop shortcut by hand: see [Do it by hand](../guides/start-in-your-profile.md#do-it-by-hand).
 
 </details>
 
 <details>
 <summary>Do I still need Apply &#x26; Restart?</summary>
 
-To load a change right away, yes. When you turn mods on or off, switch profiles, or install or update a mod while the game is running, **Apply &#x26; Restart** restarts the game with the change.
+To load a change right away, yes. When you turn mods on or off, switch profiles, or install, update or uninstall a mod while the game is running, **Apply &#x26; Restart** restarts the game with the change.
 
 * **With Start in my profile from Steam on,** you can also wait. DewDrop links your changes as you quit the game, and your next **Play** from Steam loads them. The status line says "Changes load the next time you start the game from Steam, or restart now."
 * **Without it,** a normal launch loads your whole `Mods` folder, so it takes a restart to get into your profile: **Restart now** in the **Load your profile?** box, or **Apply &#x26; Restart**.
 
-A mod update that says **Update ready, restart to finish** also goes in when you quit the game on Windows.
+Uninstalled mods are deleted when the game closes, however you quit. On Windows, a mod update that says **Update ready, restart to finish** also goes in when you quit.
 
 </details>
 
 <details>
 <summary>Why does Steam close when I quit the game?</summary>
 
-That's **Start in my profile from Steam** saving its change. Steam writes over its settings file while it runs, so a game's launch options can only be changed while Steam is closed. When you quit the game, DewDrop waits a few seconds, closes Steam, changes the launch option, and opens Steam again in the system tray.
+That's **Start in my profile from Steam** saving its change, on Windows. Steam writes over its settings file while it runs, so a game's launch options can only be changed while Steam is closed. When you quit the game, DewDrop waits a few seconds, closes Steam, changes the launch option, and opens Steam again in the system tray.
 
-It happens once each time you turn the setting on or off, not every time you play. If it happens every time, see [Troubleshooting](troubleshooting.md#steam-closed-and-opened-again-by-itself).
+It happens once each time you turn the setting on or off, not every time you play. On Linux and the Steam Deck, DewDrop's Steam launcher reads the setting itself, so Steam stays open. If it happens every time, see [Troubleshooting](troubleshooting.md#steam-closed-and-opened-again-by-itself).
 
 </details>
 
 <details>
 <summary>Can I undo Start in my profile from Steam?</summary>
 
-Yes. Untick **Start in my profile from Steam** on the **Account** tab. When you quit the game, Steam closes and opens again once, and DewDrop removes the `--mods-path` part from the launch option. SMAPI's part stays, so **Play** still starts the game with mods, loading your whole `Mods` folder.
+Yes. Untick **Start in my profile from Steam** on the **Account** tab.
 
-You can also do it by hand: in Steam, right-click **Stardew Valley**, choose **Properties**, and on the **General** page delete only the `--mods-path "..."` part of **Launch Options**. If DewDrop is still installed, untick the setting too the next time you play, or DewDrop puts the part back when you quit.
+* **On Windows,** Steam closes and opens again once when you quit the game, and DewDrop removes the `--mods-path` part from the launch option. SMAPI's part stays, so **Play** still starts the game with mods, loading your whole `Mods` folder.
+* **On Linux and the Steam Deck,** it counts at once, and Steam stays open. DewDrop's Steam launcher then starts the game with your whole `Mods` folder.
+
+You can also delete the `--mods-path "..."` part from Steam's launch options by hand on Windows. If DewDrop is still installed, untick the setting too, or DewDrop puts the part back when you quit. See [Start in your profile](../guides/start-in-your-profile.md#turn-it-off).
 
 </details>
 
@@ -156,7 +170,7 @@ Hover over the button to see why. Usually it says "Nothing to apply: the loaded 
 <details>
 <summary>Why can't I turn DewDrop itself off?</summary>
 
-If DewDrop were off after a restart, there'd be no Mods button to turn it back on. So it stays on in every profile. To stop using it, [uninstall it](../getting-started/uninstalling.md).
+If DewDrop were off after a restart, there'd be no **Mods** button to turn it back on. So it stays on in every profile, and it has no trash can on the **Installed** tab. To stop using it, [uninstall DewDrop](../getting-started/uninstalling.md).
 
 </details>
 
@@ -177,14 +191,32 @@ While `Vanilla` is your profile, **Play** in Steam starts it if **Start in my pr
 <details>
 <summary>Can I install a mod from a zip file I downloaded?</summary>
 
-Not from the menu yet. Extract the zip into your `Mods` folder, so the mod's `manifest.json` ends up inside a folder in `Mods`. If the game is running, click **Rescan** on the **Installed** tab so the mod shows up. With **Turn on mods when installed** on (the default), DewDrop turns the new mod on in your active profile, when the game starts or when you click **Rescan**. If it isn't loaded yet, its row says **On after restart**: click **Apply &#x26; Restart** to load it. See [Managing your mods](../guides/installed.md).
+Not from the menu yet. Extract the zip into your `Mods` folder, so the mod's `manifest.json` ends up inside a folder in `Mods`. If the game is running, click **Rescan** on the **Installed** tab so the mod shows up.
+
+With **Turn on mods when installed** on (the default), DewDrop turns the new mod on in your active profile, when the game starts or when you click **Rescan**. If it isn't loaded yet, its row says **On after restart**: click **Apply &#x26; Restart** to load it. See [Managing your mods](../guides/installed.md).
 
 </details>
 
 <details>
 <summary>How do I delete a mod?</summary>
 
-There's no delete button yet. Turning a mod off is usually enough. To remove it for good, close the game and delete the mod's folder from your `Mods` folder. **Open mods folder** on the **Downloads** tab opens it.
+Uninstall it (DewDrop 0.2.0 and later):
+
+* On the **Installed** tab, click the trash can at the right of the mod's row, then click **Uninstall**.
+* Or, on the mod's page in **Browse**, click the red **Uninstall** button at the top.
+
+DewDrop turns the mod off in your profile now, and deletes its folder, settings included, when the game closes. Until then, its row on the **Installed** tab has an **Undo** button. See [Uninstall a mod](../guides/installed.md#uninstall-a-mod).
+
+If you might want the mod again, turning it off is enough: its folder and settings stay.
+
+</details>
+
+<details>
+<summary>How can I tell which mods I already have while browsing?</summary>
+
+Since DewDrop 0.2.0, Browse marks them. A card says **Installed** in green, or **Update** in orange when a newer version is out. On a mod's page, the top bar shows the version you have, and the file you installed says **Installed** instead of having an install button. See [Browsing Nexus Mods](../guides/browse.md) and [A mod's page](../guides/mod-page.md).
+
+DewDrop can't recognize every mod. A content pack you added by hand, with no Nexus Mods update key in its `manifest.json`, may not get a tag. [How DewDrop knows you have a mod](../guides/browse.md#how-dewdrop-knows-you-have-a-mod) explains why.
 
 </details>
 
@@ -205,7 +237,7 @@ The **Downloads** tab only lists downloads from the current session, and it's cl
 <details>
 <summary>Can I use a controller?</summary>
 
-Yes. Move the cursor with the left stick and press **A** to click. **LB** and **RB** switch tabs, and **B** closes a dialog or the menu. Selecting a text box opens the game's on-screen keyboard. See [The DewDrop menu](../guides/the-menu.md).
+Yes. Move the cursor with the left stick and press **A** to click. **LB** and **RB** (**L1** and **R1** on a Steam Deck) switch tabs, and **B** closes a dialog or the menu. Selecting a text box opens an on-screen keyboard: Steam's, in Game Mode on a Steam Deck. See [The DewDrop menu](../guides/the-menu.md).
 
 </details>
 
@@ -230,10 +262,17 @@ No. Without one you can still turn mods on and off, use profiles, check for mod 
 
 No, but it makes downloads quicker:
 
-* **Premium:** a mod file's **Install** button downloads and installs it right in the game, on any system.
-* **Free:** **Get on Nexus** opens the file on the website, and **Slow download** there sends it back to DewDrop. This only works on Windows for now, after a one-time setup on the **Account** tab. On macOS and Linux, download the mod from the website and add it to `Mods` yourself, then turn it on in the **Installed** tab and click **Apply &#x26; Restart**.
+* **Premium:** a mod file's **Install** button downloads and installs it right in the game, on any system, including the Steam Deck.
+* **Free:** **Get on Nexus** opens the file on the website, and **Slow download** there sends it back to DewDrop. This only works on Windows for now, after a one-time setup on the **Account** tab. On macOS, Linux and the Steam Deck, download the mod from the website, add it to `Mods` yourself, click **Rescan** on the **Installed** tab, and click **Apply &#x26; Restart**. [Install the mod by hand](../nexus-mods/free-vs-premium.md#install-the-mod-by-hand) has the steps.
 
 See [Free vs Premium downloads](../nexus-mods/free-vs-premium.md).
+
+</details>
+
+<details>
+<summary>How do I log in to Nexus Mods on a Steam Deck?</summary>
+
+The easiest way is to let the installer take your API key while you set DewDrop up in Desktop Mode: paste it into Konsole when it asks, and DewDrop logs in with it the next time the game starts. You can also log in on the **Account** tab in Game Mode, with Steam's on-screen keyboard. See [On a Steam Deck](../nexus-mods/connecting.md#on-a-steam-deck).
 
 </details>
 
@@ -247,7 +286,7 @@ No. DewDrop installs single mods. Use Stardrop to install a collection. DewDrop 
 <details>
 <summary>Is my Nexus API key safe?</summary>
 
-DewDrop only sends the key to Nexus Mods. It stores it the way Stardrop does, scrambled in `Settings.json` with what unscrambles it in `Cache/Notion.json`, so never share those two files. To remove it, click **Log out** on the **Account** tab; Stardrop is logged out too. See [How safe is my key?](../nexus-mods/connecting.md#how-safe-is-my-key)
+DewDrop only sends the key to Nexus Mods. It stores it the way Stardrop does, scrambled in `Settings.json` with what unscrambles it in `Cache/Notion.json`, so never share those two files. (On a Steam Deck, a key you give the installer waits as plain text in `Cache/DewDrop/nexus-key.txt` until DewDrop has logged in with it and saved it. Don't share that file either.) To remove it, click **Log out** on the **Account** tab; Stardrop is logged out too. See [How safe is my key?](../nexus-mods/connecting.md#how-safe-is-my-key)
 
 </details>
 
@@ -270,29 +309,27 @@ They can share a `Mods` folder, but they don't know about each other, so use one
 <details>
 <summary>Does DewDrop work on Mac and Linux?</summary>
 
-It's built to, but it's only been fully tested on Windows. On macOS and Linux, website downloads for free Nexus accounts don't reach DewDrop yet, and **Apply &#x26; Restart** hasn't been tested. See [Platform support](../reference/platform-support.md).
+It's built to, but so far only Windows has been fully tested. The installer has been tested on Linux and on a Mac with an Apple chip, where it offers to install Rosetta, Apple's add-on that SMAPI's installer needs. What's different:
 
-On Linux, you need the Linux version of the game, not the Windows version running through Proton (Steam's tool for running Windows games on Linux). To check, in Steam right-click **Stardew Valley** > **Properties** > **Compatibility**. If **Force the use of a specific Steam Play compatibility tool** is ticked, untick it, let Steam download the Linux version, and run the installer again. The installer warns you if it finds the Windows version.
+* Website downloads for free Nexus Mods accounts don't reach DewDrop yet.
+* **Apply &#x26; Restart** hasn't been tested yet.
+* **Start in my profile from Steam** isn't available on macOS. On Linux, it needs DewDrop's Steam launcher.
 
-</details>
-
-<details>
-<summary>Why is Start in my profile from Steam only for Steam on Windows?</summary>
-
-It works by changing Stardew Valley's launch options in Steam, so it needs the Steam version of the game, and somewhere DewDrop can safely add SMAPI's `--mods-path` option:
-
-* **GOG and the Xbox app** don't have Steam's launch options for DewDrop to change.
-* **macOS and Linux:** SMAPI's launcher there doesn't pass on the options Steam gives it, so a launch option can't point SMAPI at your profile.
-* **Steam Deck, Proton and Wine** aren't supported.
-
-Everywhere else, the **Load your profile?** box offers to restart into your profile, and **Apply &#x26; Restart** works as always. Both use the same restart, which hasn't been tested on macOS and Linux yet. On Windows, you can also add `--mods-path` to a desktop shortcut by hand: see [Start in your profile](../guides/start-in-your-profile.md).
+On Linux, you need the Linux version of the game, not the Windows version running through Proton (Steam's tool for running Windows games on Linux). The installer warns you if it finds the Windows version, and [Troubleshooting](troubleshooting.md#linux-the-windows-version-of-the-game) shows how to switch. See [Platform support](../reference/platform-support.md) for the details.
 
 </details>
 
 <details>
 <summary>Does DewDrop work on Steam Deck?</summary>
 
-It isn't supported, and it hasn't been tested. In Game Mode, Steam may stop DewDrop's restart helper when the game closes, so **Apply &#x26; Restart** might not bring the game back. The Windows version of the game through Proton isn't supported either. On Steam Deck and under Proton, DewDrop doesn't show the **Load your profile?** box, and **Start in my profile from Steam** isn't available. See [Platform support](../reference/platform-support.md#steam-deck).
+Yes, from DewDrop 0.2.0. It's new and still being tested. You run the installer once in Desktop Mode. It sets Stardew Valley up in Steam to start through DewDrop's launcher, and can take your Nexus Mods API key so you don't have to type it. After that, you install, update and switch mods from the **Mods** button in Game Mode.
+
+* **Apply &#x26; Restart** is meant to bring the game back in Game Mode, which is still being checked on a real Deck. If the game doesn't come back, press **Play** again. If the restart never got as far as starting the game, that launch opens in your profile instead.
+* There's no SMAPI console window, so console commands such as `dewdrop_nxm` can't be typed. The SMAPI log has what SMAPI and DewDrop report.
+* Free Nexus Mods accounts install mods by hand, in Desktop Mode.
+* The Windows version of the game through Proton isn't supported.
+
+See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
 
 </details>
 
@@ -317,17 +354,22 @@ DewDrop only adds a menu to the title screen, so other players don't need it. Wh
 ## Updating and removing DewDrop
 
 <details>
-<summary>How do I know when DewDrop has an update?</summary>
+<summary>How do I update DewDrop?</summary>
 
-When a new DewDrop is out, SMAPI's window mentions it as the game starts, and DewDrop's own row on the **Installed** tab gets an **Update to** button that opens the release page. You can also check the [Releases page](https://github.com/friessssss/DewDrop/releases/latest). To update, run the newer installer, which updates DewDrop in place and keeps your settings. See [Updating DewDrop](../getting-started/updating-dewdrop.md).
+When a new DewDrop is out, SMAPI mentions it in its window and log as the game starts, and DewDrop's own row on the **Installed** tab gets an **Update to** button that opens the release page. You can also check the [Releases page](https://github.com/friessssss/DewDrop/releases/latest).
+
+To update, close the game and run the installer again, for example by pasting the same install line you used the first time. It updates DewDrop in place and keeps your settings. On a Steam Deck, do this in Desktop Mode. See [Updating DewDrop](../getting-started/updating-dewdrop.md).
 
 </details>
 
 <details>
 <summary>How do I uninstall DewDrop?</summary>
 
-If you turned on **Start in my profile from Steam**, untick it first and quit the game, so DewDrop takes `--mods-path` out of Steam's launch options. Otherwise SMAPI keeps loading your last profile, with no Mods button to change it. (You can also delete the `--mods-path "..."` part in Steam by hand afterward.)
+1. **On Windows, if you turned on Start in my profile from Steam,** untick it first and quit the game, so DewDrop takes `--mods-path` out of Steam's launch options. Otherwise SMAPI keeps loading your last profile, with no **Mods** button to change it.
+2. Close the game and delete the `DewDrop` folder from your `Mods` folder.
 
-Then close the game and delete the `DewDrop` folder from your `Mods` folder. Your other mods stay where they are. A normal launch then loads all of them again, including any you'd turned off in DewDrop. See [Uninstalling DewDrop](../getting-started/uninstalling.md).
+Your other mods stay where they are. A normal launch then loads all of them again, including any you'd turned off in DewDrop.
+
+On Linux and the Steam Deck, Steam's launch option may run DewDrop's launcher from DewDrop's data folder. Take it out of Steam before you delete that folder. [Uninstalling DewDrop](../getting-started/uninstalling.md) has the details.
 
 </details>

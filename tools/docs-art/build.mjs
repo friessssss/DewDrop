@@ -92,8 +92,11 @@ const SHOTS = {
   // name: [raw capture, label, icon, crop [x, y, w, h] in the 1920x1080 capture or null for the whole screen]
   title: ['title.png', 'Title screen', 'window', null],
   installed: ['installed.png', 'Installed', 'installed', 'menu'],
+  'uninstall-dialog': ['uninstall-dialog.png', 'Uninstall', 'installed', 'menu'],
+  uninstalled: ['uninstalled.png', 'Uninstalled', 'installed', 'menu'],
   browse: ['browse.png', 'Browse', 'browse', 'menu'],
   'mod-page': ['mod-page.png', 'Mod page', 'browse', 'menu'],
+  'mod-page-installed': ['mod-page-installed.png', 'Installed mod', 'browse', 'menu'],
   profiles: ['profiles.png', 'Profiles', 'profiles', 'menu'],
   downloads: ['downloads.png', 'Downloads', 'downloads', 'menu'],
   account: ['account.png', 'Account', 'account', 'menu'],

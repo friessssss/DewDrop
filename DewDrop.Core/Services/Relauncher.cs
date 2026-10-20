@@ -5,9 +5,9 @@ namespace DewDrop.Core.Services
 {
     /// <summary>
     /// Restarts the game through SMAPI once the current process has exited. A detached shell waits on our PID,
-    /// finishes any mod updates that were blocked by the running game, then starts SMAPI pointed at the linked
-    /// mods folder, so the new mod set loads in a clean process. On Windows the same script can instead just finish
-    /// the updates, and change Steam's launch option for the game (see <see cref="SteamJob"/>), without starting it.
+    /// finishes any mod updates and uninstalls that were blocked by the running game, then starts SMAPI pointed at the
+    /// linked mods folder, so the new mod set loads in a clean process. On Windows the same script can instead just
+    /// finish those, and change Steam's launch option for the game (see <see cref="SteamJob"/>), without starting it.
     /// </summary>
     public static class Relauncher
     {
@@ -72,8 +72,9 @@ namespace DewDrop.Core.Services
         }
 
         /// <summary>
-        /// Windows only: once the game has closed, finishes waiting mod updates and makes a Steam launch option change,
-        /// without starting the game again. Does nothing elsewhere, where updates never wait and Steam isn't changed.
+        /// Windows only: once the game has closed, finishes waiting mod updates and uninstalls and makes a Steam launch
+        /// option change, without starting the game again. Does nothing elsewhere, where open files never block a move
+        /// and Steam isn't changed.
         /// </summary>
         public static void ScheduleAfterExit(string gamePath, string modsPath, string pendingUpdatesFile, string scriptFolder, ILog log, SteamJob? steamJob)
         {
@@ -81,6 +82,50 @@ namespace DewDrop.Core.Services
             {
                 Start(gamePath, modsPath, pendingUpdatesFile, scriptFolder, log, launchId: null, relaunch: false, steamJob);
             }
+        }
+
+        /// <summary>
+        /// Linux with DewDrop's Steam launcher (see <see cref="SteamLauncher"/>): once the game has closed, runs the
+        /// launcher again, as Steam did. It finds the restart file written here and starts SMAPI on the profile folder,
+        /// with no terminal window. The restart stays in the game's Steam session (and, on a Steam Deck, Steam's
+        /// runtime), so Steam keeps counting it as the game and Game Mode shows it.
+        /// </summary>
+        /// <param name="launchId">Handed to the new game as <see cref="LaunchIdVariable"/> by the launcher.</param>
+        public static void ScheduleThroughLauncher(string launcherPath, string gamePath, string scriptFolder, string launchId, ILog log)
+        {
+            ScheduleThroughLauncher(launcherPath, gamePath, scriptFolder, launchId, log, Environment.ProcessId);
+        }
+
+        /// <param name="gamePid">The process to wait for: the game, except in tests.</param>
+        internal static void ScheduleThroughLauncher(string launcherPath, string gamePath, string scriptFolder, string launchId, ILog log, int gamePid)
+        {
+            Directory.CreateDirectory(scriptFolder);
+            var restartFile = Path.Combine(scriptFolder, SteamLauncher.RestartName);
+            File.WriteAllText(restartFile, launchId);
+
+            var info = new ProcessStartInfo("/bin/sh") { UseShellExecute = false };
+            info.ArgumentList.Add("-c");
+            info.ArgumentList.Add("while kill -0 \"$1\" 2>/dev/null; do sleep 0.5; done; exec \"$2\" \"$3\"");
+            info.ArgumentList.Add("dewdrop-restart");
+            info.ArgumentList.Add(gamePid.ToString());
+            info.ArgumentList.Add(launcherPath);
+            info.ArgumentList.Add(Path.Combine(gamePath, "StardewValley"));
+
+            // The launcher sets these for the new game itself
+            info.Environment.Remove(LaunchIdVariable);
+            info.Environment.Remove("SMAPI_MODS_PATH");
+            try
+            {
+                Process.Start(info);
+            }
+            catch
+            {
+                // No restart is coming, so the next launch mustn't pass for it
+                File.Delete(restartFile);
+                throw;
+            }
+
+            log.Info("Scheduling a restart through DewDrop's Steam launcher");
         }
 
         private static void Start(string gamePath, string modsPath, string pendingUpdatesFile, string scriptFolder, ILog log, string? launchId, bool relaunch, SteamJob? steamJob)
@@ -134,7 +179,9 @@ namespace DewDrop.Core.Services
                 // Unix lets open files be replaced, so updates never wait for a restart there
                 var launcher = LauncherPath(gamePath);
                 string Quote(string value) => "'" + value.Replace("'", "'\\''") + "'";
-                var script = $"while kill -0 {pid} 2>/dev/null; do sleep 0.5; done; cd {Quote(gamePath)} && {LaunchIdVariable}={Quote(launchId ?? "")} SMAPI_MODS_PATH={Quote(modsPath)} nohup {Quote(launcher)} --mods-path {Quote(modsPath)} >/dev/null 2>&1 &";
+                // Game Mode on a Steam Deck can't show the terminal window SMAPI's Linux launcher opens
+                var noTerminal = SteamDeck.InGameMode ? "SMAPI_NO_TERMINAL=true " : "";
+                var script = $"while kill -0 {pid} 2>/dev/null; do sleep 0.5; done; cd {Quote(gamePath)} && {LaunchIdVariable}={Quote(launchId ?? "")} SMAPI_MODS_PATH={Quote(modsPath)} {noTerminal}nohup {Quote(launcher)} --mods-path {Quote(modsPath)} >/dev/null 2>&1 &";
                 info = new ProcessStartInfo("/bin/sh") { UseShellExecute = false };
                 info.ArgumentList.Add("-c");
                 info.ArgumentList.Add(script);
@@ -142,7 +189,7 @@ namespace DewDrop.Core.Services
 
             log.Info(relaunch
                 ? $"Scheduling a relaunch through SMAPI with mods from {modsPath}"
-                : $"Scheduling {(steamJob is null ? "the waiting mod updates" : "the Steam launch option change")} for when the game closes");
+                : $"Scheduling {(steamJob is null ? "the waiting mod updates and uninstalls" : "the Steam launch option change")} for when the game closes");
             Process.Start(info);
         }
 
@@ -150,7 +197,7 @@ namespace DewDrop.Core.Services
         // one in, put the old one back on failure. Folders are moved with [IO.Directory]::Move, a single rename that
         // fails as a whole while a file is in use; Move-Item falls back to moving files one at a time and can leave
         // a mod split between two folders. Paths only arrive as arguments, so the script itself stays plain ASCII.
-        internal const string WindowsScript = @"# DewDrop relauncher: waits for the game to close, finishes blocked mod updates, can change Steam's launch
+        internal const string WindowsScript = @"# DewDrop relauncher: waits for the game to close, finishes blocked mod updates and uninstalls, can change Steam's launch
 # option for the game, then starts SMAPI again (unless -NoRelaunch).
 param([int]$GamePid, [string]$GamePath, [string]$ModsPath, [string]$PendingFile, [string]$LaunchId, [switch]$NoRelaunch, [string]$SteamJob)
 
@@ -178,6 +225,42 @@ function Copy-PlayerFiles([string]$From, [string]$To, $Added) {
     }
 }
 
+# Same checks as PendingUpdates.TryRemove: the copy may only go to the name DewDrop reserved for it ('<32 hex>-removed'
+# in the staging folder beside it), and the folder must still hold that mod. Returns 'ok', 'drop' (nothing to remove) or
+# 'keep' when it can't tell: ConvertFrom-Json rejects the comments and trailing commas SMAPI allows, so DewDrop's own
+# reader decides at the next start.
+function Test-Removal($Swap) {
+    $target = [System.IO.Path]::GetFullPath([string]$Swap.Target).TrimEnd('\')
+    $staged = [System.IO.Path]::GetFullPath([string]$Swap.Staged).TrimEnd('\')
+    $root = [System.IO.Path]::GetDirectoryName($staged)
+    if ([System.IO.Path]::GetFileName($staged) -notmatch '^[0-9a-f]{32}-removed$' -or [System.IO.Path]::GetFileName($root) -ne '.dewdrop-staging' -or [System.IO.Path]::GetDirectoryName($root) -ne [System.IO.Path]::GetDirectoryName($target)) {
+        Write-Log ('Did not uninstall ' + $Swap.Target + ': its record does not look like one DewDrop made')
+        return 'drop'
+    }
+    $manifest = [System.IO.Path]::Combine($target, 'manifest.json')
+    if (-not [System.IO.File]::Exists($manifest)) { Write-Log ('Did not uninstall ' + $Swap.Target + ': it is gone'); return 'drop' }
+    # Only the top-level UniqueID counts; a content pack names its framework's UniqueID too
+    $id = $null
+    try { $id = [string](Get-Content -LiteralPath $manifest -Raw -Encoding UTF8 -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop).UniqueID } catch { }
+    if ($id -and $id -eq [string]$Swap.UniqueId) { return 'ok' }
+    Write-Log ('Left ' + $Swap.Target + ' for DewDrop to check at the next start')
+    return 'keep'
+}
+
+# Links in the profile's folder that lead to an uninstalled mod would lead nowhere once it's gone
+function Remove-LinksTo([string]$Target) {
+    if (-not $ModsPath -or -not [System.IO.Directory]::Exists($ModsPath)) { return }
+    $want = [System.IO.Path]::GetFullPath($Target).TrimEnd('\')
+    foreach ($dir in [System.IO.Directory]::GetDirectories($ModsPath)) {
+        try {
+            if (-not ([System.IO.File]::GetAttributes($dir) -band [System.IO.FileAttributes]::ReparsePoint)) { continue }
+            $to = [string]@((Get-Item -LiteralPath $dir -Force).Target)[0]
+            if ($to.StartsWith('\\?\') -or $to.StartsWith('\??\')) { $to = $to.Substring(4) }
+            if ($to -and [System.IO.Path]::GetFullPath($to).TrimEnd('\') -eq $want) { [System.IO.Directory]::Delete($dir, $false) }
+        } catch { Write-Log ('Could not check the link ' + $dir + ': ' + $_.Exception.Message) }
+    }
+}
+
 try { [System.IO.File]::WriteAllText($logFile, '') } catch { }
 Wait-Process -Id $GamePid -ErrorAction SilentlyContinue
 Start-Sleep -Milliseconds 500
@@ -191,6 +274,26 @@ if ($PendingFile -and (Test-Path -LiteralPath $PendingFile)) {
     catch { $readOk = $false; Write-Log ('Could not read ' + $PendingFile + ': ' + $_.Exception.Message) }
     foreach ($swap in $swaps) {
         if ($null -eq $swap) { continue }
+
+        # An uninstall has nothing staged, so it's handled before the check for a staged copy below
+        if ($swap.Remove) {
+            try {
+                $check = Test-Removal $swap
+                if ($check -eq 'drop') { continue }
+                if ($check -ne 'ok') { $left += $swap; continue }
+                [void][System.IO.Directory]::CreateDirectory([System.IO.Path]::GetDirectoryName($swap.Staged))
+                [System.IO.Directory]::Move($swap.Target, $swap.Staged)
+                Write-Log ('Uninstalled ' + $swap.UniqueId)
+                Remove-LinksTo $swap.Target
+                try { [System.IO.Directory]::Delete($swap.Staged, $true) } catch { Write-Log ('Left the uninstalled copy at ' + $swap.Staged) }
+            }
+            catch {
+                Write-Log ('Could not uninstall ' + $swap.UniqueId + ' yet: ' + $_.Exception.Message)
+                $left += $swap
+            }
+            continue
+        }
+
         $old = $null
         $carried = New-Object 'System.Collections.Generic.List[string]'
         try {

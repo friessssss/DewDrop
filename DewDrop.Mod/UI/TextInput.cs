@@ -1,3 +1,5 @@
+using DewDrop.Core.Services;
+using DewDrop.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -57,8 +59,14 @@ namespace DewDrop.UI
             }
             Selected = inside;
 
-            // A controller has no keys to type with; open the game's on-screen keyboard, as vanilla text boxes do
-            if (inside && Game1.options.gamepadControls && !Game1.lastCursorMotionWasMouse)
+            // Game Mode on a Steam Deck has no keyboard, whatever the box was clicked with: Steam's floating one types
+            // straight into the box. Elsewhere a controller has no keys to type with either; open the game's
+            // on-screen keyboard, as vanilla text boxes do.
+            if (inside && SteamDeck.InGameMode && SteamOverlay.ShowKeyboard(Bounds))
+            {
+                return;
+            }
+            if (inside && (SteamDeck.InGameMode || (Game1.options.gamepadControls && !Game1.lastCursorMotionWasMouse)))
             {
                 Game1.showTextEntry(this);
             }

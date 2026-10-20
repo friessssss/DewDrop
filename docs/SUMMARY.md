@@ -13,6 +13,7 @@
   * [About SMAPI](getting-started/installing/smapi.md)
 * [Your first launch](getting-started/first-launch.md)
 * [How launching works](getting-started/launching.md)
+* [DewDrop on the Steam Deck](getting-started/steam-deck.md)
 * [Updating DewDrop](getting-started/updating-dewdrop.md)
 * [Uninstalling DewDrop](getting-started/uninstalling.md)
 
@@ -61,6 +62,7 @@
 * [Building from source](contributing/building.md)
 * [Releasing](contributing/releasing.md)
 * [The debug bridge](contributing/debug-bridge.md)
+* [Testing on a Steam Deck](contributing/steam-deck-testing.md)
 * [Docs and art style](contributing/docs-and-art.md)
 * [Latest release](https://github.com/friessssss/DewDrop/releases/latest)
 * [GitHub repository](https://github.com/friessssss/DewDrop)

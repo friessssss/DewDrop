@@ -109,7 +109,7 @@ namespace DewDrop
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
-            Nexus.RestoreSavedLogin();
+            Nexus.RestoreSavedLogin(Mods.Paths);
             ProfileStart.OnGameLaunched();
             if (Config.CheckUpdatesOnLaunch)
             {

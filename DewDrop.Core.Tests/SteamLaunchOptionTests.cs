@@ -94,7 +94,10 @@ namespace DewDrop.Core.Tests
             Assert.Equal(Selected, SteamLaunchOption.ModsPath($"\"{Smapi}\" --mods-path \"{Selected}\" %command%"));
             Assert.Equal(@"C:\Mods", SteamLaunchOption.ModsPath($"\"{Smapi}\" --mods-path C:\\Mods %command%"));
             Assert.Null(SteamLaunchOption.ModsPath($"\"{Smapi}\" %command%"));
-            Assert.True(SteamLaunchOption.PointsAt($"\"{Smapi}\" --mods-path \"{Selected.ToUpperInvariant()}\\\" %command%", Selected));
+            Assert.True(SteamLaunchOption.PointsAt($"\"{Smapi}\" --mods-path \"{Selected}\\\" %command%", Selected));
+
+            // The option is only read on Windows, where case doesn't count; these tests also run on Linux, where it does
+            Assert.Equal(!OperatingSystem.IsLinux(), SteamLaunchOption.PointsAt($"\"{Smapi}\" --mods-path \"{Selected.ToUpperInvariant()}\\\" %command%", Selected));
         }
 
         [Fact]

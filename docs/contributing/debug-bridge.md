@@ -13,9 +13,13 @@ The bridge only exists in Debug builds. Any program on your computer can use it,
 
 ## Turn it on
 
-1. Close the game, then build Debug: `dotnet build DewDrop.sln`. This deploys the Debug build to your `Mods` folder. See [Building from source](building.md).
+1. Close the game, then build Debug. This deploys the Debug build to your `Mods` folder. See [Building from source](building.md).
+
+   ```bash
+   dotnet build DewDrop.sln
+   ```
 2. Start the game through SMAPI.
-3. In the SMAPI console, look for `Debug bridge listening in <folder>`. If that line is missing, a Release build is loaded.
+3. In the SMAPI console or log, look for `Debug bridge listening in <folder>`. If that line is missing, a Release build is loaded.
 
 The bridge lives in a `dewdrop-bridge` folder inside your temp folder:
 
@@ -24,7 +28,11 @@ The bridge lives in a `dewdrop-bridge` folder inside your temp folder:
 
 It has two subfolders, `in` and `out`, which are created when the game starts.
 
-When you've finished, build Release again (`dotnet build DewDrop.sln -c Release`) so the copy you play with leaves the bridge out.
+When you've finished, build Release again so the copy you play with leaves the bridge out:
+
+```bash
+dotnet build DewDrop.sln -c Release
+```
 
 ## How it works
 
@@ -37,7 +45,7 @@ Only one file runs at a time. The bridge doesn't read the next `.cmd` until ever
 
 A finished reply file looks like this:
 
-```
+```text
 > skipintro
 ok
 > wait 2000
@@ -79,11 +87,15 @@ The command name isn't case-sensitive. Everything after the first space is the a
 | `uiscale F` | Sets the UI scale, for example `1.0`. | `ui scale F` |
 | `quit` | Closes the game. | `bye` |
 | `ask on` or `ask off` | Turns **Ask to load my profile** on or off and saves it in `config.json`. Any word other than `on` means off. | `ask True` or `ask False` |
-| `steam on` or `steam off` | Ticks or unticks **Start in my profile from Steam** and saves it in `config.json`. This only records the choice: Steam itself changes when the game closes. Any word other than `on` means off. | `steam wanted True, pending True`: the setting, and whether Steam will change when the game closes |
+| `steam on` or `steam off` | Ticks or unticks **Start in my profile from Steam** and saves it in `config.json`. On Windows this only records the choice: Steam itself changes when the game closes. With DewDrop's Steam launcher (Linux), it writes or deletes the launcher's `start-in-profile` file at once. Any word other than `on` means off. | `steam wanted True, pending True`: the setting, and whether Steam will change when the game closes (never with the launcher) |
 | `steamcheck` | Reads Stardew Valley's launch option from Steam's settings again, for example after you changed it while the game runs. | `problem=… option=… on=… pending=…` (see below) |
 | `marker STAGE` | Leaves a restart note in `startup.json` for the next launch to find, as if a restart were in progress. `STAGE` is `restarting` or `arrived`. `marker clear` (or any other word) removes the note. | `marker Restarting`, `marker Arrived` or `marker cleared`, or `couldn't save` |
 | `unsee ID` | Takes mods off the list of mods DewDrop has seen, so they count as new in your `Mods` folder at the next launch. Give one or more unique IDs, separated by spaces. | `forgotten`, even for an ID that wasn't on the list, or `couldn't save` |
 | `diff` | Reports how the mods SMAPI loaded differ from the active profile (see below). | the difference line |
+| `uninstall ID` | Uninstalls the first loose copy of the mod with that unique ID, as its trash can on the **Installed** tab does, without the dialog. The folder really is deleted when the game closes, unless you send `undo` first. | `uninstalled <folder>` with the folder's full path, `refused: <reason>` with the reason the trash can would give, or `not installed` (also for a mod that's already uninstalled, or only in a collection) |
+| `undo ID` | Keeps an uninstalled mod, as its **Undo** button does. | `kept <folder>: <message>`, with the message **Undo** shows. Otherwise the message on its own, such as `<name> was already deleted.`, or `not uninstalled` |
+| `removals` | Reports the uninstalls waiting for the game to close. | `removing=[ids] stillLoaded=[ids] queued=[id@folder, ...]` (see below) |
+| `sources ID` | Reports what DewDrop knows about where a mod came from on Nexus Mods. | `nexus=[ids] install=<mod>/<file> v<version> copies=<n>` (see below), or `not installed` |
 | anything else |  | `unknown command` |
 
 The comment at the top of `DebugBridge.cs` doesn't list `window`, `borderless` or `uiscale`, but all three work.
@@ -104,9 +116,9 @@ The comment at the top of `DebugBridge.cs` doesn't list `window`, `borderless` o
 | `ask` | The **Ask to load my profile** setting: `True` or `False`. |
 | `askStatus` | What happened about the **Load your profile?** box this session, in double quotes. See the next table. |
 | `steamWanted` | Whether **Start in my profile from Steam** is ticked. Until you've chosen, it follows what Steam's launch option already does. |
-| `steamOn` | `True` when Stardew Valley's launch option in Steam, as last read, has `--mods-path` pointing at `Selected Mods`. DewDrop reads it as the game starts and on `steamcheck`. |
-| `steamPending` | `True` when Steam's launch option will change as the game closes: the setting can be used here, and `steamWanted` differs from `steamOn`. |
-| `steamProblem` | Why **Start in my profile from Steam** can't be used on this PC, in double quotes, as the row's hover text says it. `"none"` when it can. |
+| `steamOn` | Whether Steam starts the game in the profile now. On Windows, `True` when Stardew Valley's launch option in Steam, as last read, has `--mods-path` pointing at `Selected Mods`; DewDrop reads it as the game starts and on `steamcheck`. With DewDrop's Steam launcher, `True` while its `start-in-profile` file exists. |
+| `steamPending` | `True` when Steam's launch option will change as the game closes: the setting can be used here, and `steamWanted` differs from `steamOn`. Always `False` with DewDrop's Steam launcher, which reads the setting at each launch. |
+| `steamProblem` | Why **Start in my profile from Steam** can't be used on this computer, in double quotes, as the row's hover text says it. `"none"` when it can. |
 | `marker` | The restart note in `startup.json` right now: `Restarting`, `Arrived` or `none`. The note is cleared when the restarted game reaches its title screen, so it's usually `none`. |
 | `failed` | On a launch that isn't in a profile, the note it found from a restart that didn't come back: `Restarting` if the restart never came back, `Arrived` if the game closed while the profile was loading. Otherwise `none`. |
 | `nexus` | Your Nexus Mods user name, with `+premium` for Premium accounts, or `no` when logged out. |
@@ -122,7 +134,7 @@ The comment at the top of `DebugBridge.cs` doesn't list `window`, `borderless` o
 | `the game started in a profile` | A launch in a profile that isn't a DewDrop restart, such as one from Stardrop, from Steam with **Start in my profile from Steam** on, or with a `--mods-path` launch option. |
 | `SMAPI started on a folder DewDrop doesn't manage` | The session is `Custom`. |
 | `turned off` | **Ask to load my profile** is off. |
-| `not available on Steam Deck or under Wine or Proton` | The box is off on this system. |
+| `not available under Wine or Proton` | The box is off on this system. |
 | `the settings or profile couldn't be read` | Stardrop's `Settings.json` or the active profile file couldn't be read. |
 | `started from a Steam invite` | The game started from a Steam multiplayer invite. |
 | `SMAPI's launcher is missing` | SMAPI's launcher isn't in the game folder, so a restart couldn't start. |
@@ -135,7 +147,7 @@ The comment at the top of `DebugBridge.cs` doesn't list `window`, `borderless` o
 
 `diff` replies with one line, for example:
 
-```
+```text
 matches=False turnedOff=[Author.ModA, Author.ModB] notLoaded=[] otherCopy=[] rejected=[]
 ```
 
@@ -153,7 +165,7 @@ Each list holds unique IDs. DewDrop itself never counts. The comparison is only 
 
 `steamcheck` replies with one line, for example:
 
-```
+```text
 problem=none option="C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe" %command% on=False pending=True
 ```
 
@@ -162,6 +174,34 @@ problem=none option="C:\Program Files (x86)\Steam\steamapps\common\Stardew Valle
 | `problem` | Why **Start in my profile from Steam** can't be used here, or `none`. Unlike `steamProblem` in the status line, it isn't in quotes. |
 | `option` | Stardew Valley's launch option, exactly as Steam stores it. It's empty when the game has no launch option, and `(unknown)` when DewDrop couldn't read it. |
 | `on` and `pending` | The same as `steamOn` and `steamPending` in the status line. |
+
+### The removals line
+
+`removals` replies with one line, for example:
+
+```text
+removing=[Author.ModA] stillLoaded=[Author.ModA] queued=[Author.ModA@C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\ModA]
+```
+
+| Field | Meaning |
+| --- | --- |
+| `removing` | Unique IDs of the mods uninstalled and waiting for the game to close: the rows that say **Deleted when the game closes**. |
+| `stillLoaded` | The ones of those the game has loaded, which make the bottom bar say "... still loaded. Restart to finish uninstalling." |
+| `queued` | The uninstalls listed in `pending-updates.json`, each as the unique ID, `@`, and the mod's folder. Usually the same mods as `removing`. |
+
+### The sources line
+
+`sources` replies with one line, for example:
+
+```text
+nexus=[1915] install=1915/12345 v2.5.3 copies=1
+```
+
+| Field | Meaning |
+| --- | --- |
+| `nexus` | The Nexus mod IDs the mod belongs to, from its update key, DewDrop's install record and smapi.io's list. Browse tags these mods' cards. See [How DewDrop knows you have a mod](../guides/browse.md#how-dewdrop-knows-you-have-a-mod). |
+| `install` | The Nexus mod and file DewDrop last installed it from, and the version that file put in, from `mod-sources.json`. `none` when DewDrop didn't install it. |
+| `copies` | How many loose copies of the mod are installed. It's 1 for a mod that's only in a collection. More than 1 means the **Installed** tab says **Installed twice**. |
 
 ### Screenshots
 
@@ -220,6 +260,11 @@ At 3840×2160 the frame is at x 1120, y 501, 1600 × 1150.
 * `scroll` only moves a list when your real mouse is over it. Use `key Down` and `key Up` instead.
 * The tooltip box and the tab highlight are drawn at your real mouse position. The game also re-hovers at the real mouse every tick, so put `hover` and `shot` in the same file with no `wait` between them.
 
+**The game window in the background**
+
+* When `pauseWhenOutOfFocus` is `true` in the game's `startup_preferences` file, the game skips its own update while its window isn't in front. The bridge still runs commands, and clicks, keys and `shot` still work, but the menu stops updating itself. For example, the **Profiles** tab's buttons keep the state they had, so **Use this profile** stays grayed out after **Duplicate** until you click another tab and back. A mod's page never shows its **Installed** note or its **Uninstall** button.
+* So keep the game window in front, or close the game, set `pauseWhenOutOfFocus` to `false` and start it again. Back up `startup_preferences` first and put it back afterward.
+
 **Clean screenshots**
 
 * Info messages stay for 5 seconds and error messages for 8. Wait for them to clear, or click one to dismiss it.
@@ -231,23 +276,23 @@ At 3840×2160 the frame is at x 1120, y 501, 1600 × 1150.
 * A `wait` on the last line doesn't hold back `DONE`.
 * A line starting with `#` isn't a comment. It gets `unknown command`.
 
-**Not tested yet:** whether `uiscale` is saved between sessions, how the bridge behaves while the window is minimized or in the background, and sending `open` while the menu is already open.
+**Not tested yet:** whether `uiscale` is saved between sessions, how the bridge behaves while the window is minimized, and sending `open` while the menu is already open.
 
 ## Testing starting in your profile
 
 DewDrop decides once per launch, on the first title screen, whether to ask **Load your profile?**, and it changes Steam's launch option only as the game closes. [Start in your profile](../guides/start-in-your-profile.md) explains both. So most of these tests set up the **next** launch: send the commands, close the game with `quit`, then start it again yourself. The bridge can't start the game for you.
 
-Most tests need a normal launch, one where SMAPI loads your whole `Mods` folder. On Windows, running `StardewModdingAPI.exe` from the game folder always does. Steam's **Play** button does too, unless **Start in my profile from Steam** is on.
+Most tests need a normal launch, one where SMAPI loads your whole `Mods` folder. Running SMAPI from the game folder always does: `StardewModdingAPI.exe` on Windows, `StardewModdingAPI` on Linux. Steam's **Play** button does too, unless **Start in my profile from Steam** is on.
 
 {% hint style="warning" %}
-While **Start in my profile from Steam** is ticked, quitting the game can close the real Steam and change its settings file. `steam on` ticks it, and so does **Restart now** while the box's Steam checkbox is ticked. Test that part with a [fake Steam folder](#testing-with-a-fake-steam-folder) instead.
+On Windows, while **Start in my profile from Steam** is ticked, quitting the game can close the real Steam and change its settings file. `steam on` ticks it, and so does **Restart now** while the box's Steam checkbox is ticked. Test that part with a [fake Steam folder](#testing-with-a-fake-steam-folder) instead.
 {% endhint %}
 
 ### The Load your profile? box
 
 1. **Make the mods differ.** On the **Installed** tab, turn off a mod that's in your `Mods` folder. Then `quit` and start the game normally, which loads that mod anyway.
 2. **Check the box.** On the title screen, send `status` and `diff`. Look for `kind=Plain`, `askStatus="asked"`, and the mod's ID in `turnedOff`. `shot` captures the **Load your profile?** box. The box ignores clicks and keys for its first half second. After that, `key Escape` answers **Not now**, and `key Enter` answers **Restart now**, which really restarts the game.
-3. **Mind the Steam checkbox.** On Windows with the Steam version of the game, while **Start in my profile from Steam** is off and can be used, the box also shows **Start in my profile from Steam from now on**, ticked. **Restart now** then turns the setting on, and Steam changes when you quit the restarted game. Click the checkbox to untick it before you answer, unless you're testing with a fake Steam folder.
+3. **Mind the Steam checkbox.** With the Steam version of the game on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher, while **Start in my profile from Steam** is off and can be used, the box also shows **Start in my profile from Steam from now on**, ticked. **Restart now** then turns the setting on: on Windows, Steam changes when you quit the restarted game; with the launcher, at once. Click the checkbox to untick it before you answer, unless you're testing with a fake Steam folder.
 4. **Check the restart.** The restarted game skips its title intro, and `status` shows `kind=Profile` and `askStatus="this session is DewDrop's restart"`.
 5. **Turn the question off.** Send `ask off`, then `quit` and start normally. No box opens, and `status` shows `askStatus="turned off"`. **Don't ask again** in the box does the same. Send `ask on` to turn it back on.
 6. **Try a new mod.** Send `unsee` with the unique ID of a mod that's in your `Mods` folder and off in every profile. Then `quit` and start normally. While **Turn on mods when installed** is on, DewDrop turns that mod on in the active profile as the game starts, and when you open the menu a message says "Turned on *name*, new in your Mods folder." A new mod doesn't count as a difference, so it never opens the box by itself. Each launch marks every mod that's on in any profile as seen again, so `unsee` only lasts for mods that are off everywhere.
@@ -258,14 +303,18 @@ The note that `marker` leaves has the ID `bridge`. A launch in your profile trea
 
 ### Testing with a fake Steam folder
 
-Debug builds read the environment variable `DEWDROP_FAKE_STEAM` (see `ProfileStart.cs`). When it names a folder, DewDrop treats that folder as Steam's folder, and the `localconfig.vdf` file in it as your Steam account's settings. As the game closes, DewDrop changes that file instead. It looks for Steam as `steam.exe` in the fake folder, which isn't running, so the real Steam is never closed and its settings are never touched. A restart that DewDrop starts keeps the variable, because the game starts it.
+Debug builds read the environment variable `DEWDROP_FAKE_STEAM` (see `ProfileStart.cs`). When it names a folder, DewDrop treats that folder as Steam's folder, and the `localconfig.vdf` file in it as your Steam account's settings, so the real Steam is never closed and its settings are never touched. A restart that DewDrop starts keeps the variable, because the game starts it.
 
-Two things still happen for real:
+It works on Windows and Linux, with the Steam copy of the game: the game's folder path has to contain `steamapps`. Otherwise `steamProblem` says why the setting can't be used.
+
+Two things still happen for real on both:
 
 * `steam on` and `steam off` save the setting in `config.json`, as ticking the row does.
 * With the setting on, DewDrop links your profile into `Selected Mods` as the game closes, as **Apply & Restart** does.
 
-You need Windows and the Steam copy of the game: the game's folder path has to contain `steamapps`. Otherwise `steamProblem` says why the setting can't be used.
+{% tabs %}
+{% tab title="Windows" %}
+As the game closes, DewDrop changes the fake `localconfig.vdf` instead of the real one. It looks for Steam as `steam.exe` in the fake folder, which isn't running, so it never closes the real Steam.
 
 1. **Note your setting.** Open `Mods/DewDrop/config.json` and write down the value of `StartInProfileFromSteam`, so you can put it back at the end. DewDrop may change it as soon as the game starts with the fake folder.
 2. **Make the fake folder.** In PowerShell:
@@ -292,8 +341,43 @@ You need Windows and the Steam copy of the game: the game's folder path has to c
 8. **Try a change made meanwhile.** Send `steam on`. While the game still runs, change the text after `LaunchOptions` in the fake file with a text editor, then `quit`. DewDrop leaves the file alone, and at the next start the menu says "Steam's launch option wasn't changed: Stardew Valley's launch options changed in Steam while the game was running, so DewDrop left them alone."
 9. **Try an option DewDrop can't add to.** Change the `LaunchOptions` value in the fake file to `-novid %command%` and send `steamcheck`. `problem=` says the launch option starts another program, and the row on the **Account** tab is grayed out.
 10. **Clean up.** Close the game and the PowerShell window. Set `StartInProfileFromSteam` in `config.json` back to the value you noted. `null` is also safe: DewDrop then follows what the real Steam already does. Otherwise, the next time you quit the game without the fake folder, DewDrop may close the real Steam and change its launch option to match the setting.
+{% endtab %}
 
-The SMAPI console command `dewdrop_status` prints the session kind, the **Ask to load my profile** setting and what happened on the title screen, and the state of **Start in my profile from Steam** with Steam's launch option. It works in Release builds too. See [Console commands](../reference/console-commands.md).
+{% tab title="Linux" %}
+On Linux, DewDrop never edits Steam's settings. It only checks that Stardew Valley's launch option runs DewDrop's Steam launcher, which the installer sets up on a Steam Deck, or on other Linux with `--steam-setup`. A fake folder whose launch option runs the launcher lets you try DewDrop's side of it on any Linux PC: the setting, starting in your profile and **Apply & Restart** through the launcher. This hasn't been tried on a Linux PC yet.
+
+The launcher's files are real: DewDrop copies the launcher into `~/.config/Stardrop/Data/Cache/DewDrop/`, and `steam on` writes a `start-in-profile` file beside it. They only matter when Steam runs the launcher, so they don't change how the real Steam starts the game.
+
+1. **Note your setting.** Write down the value of `StartInProfileFromSteam` in `Mods/DewDrop/config.json`, so you can put it back at the end.
+2. **Make the fake folder,** with a launch option that runs the launcher:
+
+   ```bash
+   fake="$HOME/dewdrop-fake-steam"
+   launcher="${XDG_CONFIG_HOME:-$HOME/.config}/Stardrop/Data/Cache/DewDrop/steam-launch.sh"
+   mkdir -p "$fake"
+   printf '"UserLocalConfigStore" { "Software" { "Valve" { "Steam" { "apps" { "413150" { "LaunchOptions" "\\"%s\\" %%command%%" } } } } } }\n' "$launcher" > "$fake/localconfig.vdf"
+   ```
+3. **Start the game from the same terminal,** with the variable set. Use your own game folder:
+
+   ```bash
+   export DEWDROP_FAKE_STEAM="$fake"
+   cd "$HOME/.local/share/Steam/steamapps/common/Stardew Valley"
+   ./StardewModdingAPI
+   ```
+4. **Turn it on.** Send `steamcheck`, which starts with `problem=none`. The launcher is now in place. Send `steam on`, which replies `steam wanted True, pending False`, and `quit`.
+5. **Start the game the way Steam would,** through the launcher, from the same terminal and folder:
+
+   ```bash
+   "$launcher" "$PWD/StardewValley"
+   ```
+
+   `status` shows `kind=Profile`. `steam-launch.log`, beside the launcher, says "Starting SMAPI on .../Selected Mods (Start in my profile from Steam is on)".
+6. **Try Apply & Restart.** Turn a mod off and click **Apply & Restart**. The game closes and the launcher starts it again: `steam-launch.log` says "(restarting into the profile)", and `status` shows `askStatus="this session is DewDrop's restart"`.
+7. **Clean up.** Send `steam off`, or delete the `start-in-profile` file. Close the game and the terminal, and set `StartInProfileFromSteam` in `config.json` back to the value you noted.
+{% endtab %}
+{% endtabs %}
+
+The SMAPI console command `dewdrop_status` prints the session kind, the **Ask to load my profile** setting and what happened on the title screen, and the state of **Start in my profile from Steam** with Steam's launch option. It works in Release builds too, but there's nowhere to type it when Steam starts the game through DewDrop's Steam launcher, since there's no console window then. See [Console commands](../reference/console-commands.md).
 
 ## Example drivers
 

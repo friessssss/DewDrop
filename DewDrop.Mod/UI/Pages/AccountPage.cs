@@ -750,6 +750,15 @@ namespace DewDrop.UI.Pages
 
             var wanted = ProfileStart.SteamWanted;
             var on = ProfileStart.SteamOn;
+
+            // DewDrop's launcher reads the setting at each launch, so it never waits for Steam
+            if (ProfileStart.UsesSteamLauncher)
+            {
+                return on
+                    ? "Steam starts the game in your profile. Changes you make load the next time you start it."
+                    : "Have Steam start the game in your profile, so you don't need Apply & Restart.";
+            }
+
             return (wanted, on) switch
             {
                 (true, true) => "Steam starts the game in your profile. Changes you make load the next time you start it.",

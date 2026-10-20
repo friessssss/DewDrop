@@ -20,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The Steam launcher ships in the mod folder; the tests run it -->
+    <None Include="..\DewDrop.Mod\assets\steam-launch.sh" Link="steam-launch.sh" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

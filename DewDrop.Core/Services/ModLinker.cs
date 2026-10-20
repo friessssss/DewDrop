@@ -134,6 +134,49 @@ namespace DewDrop.Core.Services
             return new LinkResult(linked, failed);
         }
 
+        /// <summary>
+        /// Removes the links in the linked folder that lead to these mod folders (ones just uninstalled), so the next
+        /// launch in the profile doesn't find a link that leads nowhere. Other links are left as they are.
+        /// </summary>
+        public void RemoveLinksTo(string selectedModsFolder, IReadOnlyCollection<string> modFolders)
+        {
+            if (modFolders.Count == 0 || !Directory.Exists(selectedModsFolder))
+            {
+                return;
+            }
+
+            var targets = new HashSet<string>(modFolders.Select(f => Path.GetFullPath(f).TrimEnd(Path.DirectorySeparatorChar)), DewDropPaths.PathComparer);
+
+            // Files too: on Unix a symlink whose folder is already gone is listed as a file
+            foreach (var entry in new DirectoryInfo(selectedModsFolder).EnumerateFileSystemInfos())
+            {
+                try
+                {
+                    if (entry.LinkTarget is not { Length: > 0 } target)
+                    {
+                        continue;
+                    }
+
+                    // Long paths are linked with the \\?\ prefix (see Rebuild)
+                    if (target.StartsWith(@"\\?\", StringComparison.Ordinal) || target.StartsWith(@"\??\", StringComparison.Ordinal))
+                    {
+                        target = target[4..];
+                    }
+
+                    var full = Path.GetFullPath(Path.Combine(selectedModsFolder, target)).TrimEnd(Path.DirectorySeparatorChar);
+                    if (targets.Contains(full))
+                    {
+                        // Removes the junction/symlink itself (a folder's Delete() isn't recursive), never the target's contents
+                        entry.Delete();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Trace($"Couldn't check the link {entry.FullName}: {ex.Message}");
+                }
+            }
+        }
+
         /// <summary>The installed mod in a folder (following links), or one read from its manifest if the scan didn't list it.</summary>
         private InstalledMod? FindAlwaysLinked(string folder, IReadOnlyList<InstalledMod> installed)
         {
@@ -142,7 +185,7 @@ namespace DewDrop.Core.Services
                 var info = new DirectoryInfo(folder);
                 var real = info.ResolveLinkTarget(returnFinalTarget: true) as DirectoryInfo ?? info;
                 var fullName = real.FullName.TrimEnd(Path.DirectorySeparatorChar);
-                var match = installed.FirstOrDefault(m => m.Folder.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(fullName, StringComparison.OrdinalIgnoreCase));
+                var match = installed.FirstOrDefault(m => m.Folder.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(fullName, DewDropPaths.PathComparison));
                 if (match is not null)
                 {
                     return match;
