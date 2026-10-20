@@ -164,6 +164,23 @@ if [ "$(uname -s)" = "Linux" ]; then
     check "stops by default" '[ $code = 1 ] && grep -q "Proton" "$ROOT/out.txt"'
 fi
 
+echo "== an Apple Silicon Mac without Rosetta is offered Rosetta before SMAPI's (Intel) installer runs"
+setup
+rm -f "$GAME/StardewModdingAPI.dll"
+# Stand-ins: a Mac (uname), Apple Silicon (sysctl), no Rosetta (arch fails), and GitHub's SMAPI release (curl).
+mkdir -p "$ROOT/bin"
+printf '#!/bin/sh\necho Darwin\n' > "$ROOT/bin/uname"
+printf '#!/bin/sh\necho 1\n' > "$ROOT/bin/sysctl"
+printf '#!/bin/sh\nexit 1\n' > "$ROOT/bin/arch"
+printf '#!/bin/sh\necho %s\n' "'{\"tag_name\": \"4.5.2\", \"browser_download_url\": \"https://example.com/SMAPI-4.5.2-installer.zip\"}'" > "$ROOT/bin/curl"
+chmod +x "$ROOT/bin/"*
+PATH="$ROOT/bin:$PATH" bash "$SCRIPT" --yes --no-launch --dry-run --game-path "$GAME" --mod-source "$MOD_ZIP" < /dev/null > "$ROOT/out.txt" 2>&1
+code=$?
+check "exit 0" '[ $code = 0 ]' || show
+check "offers Rosetta" 'grep -q "needs Rosetta" "$ROOT/out.txt" && grep -q "softwareupdate --install-rosetta" "$ROOT/out.txt"'
+check "then goes on to SMAPI" 'grep -q "SMAPI.Installer --install" "$ROOT/out.txt"'
+rm -rf "$ROOT/bin"
+
 echo "== the one-line installer (curl ... | bash) downloads install.sh and runs it"
 setup
 # The extra line checks the installer didn't read the rest of the piped script as its answers.
