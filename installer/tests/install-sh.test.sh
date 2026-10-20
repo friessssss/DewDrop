@@ -37,8 +37,10 @@ cat > "$ROOT/mod/DewDrop/manifest.json" <<'EOF'
 }
 EOF
 echo "dll" > "$ROOT/mod/DewDrop/DewDrop.dll"
+mkdir -p "$ROOT/mod/DewDrop/assets"
+cp "$HERE/../../DewDrop.Mod/assets/steam-launch.sh" "$ROOT/mod/DewDrop/assets/steam-launch.sh"
 MOD_ZIP="$ROOT/DewDrop-9.9.9.zip"
-(cd "$ROOT/mod" && python3 -c 'import sys, zipfile; z = zipfile.ZipFile(sys.argv[1], "w"); [z.write(p) for p in sys.argv[2:]]' "$MOD_ZIP" DewDrop DewDrop/manifest.json DewDrop/DewDrop.dll)
+(cd "$ROOT/mod" && python3 -c 'import sys, zipfile; z = zipfile.ZipFile(sys.argv[1], "w"); [z.write(p) for p in sys.argv[2:]]' "$MOD_ZIP" DewDrop DewDrop/manifest.json DewDrop/DewDrop.dll DewDrop/assets/steam-launch.sh)
 
 setup() {
     rm -rf "$HOME/Library" "$HOME/.local" "$HOME/My Games"
@@ -162,6 +164,101 @@ if [ "$(uname -s)" = "Linux" ]; then
     : > "$GAME/Stardew Valley.exe"
     run --mod-source "$MOD_ZIP"
     check "stops by default" '[ $code = 1 ] && grep -q "Proton" "$ROOT/out.txt"'
+fi
+
+if [ "$(uname -s)" = "Linux" ]; then
+    echo "== Steam Deck: Steam's launch option is pointed at DewDrop's launcher"
+    setup
+    STEAM="$HOME/.local/share/Steam"
+    LAUNCHER="$HOME/.config/Stardrop/Data/Cache/DewDrop/steam-launch.sh"
+    ACCOUNT="$STEAM/userdata/52079950/config/localconfig.vdf"
+    OTHER="$STEAM/userdata/11111/config/localconfig.vdf"
+    FAKE="$ROOT/fake-bin"
+    vdf() { # option -> a trimmed localconfig.vdf
+        printf '"UserLocalConfigStore"\n{\n\t"Software"\n\t{\n\t\t"Valve"\n\t\t{\n\t\t\t"Steam"\n\t\t\t{\n\t\t\t\t"apps"\n\t\t\t\t{\n'
+        printf '\t\t\t\t\t"105600"\n\t\t\t\t\t{\n\t\t\t\t\t\t"LaunchOptions"\t\t"-other"\n\t\t\t\t\t}\n'
+        printf '\t\t\t\t\t"413150"\n\t\t\t\t\t{\n\t\t\t\t\t\t"LastPlayed"\t\t"1"\n\t\t\t\t\t\t"LaunchOptions"\t\t"%s"\n\t\t\t\t\t}\n' "$1"
+        printf '\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n'
+    }
+    mkdir -p "$(dirname "$ACCOUNT")" "$(dirname "$OTHER")" "$STEAM/config"
+    vdf '\"/old/StardewModdingAPI\" %command%' > "$ACCOUNT"
+    vdf 'someone else' > "$OTHER"
+    touch "$OTHER"
+    # The signed-in account is the MostRecent one, even though the other account's file is newer
+    printf '"users"\n{\n\t"76561198000000000"\n\t{\n\t\t"MostRecent"\t\t"0"\n\t}\n\t"76561198012345678"\n\t{\n\t\t"AccountName"\t\t"deck"\n\t\t"MostRecent"\t\t"1"\n\t}\n}\n' > "$STEAM/config/loginusers.vdf"
+    printf 'NAME="SteamOS"\nID=steamos\nID_LIKE=arch\nVARIANT_ID=steamdeck\n' > "$ROOT/os-release"
+    # A Steam that runs until it's told to shut down, and logs what it was asked
+    mkdir -p "$FAKE"
+    cat > "$FAKE/steam" <<EOF
+#!/bin/sh
+echo "steam \$*" >> "$ROOT/steam.log"
+case "\$1" in
+    --fake-running) echo \$\$ > "$ROOT/steam.pid"; while :; do sleep 0.2; done ;;
+    -shutdown) kill "\$(cat "$ROOT/steam.pid")" ;;
+esac
+EOF
+    chmod +x "$FAKE/steam"
+    deck() { PATH="$FAKE:$PATH" DEWDROP_OS_RELEASE="$ROOT/os-release" bash "$SCRIPT" --yes --no-launch --skip-smapi --mod-source "$MOD_ZIP" "$@" < /dev/null > "$ROOT/out.txt" 2>&1; code=$?; }
+    option() { grep LaunchOptions "$ACCOUNT" | sed -n 2p | sed 's/^[[:space:]]*"LaunchOptions"[[:space:]]*"\(.*\)"$/\1/'; }
+    : > "$ROOT/steam.log"
+    # Started from a subshell, so it isn't this script's child: killed, it would stay a zombie that pgrep still sees
+    ("$FAKE/steam" --fake-running &)
+    sleep 0.5
+    DEWDROP_NEXUS_KEY="my-key" deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "closed Steam first" 'grep -q "steam -shutdown" "$ROOT/steam.log" && grep -q "Steam closed" "$ROOT/out.txt"'
+    check "set the launch option" '[ "$(option)" = "\\\"$LAUNCHER\\\" %command%" ]' || option
+    check "left other games and accounts alone" 'grep -q "\"-other\"" "$ACCOUNT" && grep -q "someone else" "$OTHER"'
+    check "backed up Steam's settings" 'ls "$(dirname "$ACCOUNT")" | grep -q "localconfig.vdf.dewdrop-backup-"'
+    check "copied the launcher" '[ -x "$LAUNCHER" ] && cmp -s "$LAUNCHER" "$GAME/Mods/DewDrop/assets/steam-launch.sh"'
+    check "start in profile on by default" '[ -f "$(dirname "$LAUNCHER")/start-in-profile" ]'
+    check "saved the Nexus key for the game, readable only by you" '[ "$(cat "$(dirname "$LAUNCHER")/nexus-key.txt")" = "my-key" ] && ls -l "$(dirname "$LAUNCHER")/nexus-key.txt" | grep -q "^-rw-------"'
+    check "opened Steam again" 'grep -q "steam -silent" "$ROOT/steam.log"'
+    check "says to go back to Game Mode" 'grep -q "Return to Gaming Mode" "$ROOT/out.txt"'
+
+    echo "== Steam Deck: running it again changes nothing in Steam"
+    : > "$ROOT/steam.log"
+    cp "$ACCOUNT" "$ROOT/before.vdf"
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "already set" 'grep -q "already starts the game with DewDrop" "$ROOT/out.txt" && cmp -s "$ACCOUNT" "$ROOT/before.vdf"'
+    check "Steam left alone" '[ ! -s "$ROOT/steam.log" ]'
+
+    echo "== Steam Deck: other launch options keep their parts, and the profile setting can be turned off"
+    vdf 'gamemoderun %command% -novid' > "$ACCOUNT"
+    echo '{"StartInProfileFromSteam": true, "AskToLoadProfile": true}' > "$GAME/Mods/DewDrop/config.json"
+    deck --no-start-in-profile
+    check "exit 0" '[ $code = 0 ]' || show
+    check "launcher added before %command%" '[ "$(option)" = "gamemoderun \\\"$LAUNCHER\\\" %command% -novid" ]' || option
+    check "start in profile off" '[ ! -f "$(dirname "$LAUNCHER")/start-in-profile" ] && grep -q "\"StartInProfileFromSteam\": false" "$GAME/Mods/DewDrop/config.json"'
+
+    echo "== Steam Deck: a dry run changes nothing"
+    vdf '' > "$ACCOUNT"
+    cp "$ACCOUNT" "$ROOT/before.vdf"
+    rm -f "$LAUNCHER"
+    deck --dry-run
+    check "exit 0" '[ $code = 0 ]' || show
+    check "says what it would set" 'grep -q "(dry run) would close Steam, back up" "$ROOT/out.txt"'
+    check "Steam's settings untouched" 'cmp -s "$ACCOUNT" "$ROOT/before.vdf" && [ ! -e "$LAUNCHER" ]'
+
+    echo "== Steam Deck: a settings file with an unexpected layout is never written"
+    printf '"UserLocalConfigStore"\n{\n}\n' > "$ACCOUNT"
+    cp "$ACCOUNT" "$ROOT/before.vdf"
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "warns and leaves it" 'grep -q "unexpected layout" "$ROOT/out.txt" && cmp -s "$ACCOUNT" "$ROOT/before.vdf"'
+
+    echo "== other Linux systems aren't changed unless asked"
+    vdf '' > "$ACCOUNT"
+    cp "$ACCOUNT" "$ROOT/before.vdf"
+    printf 'NAME="Ubuntu"\nID=ubuntu\n' > "$ROOT/os-release"
+    deck
+    check "exit 0" '[ $code = 0 ]' || show
+    check "Steam's settings untouched" 'cmp -s "$ACCOUNT" "$ROOT/before.vdf"'
+    deck --steam-setup
+    check "--steam-setup sets it up" '[ "$(option)" = "\\\"$LAUNCHER\\\" %command%" ]' || option
+    pkill -f "$FAKE/steam" 2>/dev/null
+    rm -rf "${FAKE:?}" "${HOME:?}/.config/Stardrop"
 fi
 
 echo "== an Apple Silicon Mac without Rosetta is offered Rosetta before SMAPI's (Intel) installer runs"

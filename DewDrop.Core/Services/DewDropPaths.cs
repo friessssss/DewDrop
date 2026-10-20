@@ -35,6 +35,18 @@ namespace DewDrop.Core.Services
         /// <summary>What DewDrop remembers between sessions about restarts and mods it has seen (see <see cref="StartupState"/>).</summary>
         public string StartupStatePath => Path.Combine(CacheFolder, "DewDrop", "startup.json");
 
+        /// <summary>DewDrop's own folder in the cache: scripts the game runs or Steam starts, and their logs.</summary>
+        public string ScriptFolder => Path.Combine(CacheFolder, "DewDrop");
+
+        /// <summary>The Steam launcher on Linux and the Steam Deck (see <see cref="SteamLauncher"/>), with its files beside it.</summary>
+        public string SteamLauncherPath => Path.Combine(ScriptFolder, SteamLauncher.ScriptName);
+
+        /// <summary>
+        /// A Nexus API key the installer was given (on a Steam Deck, typing one into the game is no fun), taken and saved
+        /// to the login at the next start.
+        /// </summary>
+        public string NexusKeyHandoffPath => Path.Combine(ScriptFolder, "nexus-key.txt");
+
         public static bool IsSame(string a, string b)
         {
             return string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);

@@ -22,13 +22,72 @@ namespace DewDrop.Framework
             _vault = vault;
         }
 
-        /// <summary>Signs in with the key saved by DewDrop or Stardrop, if there is one.</summary>
-        public void RestoreSavedLogin()
+        /// <summary>
+        /// Signs in with a key the installer was given (see <see cref="DewDropPaths.NexusKeyHandoffPath"/>), which is then
+        /// saved like one typed in, else with the key saved by DewDrop or Stardrop, if there is one.
+        /// </summary>
+        public void RestoreSavedLogin(DewDropPaths paths)
         {
+            if (TakeHandedOffKey(paths.NexusKeyHandoffPath) is { } handedOff)
+            {
+                Login(handedOff, save: true, onDone: ok =>
+                {
+                    var message = ok
+                        ? $"Logged in to Nexus Mods as {Account?.Name} with the key from the installer."
+                        : $"The Nexus key from the installer didn't work: {LastError} Log in on the Account tab.";
+
+                    // The login takes a moment, so the menu may already be open
+                    if (StardewValley.Menus.TitleMenu.subMenu is UI.DewDropMenu)
+                    {
+                        ModEntry.Toast(message, error: !ok);
+                    }
+                    else
+                    {
+                        ModEntry.ToastWhenMenuOpens(message, error: !ok);
+                    }
+
+                    // A key that didn't work changes nothing: the login from before still stands
+                    if (!ok && _vault.GetKey() is { } saved)
+                    {
+                        Login(saved, save: false);
+                    }
+                });
+                return;
+            }
+
             var key = _vault.GetKey();
             if (key is not null)
             {
                 Login(key, save: false);
+            }
+        }
+
+        /// <summary>The key in the installer's file, which is removed either way: it's a secret in plain text.</summary>
+        private static string? TakeHandedOffKey(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            try
+            {
+                var key = File.ReadAllText(path).Trim();
+                File.Delete(path);
+                return key.Length > 0 ? key : null;
+            }
+            catch (Exception ex)
+            {
+                ModEntry.Log.Warn($"Couldn't read the Nexus key the installer left in {path}: {ex.Message}");
+                try
+                {
+                    File.Delete(path);
+                }
+                catch
+                {
+                    // Tried the next time
+                }
+                return null;
             }
         }
 
