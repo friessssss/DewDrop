@@ -336,7 +336,7 @@ namespace DewDrop.Framework
         }
 
         private readonly HashSet<string> _failedAtLaunch = new(StringComparer.OrdinalIgnoreCase);
-        private HashSet<string> _pendingFolders = new(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> _pendingFolders = new(DewDropPaths.PathComparer);
 
         /// <summary>Names of the mods SMAPI loaded this session, by unique ID.</summary>
         private readonly Dictionary<string, string> _loadedNames;
@@ -490,7 +490,7 @@ namespace DewDrop.Framework
             // Keep update results for mods that weren't touched since the last check
             UpdateChecker.Apply(_updateResults, Installed);
 
-            _pendingFolders = new HashSet<string>(swaps.Where(s => !s.Remove).Select(s => Path.GetFullPath(s.Target).TrimEnd(Path.DirectorySeparatorChar)), StringComparer.OrdinalIgnoreCase);
+            _pendingFolders = new HashSet<string>(swaps.Where(s => !s.Remove).Select(s => Path.GetFullPath(s.Target).TrimEnd(Path.DirectorySeparatorChar)), DewDropPaths.PathComparer);
             _removingLoadedHere = FindRemovingLoadedHere();
             _changes++;
         }
@@ -501,9 +501,9 @@ namespace DewDrop.Framework
         /// </summary>
         public (List<InstalledMod> Added, List<string> Removed) Rescan()
         {
-            var before = Installed.ToDictionary(m => m.Folder.FullName, m => m, StringComparer.OrdinalIgnoreCase);
+            var before = Installed.ToDictionary(m => m.Folder.FullName, m => m, DewDropPaths.PathComparer);
             Reload();
-            var after = Installed.Select(m => m.Folder.FullName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var after = Installed.Select(m => m.Folder.FullName).ToHashSet(DewDropPaths.PathComparer);
             var added = Installed.Where(m => !before.ContainsKey(m.Folder.FullName)).ToList();
             var removed = before.Where(p => !after.Contains(p.Key)).Select(p => p.Value.Name).ToList();
 
@@ -908,7 +908,7 @@ namespace DewDrop.Framework
 
             _loadedRealFolders ??= new HashSet<string>(
                 _loadedMods.Where(m => m.Folder is not null).Select(m => DewDropPaths.Canonical(m.Folder!).TrimEnd(Path.DirectorySeparatorChar)),
-                StringComparer.OrdinalIgnoreCase);
+                DewDropPaths.PathComparer);
             return Removing.Where(m => _loadedRealFolders.Contains(DewDropPaths.Canonical(m.Folder.FullName).TrimEnd(Path.DirectorySeparatorChar))).ToHashSet();
         }
 

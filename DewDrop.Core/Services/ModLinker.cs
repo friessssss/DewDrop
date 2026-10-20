@@ -145,7 +145,7 @@ namespace DewDrop.Core.Services
                 return;
             }
 
-            var targets = new HashSet<string>(modFolders.Select(f => Path.GetFullPath(f).TrimEnd(Path.DirectorySeparatorChar)), StringComparer.OrdinalIgnoreCase);
+            var targets = new HashSet<string>(modFolders.Select(f => Path.GetFullPath(f).TrimEnd(Path.DirectorySeparatorChar)), DewDropPaths.PathComparer);
 
             // Files too: on Unix a symlink whose folder is already gone is listed as a file
             foreach (var entry in new DirectoryInfo(selectedModsFolder).EnumerateFileSystemInfos())
@@ -185,7 +185,7 @@ namespace DewDrop.Core.Services
                 var info = new DirectoryInfo(folder);
                 var real = info.ResolveLinkTarget(returnFinalTarget: true) as DirectoryInfo ?? info;
                 var fullName = real.FullName.TrimEnd(Path.DirectorySeparatorChar);
-                var match = installed.FirstOrDefault(m => m.Folder.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(fullName, StringComparison.OrdinalIgnoreCase));
+                var match = installed.FirstOrDefault(m => m.Folder.FullName.TrimEnd(Path.DirectorySeparatorChar).Equals(fullName, DewDropPaths.PathComparison));
                 if (match is not null)
                 {
                     return match;

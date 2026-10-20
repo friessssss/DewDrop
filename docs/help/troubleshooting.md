@@ -456,7 +456,7 @@ If the update is still waiting after that, open `relaunch.log` (see [above](#the
 
 ### A mod says Installed twice
 
-A red **Installed twice** note means two folders in your mods folder hold the same mod, with the same unique ID. When SMAPI loads the whole `Mods` folder, as a normal launch does, it loads neither copy. **Show: Problems** on the **Installed** tab lists them.
+A red **Installed twice** note means two folders in your mods folder hold the same mod, with the same unique ID. When SMAPI loads the whole `Mods` folder, as a normal launch does, it loads neither copy. **Show: Problems** on the **Installed** tab lists them. On Linux, including the Steam Deck, the two folder names may differ only in capital letters, such as `Spacecore` and `SpaceCore`, after you unzip a newer version next to an old one.
 
 Hover over the row to see where the other copy is, then click the trash can on the copy you don't want. The other copy stays installed, and stays on in your profile. See [Mods installed twice](../guides/installed.md#mods-installed-twice).
 

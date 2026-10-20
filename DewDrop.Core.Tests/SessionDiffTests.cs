@@ -194,14 +194,16 @@ namespace DewDrop.Core.Tests
         }
 
         [Fact]
-        public void IdsAndFoldersCompareWithoutCase()
+        public void IdsCompareWithoutCaseAndFoldersAsTheFileSystemDoes()
         {
             var a = Loose("Author.Mod");
-            var loaded = new LoadedMod("author.mod", "Mod", a.Folder.FullName.ToUpperInvariant() + Path.DirectorySeparatorChar);
+            var loaded = new LoadedMod("author.mod", "Mod", a.Folder.FullName + Path.DirectorySeparatorChar);
+            var loadedFromOtherCase = new LoadedMod("author.mod", "Mod", a.Folder.FullName.ToUpperInvariant() + Path.DirectorySeparatorChar);
 
-            var diff = Compute(new[] { a }, new[] { a }, new[] { loaded });
+            Assert.True(Compute(new[] { a }, new[] { a }, new[] { loaded }).Matches);
 
-            Assert.True(diff.Matches);
+            // On Linux a folder whose name differs only in case is another copy of the mod
+            Assert.Equal(!OperatingSystem.IsLinux(), Compute(new[] { a }, new[] { a }, new[] { loadedFromOtherCase }).Matches);
         }
 
         [Fact]

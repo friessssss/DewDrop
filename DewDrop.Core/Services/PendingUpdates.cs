@@ -100,11 +100,11 @@ namespace DewDrop.Core.Services
             lock (_lock)
             {
                 var all = Load();
-                foreach (var replaced in all.Where(s => s.Target.Equals(swap.Target, StringComparison.OrdinalIgnoreCase)).ToList())
+                foreach (var replaced in all.Where(s => s.Target.Equals(swap.Target, DewDropPaths.PathComparison)).ToList())
                 {
                     // A newer download for the same folder supersedes the waiting one, whose copy nothing would use
                     all.Remove(replaced);
-                    if (!replaced.Staged.Equals(swap.Staged, StringComparison.OrdinalIgnoreCase) && Directory.Exists(replaced.Staged))
+                    if (!replaced.Staged.Equals(swap.Staged, DewDropPaths.PathComparison) && Directory.Exists(replaced.Staged))
                     {
                         TryDelete(replaced.Staged, _log);
                     }
@@ -118,7 +118,7 @@ namespace DewDrop.Core.Services
         /// <summary>Whether an update for this folder is waiting for a restart.</summary>
         public bool IsPending(string modFolder)
         {
-            return Load().Any(s => !s.Remove && IsSameFolder(s.Target, modFolder));
+            return Load().Any(s => !s.Remove && DewDropPaths.IsSame(s.Target, modFolder));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace DewDrop.Core.Services
             lock (_lock)
             {
                 var all = Load();
-                if (all.RemoveAll(s => s.Remove && IsSameFolder(s.Target, modFolder)) == 0)
+                if (all.RemoveAll(s => s.Remove && DewDropPaths.IsSame(s.Target, modFolder)) == 0)
                 {
                     return false;
                 }
@@ -334,7 +334,7 @@ namespace DewDrop.Core.Services
                 && root is not null
                 && Path.GetFileName(root).Equals(StagingFolderName, StringComparison.OrdinalIgnoreCase)
                 && Path.GetDirectoryName(target) is { } parent
-                && IsSameFolder(Path.GetDirectoryName(root)!, parent);
+                && DewDropPaths.IsSame(Path.GetDirectoryName(root)!, parent);
         }
 
         /// <summary>Whether a folder's manifest.json names this unique ID.</summary>
@@ -358,11 +358,6 @@ namespace DewDrop.Core.Services
                 // A manifest that can't be read can't be checked, so the folder stays
                 return false;
             }
-        }
-
-        private static bool IsSameFolder(string a, string b)
-        {
-            return Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar).Equals(Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -390,13 +385,14 @@ namespace DewDrop.Core.Services
                 List<string> roots;
                 try
                 {
+                    // Ignoring case here can only keep more, never delete a copy that's still wanted
                     keep = new HashSet<string>(
                         waiting.Where(s => !string.IsNullOrEmpty(s?.Staged)).Select(s => Path.GetFullPath(s.Staged).TrimEnd(Path.DirectorySeparatorChar)),
                         StringComparer.OrdinalIgnoreCase);
                     roots = parents
                         .Where(p => !string.IsNullOrEmpty(p))
                         .Select(p => Path.Combine(Path.GetFullPath(p), StagingFolderName))
-                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .Distinct(DewDropPaths.PathComparer)
                         .ToList();
                 }
                 catch (Exception ex)
