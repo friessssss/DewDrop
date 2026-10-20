@@ -38,6 +38,18 @@ namespace DewDrop.Core.Services
         /// <summary>Which Nexus mod and file installed mods came from (see <see cref="ModSources"/>).</summary>
         public string ModSourcesPath => Path.Combine(CacheFolder, "DewDrop", "mod-sources.json");
 
+        /// <summary>DewDrop's own folder in the cache: scripts the game runs or Steam starts, and their logs.</summary>
+        public string ScriptFolder => Path.Combine(CacheFolder, "DewDrop");
+
+        /// <summary>The Steam launcher on Linux and the Steam Deck (see <see cref="SteamLauncher"/>), with its files beside it.</summary>
+        public string SteamLauncherPath => Path.Combine(ScriptFolder, SteamLauncher.ScriptName);
+
+        /// <summary>
+        /// A Nexus API key the installer was given (on a Steam Deck, typing one into the game is no fun), taken and saved
+        /// to the login at the next start.
+        /// </summary>
+        public string NexusKeyHandoffPath => Path.Combine(ScriptFolder, "nexus-key.txt");
+
         /// <summary>
         /// How the file system compares paths: Linux's is case-sensitive, Windows' and macOS's (by default) aren't. On
         /// Linux "Mods/Spacecore" and "Mods/SpaceCore" are two folders, and must never be taken for one.

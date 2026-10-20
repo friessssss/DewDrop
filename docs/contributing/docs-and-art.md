@@ -9,7 +9,11 @@ This guide and the README share one voice and one look. Every picture is pixel a
 
 ## Where the docs live
 
-Every page is a Markdown file in the `docs/` folder of the repo. GitBook publishes them as [the DewDrop guide](https://friessssss.gitbook.io/dewdrop/) through **Git Sync**: changes merged into the repo show up on the site, and edits made in GitBook's editor are committed back to the repo.
+Every page is a Markdown file in the `docs/` folder of the repo. GitBook publishes them as [the DewDrop guide](https://friessssss.gitbook.io/dewdrop/) through **Git Sync**, which follows the `development` branch. Changes merged into `development` show up on the site straight away, and edits made in GitBook's editor are committed back to the repo.
+
+Because the site follows `development`, not the latest release, a page goes live as soon as it merges, even when the feature it describes isn't released yet. Release soon after (see [Releasing](releasing.md#what-a-release-changes-for-players)), or say on the page that the feature is coming.
+
+Every pull request gets two **GitBook (./docs)** checks. One opens the changes in GitBook's editor, and the other is a preview of the site with them, so you can see how your pages render before they merge.
 
 Two small files tell GitBook what to sync. `gitbook-docs.yaml`, at the repo root, describes the site: one space, the guide, whose content is the `docs/` folder.
 
@@ -77,11 +81,27 @@ Always put the `description` in quotes. An unquoted `:` can make the front matte
 * **Write for a beginner.** Use "you", plain words and short sentences. Never assume the reader knows what SMAPI, a `Mods` folder or a launch option is: explain it once and link to that explanation elsewhere.
 * **Lead with what the reader wants to do.** Keep one idea per paragraph, and use numbered steps for anything they have to do.
 * **Match the game's words exactly.** Put UI labels in bold, written as the menu writes them: **Apply & Restart**, **Show: Enabled**, **Get my API key**. Write menu paths with `>`, like **Account** tab > **Nexus Mods** panel. Put file names and paths in `code`.
-* **Show keys and buttons in bold:** **Esc**, **Enter**, **Ctrl+V**, and controller buttons **A**, **B**, **Start**.
+* **Quote messages word for word.** Put what DewDrop or the installer says in double quotes, exactly as the code writes it, with *italics* for the parts that change: "Uninstall *name*?".
+* **Show keys and buttons in bold:** **Esc**, **Enter**, **Ctrl+V**, and controller buttons **A**, **B**, **Start**. Write the shoulder buttons as **LB** and **RB**, except on Steam Deck pages, where they're **L1** and **R1**, as the Deck calls them.
 * **Keep the tone calm.** No marketing, no emojis, and no pile of exclamation marks; one friendly "That's it!" at the end of a procedure is fine. Don't write "simply" or "just" about anything that can go wrong.
-* **Spell names one way.** Use US English, and write DewDrop, Stardrop, SMAPI, Nexus Mods and Stardew Valley exactly like that.
-* **Be honest.** Say plainly what doesn't work on a platform yet. Only document what the code really does; when you're unsure, read the code.
-* **Keep pages focused.** Most pages run 150 to 700 words. Reference pages can be longer.
+* **Keep punctuation plain.** Use a colon, a comma or a new sentence instead of an em or en dash.
+* **Spell names one way.** Use US English, and write DewDrop, Stardrop, SMAPI, Nexus Mods, Stardew Valley and Steam Deck exactly like that.
+* **Be honest.** Say plainly what doesn't work on a platform yet, and what hasn't been tested. Only document what the code really does; when you're unsure, read the code.
+* **Keep pages focused.** Most pages run 150 to 700 words. Reference pages can be longer. When another page already explains something, link to it instead of explaining it again.
+
+### Commands and code
+
+Put anything the reader types or pastes in a fenced code block, never inline in a sentence. That covers terminal commands, the one-line installers, SMAPI console commands, Steam launch options and file contents. Give every block a language:
+
+| Language | For |
+| --- | --- |
+| `powershell` | PowerShell |
+| `cmd` | Command Prompt |
+| `bash` | Terminal on macOS and Linux, and Konsole on the Steam Deck |
+| `text` | Steam launch options, SMAPI console commands and output |
+| `json`, `xml`, `yaml`, `markdown` | File contents |
+
+Don't split one command over several lines: it has to work when pasted. When a block shows a whole file, give it a title with GitBook's `code` block, as `stardewvalley.targets` has on [Building from source](building.md#tell-the-build-where-your-game-is). When a command differs by system, put each system's version in its own tab. Short values in a sentence, such as `--dry-run` or `config.json`, stay as inline code.
 
 ### GitBook blocks
 
@@ -161,7 +181,11 @@ The code lives in `tools/docs-art/`. It needs nothing but Node.js: it uses Node'
 node tools/docs-art/build.mjs
 ```
 
-To redraw just one group, pass `--only` with one or more of `banner`, `logo`, `social`, `divider`, `icons`, `shots`, `tour`, `diagrams` and `terminal`, for example `node tools/docs-art/build.mjs --only=shots,tour`.
+To redraw only some groups, pass `--only` with one or more of `banner`, `logo`, `social`, `divider`, `icons`, `shots`, `tour`, `diagrams` and `terminal`. For example, after new screenshots:
+
+```bash
+node tools/docs-art/build.mjs --only=shots,tour
+```
 
 Two images aren't used on any page: `social-preview.png` is the 1280×640 picture for the GitHub repository's social preview (repository **Settings** > **Social preview**), and `logo-small.png` is a 64×64 logo for the GitBook site icon.
 
@@ -208,12 +232,19 @@ Every row must be the same length and use only these letters, or the build stops
 
 Screenshots are the one place real game pixels appear. Each one is a real capture from the game, never a mock-up. When the menu changes, capture the screenshot again; never draw new UI onto an old capture.
 
-1. Load a Debug build and capture with the [debug bridge](debug-bridge.md). Use the same setup every time: `window 1920 1080` and `uiscale 1.0`. Move your real mouse into a corner and wait for messages to clear before each `shot`. The `window` command changes the game's saved display settings, so back up `startup_preferences` in the game's data folder (`%AppData%\StardewValley` on Windows) first and put it back afterward. If the game window won't stay in front while you capture, set `pauseWhenOutOfFocus` to `false` in that file too, with the game closed. Otherwise the menu stops updating while the window is in the background (see [Timing and gotchas](debug-bridge.md#timing-and-gotchas)).
+1. Load a Debug build and capture with the [debug bridge](debug-bridge.md). Use the same setup every time, by sending these first:
+
+   ```text
+   window 1920 1080
+   uiscale 1.0
+   ```
+
+   Move your real mouse into a corner and wait for messages to clear before each `shot`. The `window` command changes the game's saved display settings, so back up `startup_preferences` in the game's data folder (`%AppData%\StardewValley` on Windows) first and put it back afterward. If the game window won't stay in front while you capture, set `pauseWhenOutOfFocus` to `false` in that file too, with the game closed. Otherwise the menu stops updating while the window is in the background (see [Timing and gotchas](debug-bridge.md#timing-and-gotchas)).
 2. Check every capture for anything personal before you commit it, such as your Nexus Mods user name. Blur it in the raw capture itself, and list the area in `REDACT` in `build.mjs` as a second guard.
 3. Save the raw captures in `tools/docs-art/shots/` under the names listed in `SHOTS` in `build.mjs`, then rebuild. Menu captures are cropped to the menu. `title-prompt.png`, the **Load your profile?** box, is cropped to the box with the fixed rectangle listed for it in `SHOTS`. `framedShot` adds the frame and label, and the result goes into `docs/.gitbook/assets/` as `shot-<name>.png`. Most of the same captures also make up the `demo-tour.png` animation.
 4. Build Release again afterward so you don't keep playing on the Debug build.
 
-The **Load your profile?** box only opens on a normal launch whose mods differ from your profile. To capture `title-prompt.png`, set that up as described in [Testing starting in your profile](debug-bridge.md#testing-starting-in-your-profile), then send `shot` once the box is open. The capture shows the box with its **Start in my profile from Steam from now on** checkbox, ticked, and the note under it. The box only shows that checkbox on Windows with the Steam version of the game, while **Start in my profile from Steam** is off and can be used, and it starts unticked right after a restart that didn't come back. Capture it on a launch that meets those conditions, and answer **Not now** afterward so nothing changes.
+The **Load your profile?** box only opens on a normal launch whose mods differ from your profile. To capture `title-prompt.png`, set that up as described in [Testing starting in your profile](debug-bridge.md#testing-starting-in-your-profile), then send `shot` once the box is open. The capture shows the box with its **Start in my profile from Steam from now on** checkbox, ticked, and the note under it. The box only shows that checkbox with the Steam version of the game on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher, while **Start in my profile from Steam** is off and can be used, and it starts unticked right after a restart that didn't come back. Capture it on a launch that meets those conditions, and answer **Not now** afterward so nothing changes.
 
 The menu captures show a profile named **SVE playthrough**, with 11 of 36 mods on. Start the game in that profile, by starting SMAPI with `--mods-path` pointing at `Selected Mods` as **Apply & Restart** does, so the bottom bar says the mods loaded right now match it. `mod-page-installed.png` is Content Patcher's page, with its newest version installed.
 
@@ -225,6 +256,8 @@ The menu captures show a profile named **SVE playthrough**, with 11 of 36 mods o
 4. Send `uninstall` with its unique ID, and `shot` the row.
 
 DewDrop moves the folder out of `Mods` when the game closes and deletes it at the next start.
+
+There are no Steam Deck screenshots yet. They're due from the on-device test of [pull request #11](https://github.com/friessssss/DewDrop/pull/11) (see [Testing on a Steam Deck](steam-deck-testing.md)). The Deck's screen is 1280×800, so its captures can't use the menu crop, which is set for 1920×1080: give each one its own crop rectangle in `SHOTS`.
 
 ## Rules
 

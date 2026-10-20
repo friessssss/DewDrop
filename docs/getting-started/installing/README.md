@@ -11,24 +11,26 @@ There are two ways to install DewDrop. Both end in the same place: SMAPI install
 
 ## Which one should I pick?
 
-**New to mods? Use the installer.** If you already have SMAPI and know where your `Mods` folder is, dragging DewDrop in yourself takes a minute.
+**New to mods, or on a Steam Deck? Use the installer.** If you already have SMAPI and know where your `Mods` folder is, dragging DewDrop in yourself takes a minute.
 
 | | The installer | By hand |
 | --- | --- | --- |
 | How you get it | Paste one line into PowerShell or Terminal, or download `DewDrop-<version>-installer.zip` | Download `DewDrop-<version>.zip` |
 | Installs or updates SMAPI | Yes, if it's missing or out of date | No. Install SMAPI yourself first. |
 | Finds your `Mods` folder | Yes | You find it |
-| Sets up Steam to start SMAPI (Windows) | Offers to do it for you | You do it yourself, once |
+| Sets up Steam's **Play** button (Windows) | Offers to do it for you | You do it yourself, once |
+| Sets up Steam for Game Mode (Steam Deck) | Yes | No. Run the installer afterwards. |
 | Keeps your DewDrop settings when updating | Yes | Yes, if you keep `config.json` |
-| Good for | First-timers, and anyone who wants it done for them | Players who already use mods |
+| Good for | First-timers, Steam Deck players, and anyone who wants it done for them | Players who already use mods |
 
-The one line is in [Install with the installer](installer.md#the-quick-way-one-line). Both downloads are on the [latest release page](https://github.com/friessssss/DewDrop/releases/latest), under **Assets**. You don't need the **Source code** downloads. They're for developers.
+The one line is in [Install with the installer](installer.md#the-quick-way-one-line). Both downloads are on the [latest release page](https://github.com/friessssss/DewDrop/releases/latest), under **Assets**. You don't need the **Source code** downloads; they're for developers.
 
 ## Pages in this section
 
 * [Install with the installer](installer.md): the one line to paste, the download steps, and what to do if your computer warns you about the file.
 * [Install by hand](manual.md): where to find your `Mods` folder on each system, and the mistakes to avoid.
 * [About SMAPI](smapi.md): what SMAPI is, how to install or update it yourself, and how to make Steam, GOG Galaxy or the Xbox app start it.
+* [DewDrop on the Steam Deck](../steam-deck.md): the installer in Desktop Mode, then mods in Game Mode.
 
 {% hint style="info" %}
 Keep exactly one copy of DewDrop in your `Mods` folder. If SMAPI finds two mods with the same ID, it loads neither of them, and the **Mods** button disappears. The installer finds old copies and offers to turn them off for you.

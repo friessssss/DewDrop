@@ -1,4 +1,5 @@
 using System.Globalization;
+using DewDrop.Core.Services;
 using DewDrop.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -45,9 +46,13 @@ namespace DewDrop.UI.Pages
             {
                 Tooltip = "Remove finished and failed downloads from this list."
             };
+            // Game Mode on a Steam Deck has no file manager to open it in
             _openFolder = new UiButton("Open mods folder", OpenModsFolder)
             {
-                Tooltip = "Open the folder new mods are installed into."
+                Enabled = !SteamDeck.InGameMode,
+                Tooltip = SteamDeck.InGameMode
+                    ? "Not in Game Mode: there's no file manager. The folder opens from Desktop Mode."
+                    : "Open the folder new mods are installed into."
             };
             _login = new UiButton("Log in", () => Menu.ShowPage(Menu.Account))
             {

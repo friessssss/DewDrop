@@ -15,21 +15,23 @@ The other two panels on the **Account** tab are for your Nexus Mods login and fo
 
 | Option | What it does | Default |
 | --- | --- | --- |
-| **Start in my profile from Steam** | Steam's **Play** button starts the game straight in your profile, so you don't need **Apply & Restart**. Windows, Steam version only. | Off |
+| **Start in my profile from Steam** | Steam's **Play** button starts the game straight in your profile, so you don't need **Apply & Restart**. Steam version only, on Windows, Linux and the Steam Deck. | Off, unless Steam or the installer already set it up |
 | **Ask to load my profile** | When the game starts with different mods than your profile, for example from a desktop shortcut, a **Load your profile?** box on the title screen offers to restart into it. | On |
-| **Turn on mods when installed** | Mods you download through DewDrop, and new mods you copy into your `Mods` folder yourself, are switched on in your active profile. | On |
+| **Turn on mods when installed** | Mods you download through DewDrop, and new mods you copy into your `Mods` folder yourself, are turned on in your active profile. | On |
 | **Show adult content in Browse** | Browse includes mods that Nexus Mods marks as adult content. | Off |
 | **Check for updates at startup** | DewDrop looks for new versions of your mods each time the game starts. | On |
 
-Hover over a row to see its description. A grayed-out row can't be changed here, and hovering over it tells you why.
+Point at a row to see its description. A grayed-out row can't be changed here, and pointing at it says why.
 
 ### Start in my profile from Steam
 
-Normally, pressing **Play** in Steam loads everything in your `Mods` folder, and it takes a restart to switch into your profile. With this option on, Steam starts the game straight in your profile instead. DewDrop does this by adding SMAPI's `--mods-path` option to Stardew Valley's launch options in Steam, pointing at `Selected Mods`, the folder DewDrop fills with links to your profile's mods.
+Normally, pressing **Play** in Steam loads everything in your `Mods` folder, and it takes a restart to switch into your profile. With this option on, **Play** starts the game straight in your profile. While it's on, DewDrop links your changes as you quit, so they load the next time you press **Play**. [**Apply & Restart**](apply-and-restart.md) still loads them right away.
 
-Steam has to be closed to change its launch options, so the change happens **when you quit the game**. A few seconds after the game closes, Steam closes, the launch option changes, and Steam opens again, minimized to the system tray. This happens once each time you switch the option on or off. The next time you open **Mods**, a message says "Steam now starts the game in your profile." or "Steam no longer starts the game in your profile."
+How it works depends on your system:
 
-While it's on, DewDrop links your changes as you quit the game: mods you turned on or off, a profile you switched to, and mods you installed. They load the next time you press **Play** in Steam. [**Apply & Restart**](apply-and-restart.md) still loads them right away.
+{% tabs %}
+{% tab title="Windows" icon="windows" %}
+DewDrop adds SMAPI's `--mods-path` option to Stardew Valley's launch options in Steam. Steam has to be closed for that, so the change happens **when you quit the game**: Steam closes, the launch option changes, and Steam opens again, minimized to the system tray. This happens once each time you turn the option on or off. The next time you open **Mods**, a message says "Steam now starts the game in your profile." or "Steam no longer starts the game in your profile."
 
 The row's description follows what's happening:
 
@@ -40,35 +42,53 @@ The row's description follows what's happening:
 | On | "Steam starts the game in your profile. Changes you make load the next time you start it." |
 | Turning off | "Turns off when you quit the game: Steam closes and opens again once to save it." |
 
-The row is grayed out when the option can't be used: on macOS and Linux, when the game runs through Proton or Wine, for the GOG or Xbox app version of the game, when DewDrop can't find Steam or your Steam account's settings, and when Stardew Valley's launch option in Steam starts some other program than SMAPI.
+**Before you uninstall DewDrop**, untick this row and quit the game. Otherwise SMAPI keeps loading your last profile, with no **Mods** button to change it. See [Uninstalling DewDrop](../getting-started/uninstalling.md).
+{% endtab %}
 
-* **Only Steam's Play button starts in your profile.** A desktop shortcut, or starting `StardewModdingAPI.exe` yourself, still loads the whole `Mods` folder. **Ask to load my profile** covers those launches.
-* **Until you choose, the row follows Steam.** If Steam's launch option already points at `Selected Mods`, for example because you added it yourself, the row shows as ticked and DewDrop leaves the option alone.
-* **The Windows installer asks about it too,** when it sets up Steam's launch option for SMAPI, and saves your answer here.
-* **Before you uninstall DewDrop,** untick this row and quit the game. Otherwise SMAPI keeps loading your last profile, with no **Mods** button to change it.
+{% tab title="Linux and Steam Deck" icon="linux" %}
+Steam's launch option runs DewDrop's Steam launcher, which the installer sets up: by itself on a Steam Deck, and on other Linux systems when you run it with `--steam-setup`. The launcher starts SMAPI on your profile while this row is ticked. The change takes effect as soon as you click: Steam never closes, and no message appears.
+
+The row's description reads "Have Steam start the game in your profile, so you don't need Apply & Restart." while it's off, and "Steam starts the game in your profile. Changes you make load the next time you start it." while it's on.
+
+Until the launcher is set up, the row is grayed out. On Linux other than a Steam Deck, run the installer again in a terminal with `--steam-setup`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash -s -- --steam-setup
+```
+
+On a Steam Deck, run the installer in Desktop Mode and let it set up Steam. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md) and [Installer command-line options](../reference/installer-options.md).
+{% endtab %}
+{% endtabs %}
+
+Good to know:
+
+* **Only Steam's Play button starts in your profile.** A desktop shortcut, or starting SMAPI yourself, still loads the whole `Mods` folder. **Ask to load my profile** covers those launches.
+* **At first, the row follows Steam.** The first time DewDrop checks Steam, the row takes on what Steam already does: if Steam's launch option already starts the game in your profile, for example because you added `--mods-path` yourself, the row is ticked and DewDrop leaves the option alone.
+* **The installer asks about it too,** when it sets up Steam's launch option, and saves your answer here. On Linux and the Steam Deck, it doesn't ask again once you've chosen, in the installer or in the game: it keeps your choice.
+* **It's grayed out** when it can't be used: on macOS; for the GOG or Xbox app version of the game; through Proton or Wine; when DewDrop can't find Steam, or can't find or read your Steam account's settings; on Windows, when the game's launch option in Steam starts a program other than SMAPI; and on Linux, until DewDrop's Steam launcher is set up, or when it couldn't be updated. Point at the row to see why.
 
 See [Start in your profile](start-in-your-profile.md) for the whole feature.
 
 ### Ask to load my profile
 
-When the game starts on your whole `Mods` folder, for example from a desktop shortcut, from Steam with **Start in my profile from Steam** off, or on macOS or Linux, DewDrop compares the mods that loaded with your profile. If they're different, a **Load your profile?** box on the title screen names the mods and offers to restart into your profile. Untick this row to stop the box. You can still use [**Apply & Restart**](apply-and-restart.md) whenever you like.
+When the game starts on your whole `Mods` folder, for example from a desktop shortcut, from Steam with **Start in my profile from Steam** off, or on macOS, DewDrop compares the mods that loaded with your profile. If they differ, a **Load your profile?** box on the title screen names the mods and offers to restart into your profile. Untick this row to stop the box. You can still use [**Apply & Restart**](apply-and-restart.md) whenever you like.
 
-* If every mod in your `Mods` folder is on in your profile, the mods already match and nothing appears.
+* If every mod in your `Mods` folder is on in your profile, the mods already match and the box doesn't appear.
 * **Don't ask again** in the box unticks this row.
 * A change here applies from the next time you start the game.
-* On Steam Deck, and when the game runs through Proton or Wine, the box never appears, whatever this row says.
+* When the game runs through Proton or Wine, the box never appears.
 
 See [Start in your profile](start-in-your-profile.md) for what the box says and what each button does.
 
 ### Turn on mods when installed
 
-When this is on, every mod DewDrop installs is ticked in your active profile, along with any installed mods it needs. Click [**Apply & Restart**](apply-and-restart.md) to load them.
+When this is on, every mod DewDrop installs is ticked in your active profile, along with the installed mods it needs. Click [**Apply & Restart**](apply-and-restart.md) to load them.
 
 * It covers updates too. Updating a mod that was off in your profile turns it on.
-* It covers mods you copy into your `Mods` folder yourself. DewDrop turns them on when the game starts, or when you click **Rescan** on the [Installed tab](installed.md). Only mods DewDrop has never seen before count, so a mod you turned off stays off.
+* It covers mods you copy into your `Mods` folder yourself. DewDrop turns them on when the game starts, or when you click **Rescan** on the [Installed](installed.md) tab. Only mods DewDrop has never seen before count, so a mod you turned off stays off.
 * It doesn't change collection profiles, which are read-only, or a profile whose file couldn't be read.
 
-When it's off, new mods stay off until you tick them on the [Installed tab](installed.md).
+When it's off, new mods stay off until you tick them on the [Installed](installed.md) tab.
 
 ### Show adult content in Browse
 
@@ -76,17 +96,19 @@ When you change this, [Browse](browse.md) reloads its results the next time you 
 
 ### Check for updates at startup
 
-DewDrop asks smapi.io for updates in the background as the game starts. If it finds any, the **Installed** tab shows a count, such as **Installed (2 new)**. The same check tells DewDrop which Nexus mod some of your mods are, which helps Browse [mark the mods you have](browse.md#how-dewdrop-knows-you-have-a-mod). If you turn this off, the change applies from your next launch, and you can still click **Check for updates** on the **Installed** tab whenever you like. See [Updating mods](updating-mods.md).
+DewDrop asks smapi.io for updates in the background as the game starts. If it finds any, the **Installed** tab shows a count, such as **Installed (2 new)**. The same check tells DewDrop which Nexus mod some of your mods are, which helps Browse [mark the mods you have](browse.md#how-dewdrop-knows-you-have-a-mod).
+
+If you turn this off, the change applies from your next launch, and you can still click **Check for updates** on the **Installed** tab whenever you like. See [Updating mods](updating-mods.md).
 
 ## The lines under the options
 
 * **Mods folder:** the folder DewDrop installs new mods into. This is usually your game's `Mods` folder. If you use Stardrop, it's the install folder set in Stardrop.
 * "Profiles are shared with Stardrop." See [Profiles](profiles.md) and [Using DewDrop with Stardrop](../stardrop.md).
-* "This session started outside DewDrop's profile folder." (orange) means the game didn't start in your profile, for example because you started it from a desktop shortcut. The line under **Profile:** at the bottom of the menu says whether the mods that loaded match your profile. See [How launching works](../getting-started/launching.md) and [Start in your profile](start-in-your-profile.md).
+* "This session started outside DewDrop's profile folder." (orange) means the game didn't start in your profile, for example because you started it from a desktop shortcut. The bottom bar says whether the mods that loaded match your profile. See [How launching works](../getting-started/launching.md).
 
 ## Where settings are saved
 
-The five options are saved in `config.json` in DewDrop's own mod folder, usually `Stardew Valley/Mods/DewDrop/config.json`. SMAPI creates the file the first time DewDrop runs.
+The five options are saved in `config.json` in DewDrop's own mod folder, usually `Stardew Valley/Mods/DewDrop/config.json`. SMAPI creates the file the first time the game starts with DewDrop. (The Windows installer may create it a little earlier, holding only your answer about starting in your profile.)
 
 {% code title="config.json" %}
 ```json

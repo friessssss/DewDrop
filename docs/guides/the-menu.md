@@ -1,104 +1,92 @@
 ---
-description: "Open and close the DewDrop menu, find your way around its tabs and bottom bar, and use it with a mouse, keyboard or controller."
+description: "Open and close the DewDrop menu, read its tabs and bottom bar, and use it with a mouse, keyboard, controller or Steam Deck."
 icon: window-maximize
 ---
 
 # The DewDrop menu
 
-Everything DewDrop does happens in one menu that you open from Stardew Valley's title screen. This page covers the parts every tab shares: the tabs, the bottom bar, messages, dialogs and controls.
+Everything DewDrop does happens in one menu on Stardew Valley's title screen. This page covers what every tab shares: the tabs, the bottom bar, messages, dialogs and controls.
 
-## Opening the menu
+## Open the menu
 
-On the title screen, click **Mods**. It sits between **Co-op** and **Exit**, in the same wooden style as the other buttons. The title art slides away, the same way it does for **Load**, and the menu opens on the **Installed** tab.
+On the title screen, click **Mods**. It sits between **Co-op** and **Exit**, in the same wooden style. The menu opens on the **Installed** tab.
 
-If your game window is too narrow for five big buttons, DewDrop puts a small dew-drop button above the small buttons in the bottom-right corner instead. It opens the same menu.
-
-If a **Load your profile?** box is showing over the title screen, answer it first. Nothing on the title screen can be clicked while it's open. See [Start in your profile](start-in-your-profile.md).
+If the game window is too narrow for five big buttons, a small dew-drop button above the small buttons in the bottom-right corner opens the same menu.
 
 <figure><img src="../.gitbook/assets/shot-title.png" alt="The Stardew Valley title screen with DewDrop's wooden Mods button, marked with a dew drop on a leaf, between the Co-op and Exit buttons"><figcaption><p>The Mods button on the title screen.</p></figcaption></figure>
 
-{% hint style="info" %}
-The menu only opens from the title screen. There's no hotkey for it once a save is loaded, so to change your mods in the middle of a game, exit to the title screen first.
-{% endhint %}
+The menu only opens from the title screen. To change your mods in the middle of a game, exit to the title screen first.
 
-## Closing the menu
+If a **Load your profile?** box is showing, answer it first: nothing else on the title screen can be clicked while it's open. See [Start in your profile](start-in-your-profile.md).
 
-Either of these takes you back to the title screen:
+## Close the menu
 
-* Click the title screen's back button in the bottom-right corner, the same one the game's other title menus use.
+* Click the back button in the bottom-right corner, the same one the game's other title menus use.
 * On a controller, press **B**.
 
-The keyboard's menu keys, **Esc** and **E**, don't close the menu itself. They close a dialog, and **Esc** also stops typing in a text box.
+While a dialog is open or you're typing in a box, the back button is hidden, and **B** closes the dialog or leaves the box instead. The keyboard's **Esc** and **E** never close the menu itself: they close a dialog, and **Esc** also stops typing.
 
-While a dialog is showing or you're typing in a box, the back button is hidden, and controller **B** closes the dialog or leaves the box instead of closing the menu. Close the dialog or leave the box first, then close the menu.
-
-To get from a mod's page back to your search results, click **Back** or press **Backspace**. See [A mod's page](mod-page.md).
-
-Each time you open the menu, it starts fresh on the **Installed** tab, so searches and filters are reset. Browse remembers its results for 10 minutes, so going back to a search you just ran is quick.
+Each time you open the menu, it starts fresh on the **Installed** tab, with searches and filters cleared. Browse keeps its results for 10 minutes, so going back to a recent search is quick.
 
 ## The tabs
 
-The five tabs along the top are always in this order. Click one to switch, or press **LB** and **RB** on a controller.
+The five tabs along the top are always in this order. Click one to switch, or press **LB** and **RB** on a controller (**L1** and **R1** on a Steam Deck).
 
 | Tab | What it's for | Guide |
 | --- | --- | --- |
-| **Installed** | Turn mods on and off for your profile, find mods that need something, check for updates, and uninstall mods. When updates are found, the tab reads **Installed (2 new)**, for example. | [Managing your mods](installed.md) |
+| **Installed** | Turn mods on and off for your profile, find problems, update and uninstall mods. When updates are found, it reads **Installed (2 new)**, for example. | [Managing your mods](installed.md) |
 | **Browse** | Search Nexus Mods and open a mod's page to install it. | [Browsing Nexus Mods](browse.md) |
 | **Profiles** | Create, switch, copy, rename and delete profiles. | [Profiles](profiles.md) |
-| **Downloads** | Watch downloads and installs. While some are running, the tab shows how many, such as **Downloads (1)**. | [Downloads](downloads.md) |
-| **Account** | Log in to Nexus Mods, set up mod manager links (Windows), and change settings. | [Connecting your Nexus account](../nexus-mods/connecting.md), [Settings](settings.md) |
+| **Downloads** | Follow downloads and installs. While some are running, it reads **Downloads (1)**, for example. | [Downloads](downloads.md) |
+| **Account** | Log in to Nexus Mods, set up mod manager links (Windows only), and change settings. | [Connecting your Nexus account](../nexus-mods/connecting.md), [Settings](settings.md) |
 
 ## The bottom bar
 
-The strip along the bottom of the menu tells you which profile is active and whether a restart is needed.
+The strip along the bottom says which profile is active and whether a restart would change anything.
 
-The first line shows the active profile, for example **Profile: Default**. This is the profile **Apply & Restart** uses. You change it on the [Profiles](profiles.md) tab.
+The first line names the active profile, for example **Profile: Default**. That's the profile **Apply & Restart** loads. You change it on the [Profiles](profiles.md) tab.
 
-The line under it is the status. It's always one of these:
+The second line is the status. It's always one of these. When more than one is true, the bar shows the one highest in the table.
 
 | Status | What it means |
 | --- | --- |
-| A red message saying Stardrop's `Settings.json` or a profile file "couldn't be read" | DewDrop couldn't read one of its files, so it won't change or apply your profile. **Apply & Restart** stays off. Close the game and start it again, or for a profile file, pick another profile. If it keeps happening, see [Troubleshooting](../help/troubleshooting.md). |
-| "3 mods that are off in this profile loaded anyway. Restart to load this profile." (orange) | A normal launch: you started the game from a shortcut, from SMAPI, or from Steam without **Start in my profile from Steam**, so SMAPI loaded everything in your `Mods` folder, including mods that are off in your profile. That's normal. Click **Apply & Restart** when you want to switch into your profile. |
-| "2 mods in this profile didn't load. Restart to load this profile." (orange) | A normal launch that didn't load some mods that are on in your profile, for example ones you added after the game started. **Apply & Restart** loads them. |
-| "1 mod loaded from a different copy than this profile uses. Restart to load this profile." (orange) | A normal launch loaded a different copy of a mod than the one your profile uses, such as your own copy instead of a Stardrop collection's. **Apply & Restart** switches to the right one. |
-| "This session didn't start from a DewDrop profile. Restart to load this profile." (orange) | SMAPI was started with its `--mods-path` launch option on a folder DewDrop doesn't manage. Click **Apply & Restart** when you want to switch into your profile. |
-| "Some Mod, which you uninstalled, is still loaded. Restart to finish uninstalling." (orange) | You uninstalled a mod the game is running. With more than one, it says "2 mods you uninstalled are still loaded." **Apply & Restart** finishes uninstalling them. See [Uninstall a mod](installed.md#uninstall-a-mod). |
-| "Changes are ready. Restart the game to load them." (orange) | Since this session started, you turned mods on or off, installed or updated a mod, or switched profiles. |
-| "Changes load the next time you start the game from Steam, or restart now." (orange) | The same, with **Start in my profile from Steam** on. DewDrop links your changes when you quit the game, so they load the next time you press **Play** in Steam. **Apply & Restart** loads them now. |
-| "The mods loaded right now match this profile. Uninstalled mods are deleted when the game closes." (gray) | What's loaded is exactly your profile. Mods you uninstalled weren't loaded, and their folders go when you quit. |
-| "The mods loaded right now match this profile." (gray) | Nothing to do. What's loaded is exactly your profile. |
+| A red message that Stardrop's `Settings.json` or your profile file "couldn't be read" | DewDrop won't change or apply your profile, and **Apply & Restart** stays off. Close the game and start it again, or pick another profile. See [Troubleshooting](../help/troubleshooting.md). |
+| "3 mods that are off in this profile loaded anyway. Restart to load this profile." | The game started on your whole `Mods` folder, for example from a shortcut, or from Steam without **Start in my profile from Steam**. That's normal. Click **Apply & Restart** when you want your profile. |
+| "2 mods in this profile didn't load. Restart to load this profile." | The same kind of launch, and some mods that are on in your profile didn't load, such as ones you added after the game started. |
+| "1 mod loaded from a different copy than this profile uses. Restart to load this profile." | The same kind of launch loaded another copy of a mod than your profile uses, such as your own copy instead of a Stardrop collection's. |
+| "This session didn't start from a DewDrop profile. Restart to load this profile." | SMAPI was started with its `--mods-path` option on a folder DewDrop doesn't manage. |
+| "*name*, which you uninstalled, is still loaded. Restart to finish uninstalling." | The game is still running a mod you uninstalled. With more than one, it says "2 mods you uninstalled are still loaded." See [Uninstall a mod](installed.md#uninstall-a-mod). |
+| "Changes are ready. Restart the game to load them." | Since the game started, you turned mods on or off, installed or updated a mod, or switched profiles. |
+| "Changes load the next time you start the game from Steam, or restart now." | The same, with **Start in my profile from Steam** on. Your changes load the next time you press **Play** in Steam. |
+| "The mods loaded right now match this profile. Uninstalled mods are deleted when the game closes." | Nothing needs a restart. The mods you uninstalled aren't loaded, and their folders go when you quit. |
+| "The mods loaded right now match this profile." | Nothing to do. |
 
-The numbers are examples. If more than one of the three normal-launch lines is true, the bar shows the one highest in the table.
+The numbers are examples. The last two lines are gray, and all the others but the first are orange. While downloads are running, the line ends with how many, like "Downloading 2...". A line too long to fit ends in "...": point at it to read the rest.
 
-While downloads are running, the status also says how many, like **Downloading 2...**. If a line is too long to fit, it ends with "...". Hover over it to read the whole thing.
-
-**Apply & Restart** sits on the right. It lights up when restarting would change something. Click it, confirm, and the game closes and starts again with your profile's mods. When it's grayed out, hover over it to see why, for example "Nothing to apply: the loaded mods already match this profile." [Apply & Restart](apply-and-restart.md) explains what happens in detail.
+**Apply & Restart** sits on the right. It lights up when restarting would change something. When it's grayed out, point at it to see why, for example "Nothing to apply: the loaded mods already match this profile." See [Apply & Restart](apply-and-restart.md).
 
 {% hint style="info" %}
-Your profile applies when the game starts in it: after **Apply & Restart**, or, on Windows with the Steam version, from Steam's **Play** button once **Start in my profile from Steam** is on. Any other launch loads every mod in your `Mods` folder, including ones you turned off in DewDrop. [How launching works](../getting-started/launching.md) explains why. When the mods that load differ from your profile, DewDrop offers on the title screen to restart into it. See [Start in your profile](start-in-your-profile.md).
+Your profile loads only when the game starts in it: after **Apply & Restart**, or from Steam's **Play** button with [**Start in my profile from Steam**](start-in-your-profile.md) on. Any other launch loads every mod in your `Mods` folder, including the ones you turned off. [How launching works](../getting-started/launching.md) explains why.
 {% endhint %}
 
 ## Messages
 
-Short messages pop up at the bottom of the page, just above the bottom bar, for example "Everything's up to date." Up to four show at a time, with the newest at the bottom.
+Short messages pop up above the bottom bar, such as "Everything's up to date." Up to four show at a time, with the newest at the bottom.
 
-* Normal messages disappear after about 5 seconds.
+* Normal messages go after about 5 seconds.
 * Errors are red and stay for about 8 seconds. DewDrop also writes them to the SMAPI log, which helps when you [report a problem](../help/reporting-issues.md).
 * Click a message to dismiss it early.
 
-Messages only show while the menu is open. A few come from the game starting, such as "Steam now starts the game in your profile." or "Turned on *mods*, new in your Mods folder." Those wait until you next open the menu.
+Messages only show while the menu is open, so the ones from the game's start wait until you first open it, and then stay a little longer (about 8 seconds, or 12 for errors). Examples are "Turned on *mods*, new in your Mods folder." and, on Windows, "Steam now starts the game in your profile."
 
-## Dialogs
+## Dialogs and tooltips
 
-Some actions ask before they go ahead, such as **Apply & Restart**, uninstalling a mod, deleting a profile, or logging out of Nexus Mods. The screen darkens and a box explains what will happen.
+Some actions ask first, such as **Apply & Restart**, uninstalling a mod, deleting a profile or logging out of Nexus Mods. The screen darkens and a box says what will happen.
 
-* To go ahead, click the action button (like **Restart** or **Delete**) or press **Enter**.
-* To back out, click **Cancel**, click anywhere outside the box, or press **Esc**, **E** or controller **B**.
+* To go ahead, click the action button (such as **Restart** or **Delete**) or press **Enter**.
+* To back out, click **Cancel**, click outside the box, or press **Esc**, **E** or controller **B**.
 
-## Tooltips
-
-Hover over almost anything to learn more. Buttons say what they do, mod rows show a mod's description, unique ID and folder, and grayed-out buttons say why they're off. If a name or line is cut short, its tooltip shows all of it.
+Point at almost anything to learn more. Buttons say what they do, and grayed-out buttons say why they're off. If a name or line is cut short, its tooltip shows all of it.
 
 ## Controls
 
@@ -118,8 +106,8 @@ The menu works with a mouse, a keyboard, a controller, or a mix.
 | Key | What it does |
 | --- | --- |
 | **Esc** | Closes a dialog, or stops typing in a text box. |
-| **E** | Closes a dialog. While you're typing in a box, it types the letter e as usual. |
-| **Enter** | Confirms a dialog. In a text box, it runs the box: searches on **Browse**, creates a profile on **Profiles**, and logs in on **Account**. |
+| **E** | Closes a dialog. In a text box, it types an e as usual. |
+| **Enter** | Confirms a dialog. In a text box, it searches on **Browse**, creates a profile on **Profiles**, and logs in on **Account**. |
 | **Up** / **Down** | Scroll the list. On **Profiles**, they move the selection. On a mod's page, they scroll the description. |
 | **Left** / **Right** | Go to the previous or next page of results on **Browse**. |
 | **Backspace** | On a mod's page, goes back to your search results. |
@@ -134,19 +122,29 @@ The arrow keys don't scroll while you're typing in a box. Press **Esc** to leave
 | --- | --- |
 | **Left stick** | Moves the cursor. It starts in the middle of the page. |
 | **A** | Clicks whatever is under the cursor. |
-| **LB** / **RB** | Switch to the previous or next tab. They wrap around from the last tab to the first. |
-| **D-pad** | Works like the arrow keys: scroll lists, change pages on **Browse**. |
+| **LB** / **RB** | Switch to the previous or next tab, wrapping around at the ends. |
+| **D-pad** | Works like the arrow keys: scrolls lists and changes pages on **Browse**. |
 | **B** | Closes a dialog. Otherwise leaves the text box. Otherwise closes the menu. |
 
-Selecting a text box with the controller opens the game's on-screen keyboard.
+Selecting a text box opens the game's on-screen keyboard.
 
 To go back from a mod's page, move the cursor to **Back** and press **A**. **B** closes the whole menu.
+{% endtab %}
+
+{% tab title="Steam Deck" icon="steam" %}
+In Game Mode, the Deck's controls work like a controller (see the **Controller** tab), with **L1** and **R1** to switch tabs. Because Game Mode has no desktop, a few things change:
+
+* **Typing.** Selecting a text box, by tapping, clicking or pressing **A**, opens Steam's on-screen keyboard, or the game's own if Steam's can't open.
+* **Web pages.** Buttons such as **Open on Nexus** and **Get my API key** open the page in Steam's overlay browser over the game, or in Steam's browser when the overlay is off.
+* **Open mods folder** on the **Downloads** tab is grayed out. It works in Desktop Mode.
+
+Steam Deck support is new and being tested. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
 {% endtab %}
 {% endtabs %}
 
 ## Good to know
 
 * The menu is in English only for now.
-* On small screens, such as 720p, the menu uses tighter spacing and slimmer rows so more fits.
+* On small screens, such as 720p and the Steam Deck, the menu uses tighter spacing and slimmer rows so more fits.
 * Downloads keep going if you load a save. Their progress is on the **Downloads** tab when you're back at the title screen.
-* If the menu ever runs into an error, DewDrop closes it rather than the whole title screen, and writes the error to the SMAPI log. Open **Mods** again to carry on, and see [Reporting issues](../help/reporting-issues.md) if it keeps happening.
+* If the menu runs into an error, DewDrop closes the menu rather than the whole title screen, and writes the error to the SMAPI log. Open **Mods** again to carry on, and see [Reporting issues](../help/reporting-issues.md) if it keeps happening.

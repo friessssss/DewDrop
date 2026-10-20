@@ -11,7 +11,7 @@ Check this list before you install. If you use the [installer](installing/instal
 | --- | --- | --- |
 | Stardew Valley for PC | 1.6 or later | From Steam, GOG or the Xbox app. |
 | SMAPI, the mod loader | 4.0 or later | The installer can install it for you. |
-| A Windows, macOS or Linux computer | | Windows is the main, tested platform. |
+| A Windows, macOS or Linux computer, or a Steam Deck | | Windows is the main, tested platform. |
 | A Nexus Mods account | Optional | Only needed to download mods inside DewDrop. |
 
 ## Stardew Valley
@@ -32,11 +32,11 @@ SMAPI is the mod loader that starts Stardew Valley with mods. DewDrop is a SMAPI
 | --- | --- |
 | Windows | Yes. This is the main platform, and everything is tested here. |
 | Xbox app (PC Game Pass) | Yes, with one extra step from SMAPI's guide. The installer can do it for you. |
-| macOS | Built to work, but not tested yet. SMAPI needs macOS 10.15 Catalina or later. |
-| Linux | Built to work, but not tested yet. You need the Linux version of the game (see below). |
-| Steam Deck | Not supported. |
+| macOS | Built to work, but not tested much yet. SMAPI needs macOS 10.15 Catalina or later. On a Mac with an Apple chip (M1 or later), SMAPI's installer needs Rosetta, Apple's free add-on for Intel apps; the DewDrop installer offers to install it. |
+| Linux | Built to work, but not tested much yet. You need the Linux version of the game (see below). |
+| Steam Deck | New, being tested. You run the installer once in Desktop Mode. See [DewDrop on the Steam Deck](steam-deck.md). |
 
-**On Linux, you need the Linux version of the game**, not the Windows version running through Proton (Steam's tool for running Windows games on Linux). To check, right-click **Stardew Valley** in Steam and choose **Properties** > **Compatibility**. If **Force the use of a specific Steam Play compatibility tool** is ticked, untick it and let Steam download the Linux version. The installer warns you if it finds the Windows version.
+**On Linux and the Steam Deck, you need the Linux version of the game**, not the Windows version running through Proton (Steam's tool for running Windows games on Linux). To check, right-click **Stardew Valley** in Steam and choose **Properties** > **Compatibility**. If **Force the use of a specific Steam Play compatibility tool** is ticked, untick it and let Steam download the Linux version. The installer warns you if it finds the Windows version.
 
 [Platform support](../reference/platform-support.md) has the full details.
 
@@ -46,14 +46,14 @@ You don't need an account to turn mods on and off, use profiles, use **Apply & R
 
 To **download** mods inside DewDrop, you need a Nexus Mods account. A free one works:
 
-* **Premium accounts:** the **Install** button downloads and installs the file directly.
-* **Free accounts:** the button reads **Get on Nexus**. It opens the file on the website, where you click **Slow download**. On Windows, DewDrop catches that download once you turn on mod manager links on the **Account** tab. On macOS and Linux, it can't yet, so you download mods on the website and add them yourself.
+* **Premium accounts:** the **Install** button downloads and installs the file directly, on every system.
+* **Free accounts:** the button reads **Get on Nexus**. It opens the file on the website, where you click **Slow download**. On Windows, DewDrop catches that download once you turn on mod manager links on the **Account** tab. On macOS, Linux and the Steam Deck, it can't yet, so you download mods on the website and add them yourself.
 
 [Free vs Premium downloads](../nexus-mods/free-vs-premium.md) explains the difference, and [Connecting your Nexus account](../nexus-mods/connecting.md) shows how to set up your account.
 
 ## Good to know
 
-* **You need to be online** to run the installer (it downloads SMAPI if you don't have it), to browse and download mods, and to check for mod updates. Turning mods on and off, profiles and **Apply & Restart** work offline.
+* **You need to be online** to run the installer (it may need to download SMAPI and DewDrop), to browse and download mods, and to check for mod updates. Turning mods on and off, profiles and **Apply & Restart** work offline.
 * **You don't need anything else.** SMAPI brings everything the game needs to run mods.
 * **Stardrop is optional.** DewDrop works on its own. If you already use Stardrop, DewDrop shares its profiles and Nexus login. See [Using DewDrop with Stardrop](../stardrop.md).
 * **DewDrop is in English only** for now.

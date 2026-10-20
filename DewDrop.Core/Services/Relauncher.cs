@@ -84,6 +84,50 @@ namespace DewDrop.Core.Services
             }
         }
 
+        /// <summary>
+        /// Linux with DewDrop's Steam launcher (see <see cref="SteamLauncher"/>): once the game has closed, runs the
+        /// launcher again, as Steam did. It finds the restart file written here and starts SMAPI on the profile folder,
+        /// with no terminal window. The restart stays in the game's Steam session (and, on a Steam Deck, Steam's
+        /// runtime), so Steam keeps counting it as the game and Game Mode shows it.
+        /// </summary>
+        /// <param name="launchId">Handed to the new game as <see cref="LaunchIdVariable"/> by the launcher.</param>
+        public static void ScheduleThroughLauncher(string launcherPath, string gamePath, string scriptFolder, string launchId, ILog log)
+        {
+            ScheduleThroughLauncher(launcherPath, gamePath, scriptFolder, launchId, log, Environment.ProcessId);
+        }
+
+        /// <param name="gamePid">The process to wait for: the game, except in tests.</param>
+        internal static void ScheduleThroughLauncher(string launcherPath, string gamePath, string scriptFolder, string launchId, ILog log, int gamePid)
+        {
+            Directory.CreateDirectory(scriptFolder);
+            var restartFile = Path.Combine(scriptFolder, SteamLauncher.RestartName);
+            File.WriteAllText(restartFile, launchId);
+
+            var info = new ProcessStartInfo("/bin/sh") { UseShellExecute = false };
+            info.ArgumentList.Add("-c");
+            info.ArgumentList.Add("while kill -0 \"$1\" 2>/dev/null; do sleep 0.5; done; exec \"$2\" \"$3\"");
+            info.ArgumentList.Add("dewdrop-restart");
+            info.ArgumentList.Add(gamePid.ToString());
+            info.ArgumentList.Add(launcherPath);
+            info.ArgumentList.Add(Path.Combine(gamePath, "StardewValley"));
+
+            // The launcher sets these for the new game itself
+            info.Environment.Remove(LaunchIdVariable);
+            info.Environment.Remove("SMAPI_MODS_PATH");
+            try
+            {
+                Process.Start(info);
+            }
+            catch
+            {
+                // No restart is coming, so the next launch mustn't pass for it
+                File.Delete(restartFile);
+                throw;
+            }
+
+            log.Info("Scheduling a restart through DewDrop's Steam launcher");
+        }
+
         private static void Start(string gamePath, string modsPath, string pendingUpdatesFile, string scriptFolder, ILog log, string? launchId, bool relaunch, SteamJob? steamJob)
         {
             var pid = Environment.ProcessId;
@@ -135,7 +179,9 @@ namespace DewDrop.Core.Services
                 // Unix lets open files be replaced, so updates never wait for a restart there
                 var launcher = LauncherPath(gamePath);
                 string Quote(string value) => "'" + value.Replace("'", "'\\''") + "'";
-                var script = $"while kill -0 {pid} 2>/dev/null; do sleep 0.5; done; cd {Quote(gamePath)} && {LaunchIdVariable}={Quote(launchId ?? "")} SMAPI_MODS_PATH={Quote(modsPath)} nohup {Quote(launcher)} --mods-path {Quote(modsPath)} >/dev/null 2>&1 &";
+                // Game Mode on a Steam Deck can't show the terminal window SMAPI's Linux launcher opens
+                var noTerminal = SteamDeck.InGameMode ? "SMAPI_NO_TERMINAL=true " : "";
+                var script = $"while kill -0 {pid} 2>/dev/null; do sleep 0.5; done; cd {Quote(gamePath)} && {LaunchIdVariable}={Quote(launchId ?? "")} SMAPI_MODS_PATH={Quote(modsPath)} {noTerminal}nohup {Quote(launcher)} --mods-path {Quote(modsPath)} >/dev/null 2>&1 &";
                 info = new ProcessStartInfo("/bin/sh") { UseShellExecute = false };
                 info.ArgumentList.Add("-c");
                 info.ArgumentList.Add(script);

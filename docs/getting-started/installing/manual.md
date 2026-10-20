@@ -9,6 +9,10 @@ DewDrop is a normal SMAPI mod, so you can install it like any other: put its fol
 
 Prefer to have it done for you? Use the [installer](installer.md) instead. It also installs SMAPI if you need it.
 
+{% hint style="warning" %}
+**On a Steam Deck, use the installer.** Besides installing DewDrop, it sets Steam up to start the game with DewDrop's launcher. Without that, Game Mode can show a black screen or a terminal window instead of the game. If you've already installed DewDrop by hand, run the installer once in Desktop Mode; it updates your copy where it is and keeps your settings. See [DewDrop on the Steam Deck](../steam-deck.md).
+{% endhint %}
+
 ## Before you start: install SMAPI
 
 DewDrop needs **SMAPI 4.0 or later**. If you've used mods before, you probably have it already.
@@ -17,9 +21,7 @@ If you don't, download it from [smapi.io](https://smapi.io) and follow SMAPI's i
 
 ## Download DewDrop
 
-Open the [latest DewDrop release](https://github.com/friessssss/DewDrop/releases/latest). Under **Assets**, click `DewDrop-<version>.zip` (for example, `DewDrop-0.1.0.zip`).
-
-Make sure you pick the one **without** `-installer` in its name. Inside it is a single folder called `DewDrop`.
+Open the [latest DewDrop release](https://github.com/friessssss/DewDrop/releases/latest). Under **Assets**, click `DewDrop-<version>.zip`: the one **without** `-installer` in its name. Inside it is a single folder called `DewDrop`.
 
 ## Find your Mods folder
 
@@ -79,7 +81,7 @@ By default, it's `/Applications/Stardew Valley.app/Contents/MacOS/Mods`.
 
 By default, it's one of these:
 
-* `~/.local/share/Steam/steamapps/common/Stardew Valley/Mods`
+* `~/.local/share/Steam/steamapps/common/Stardew Valley/Mods` (this is the one on a Steam Deck)
 * `~/.steam/steam/steamapps/common/Stardew Valley/Mods`
 * Steam installed as a Flatpak: `~/.var/app/com.valvesoftware.Steam/data/Steam/steamapps/common/Stardew Valley/Mods`
 
@@ -103,14 +105,15 @@ Close the game if it's running. Then:
 
 When you're done, it should look like this:
 
-```
+```text
 Mods/
   DewDrop/
     manifest.json
     DewDrop.dll
     DewDrop.Core.dll
     SharpCompress.dll
-    ZstdSharp.dll
+    assets/
+      steam-launch.sh
     ...
 ```
 
@@ -123,6 +126,12 @@ Start the game with SMAPI. A second window, the SMAPI console, opens next to the
 
 On the title screen, click the new **Mods** button between **Co-op** and **Exit**. That's it! Next, read [Your first launch](../first-launch.md).
 
+**On Linux with Steam,** the **Start in my profile from Steam** setting needs DewDrop's Steam launcher, which installing by hand doesn't set up. To add it, run the installer with its `--steam-setup` option (Flatpak and Snap Steam aren't supported for this yet). It updates your copy of DewDrop where it is and keeps your settings:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash -s -- --steam-setup
+```
+
 {% hint style="info" %}
 **Using Stardrop?** The first time, start the game from Steam or `StardewModdingAPI.exe` (on macOS and Linux, the game's normal launcher), not from Stardrop. Stardrop only loads the mods in its profile, and DewDrop isn't in it yet. On that first launch, DewDrop adds itself to your Stardrop profiles. See [Using DewDrop with Stardrop](../../stardrop.md).
 {% endhint %}
@@ -133,7 +142,7 @@ If the **Mods** button doesn't appear, the folder is usually in the wrong place.
 
 * **The zip itself is in `Mods`.** SMAPI can't read zip files. Take the `DewDrop` folder out of the zip and put that in `Mods` instead.
 * **The files are loose in `Mods`.** If `manifest.json` and the `.dll` files sit straight in `Mods`, SMAPI won't load them. Make a `DewDrop` folder in `Mods` and move them into it.
-* **A folder inside a folder**, like `Mods/DewDrop/DewDrop/manifest.json` or `Mods/DewDrop-0.1.0/DewDrop/manifest.json`. This happens when you extract the zip into a new folder and then copy that folder. If yours is one level deeper like this, move the inner `DewDrop` folder straight into `Mods` and delete the empty outer one.
+* **A folder inside a folder**, like `Mods/DewDrop/DewDrop/manifest.json` or `Mods/DewDrop-<version>/DewDrop/manifest.json`. This happens when you extract the zip into a new folder and then copy that folder. Move the inner `DewDrop` folder straight into `Mods` and delete the empty outer one.
 * **Two copies of DewDrop.** If SMAPI finds the same mod twice, it loads neither, and says "you have multiple copies of this mod installed" in its console. Keep one copy and delete the other.
 * **The wrong game.** If you have the game from more than one store, make sure you're using the `Mods` folder of the copy you play.
 
@@ -141,4 +150,4 @@ Still stuck? See [Troubleshooting](../../help/troubleshooting.md).
 
 ## Updating by hand
 
-To update DewDrop yourself, close the game and replace the old `DewDrop` folder with the new one. Copy your `config.json` out of the old folder first and put it back afterwards. That file holds your DewDrop settings. [Updating DewDrop](../updating-dewdrop.md) has the details. Running the [installer](installer.md) does the same thing for you.
+To update DewDrop yourself, close the game and copy the new files over the old ones. Your settings are in `config.json` in the old folder, and the new zip doesn't include one, so copying over keeps them. [Updating DewDrop](../updating-dewdrop.md#option-2-replace-the-folder-by-hand) has the steps for each system. Running the [installer](installer.md) does the same thing for you.

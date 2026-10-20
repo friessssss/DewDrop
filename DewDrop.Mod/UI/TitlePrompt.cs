@@ -78,7 +78,9 @@ namespace DewDrop.UI
             _footer = _error
                 ? ""
                 : showSteam
-                    ? Ui.Wrap("With that ticked, Steam closes and opens again once after you quit, to save its new launch option.", textWidth)
+                    ? Ui.Wrap(ProfileStart.UsesSteamLauncher
+                        ? "With that ticked, Steam's Play button starts the game in your profile from now on."
+                        : "With that ticked, Steam closes and opens again once after you quit, to save its new launch option.", textWidth)
                     : "You can change this any time in Mods > Account.";
 
             var headingHeight = Ui.LineHeight(Ui.Large);

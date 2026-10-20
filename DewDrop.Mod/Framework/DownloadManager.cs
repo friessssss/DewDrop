@@ -88,6 +88,18 @@ namespace DewDrop.Framework
 
         public static void OpenUrl(string url)
         {
+            // Game Mode on a Steam Deck has no desktop browser: Steam's overlay shows the page over the game, else
+            // Steam's own browser
+            var web = url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("http://", StringComparison.OrdinalIgnoreCase);
+            if (SteamDeck.InGameMode && web)
+            {
+                if (SteamOverlay.OpenWebPage(url))
+                {
+                    return;
+                }
+                url = "steam://openurl/" + url;
+            }
+
             try
             {
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
