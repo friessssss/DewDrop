@@ -1,17 +1,19 @@
 ---
-description: "Exact details on settings, commands, installer options, file locations, how DewDrop works and where it runs."
+description: "Exact details on settings, console commands, files, how DewDrop works, where it runs and the installer's options."
 icon: book-open
 ---
 
 # Reference
 
-These pages are the look-it-up part of the guide. They go into more detail than the rest, for when something isn't behaving the way you expect or you're curious what DewDrop does behind the scenes. You don't need any of them to use DewDrop day to day.
+These pages are for looking things up. You don't need them to use DewDrop day to day, but they help when something doesn't behave the way you expect, or when you're curious what DewDrop does behind the scenes.
 
-* [config.json options](config.md): every setting in DewDrop's own `config.json`, its default and what it changes, plus the settings DewDrop reads from Stardrop.
-* [Console commands](console-commands.md): the three commands DewDrop adds to the SMAPI console, including `dewdrop_status` for checking what DewDrop sees.
-* [Installer command-line options](installer-options.md): run the installer with a chosen game folder, preview what it would do, or install without questions.
-* [Where DewDrop keeps files](file-locations.md): every folder and file DewDrop uses on Windows, macOS and Linux, and which ones are safe to delete.
-* [How DewDrop works](how-it-works.md): profiles, the `Selected Mods` folder, **Apply & Restart**, starting in your profile, updates and the **Mods** button art.
-* [Platform support](platform-support.md): what works on Windows, macOS, Linux, Steam Deck and the Xbox app, and what hasn't been tested yet.
+| Page | Look here for |
+| --- | --- |
+| [config.json options](config.md) | Every setting in DewDrop's `config.json`, its default and what it changes, plus the settings DewDrop reads from Stardrop. |
+| [Console commands](console-commands.md) | The three commands DewDrop adds to the SMAPI console, such as `dewdrop_status`, and what to do where there's no console. |
+| [Where DewDrop keeps files](file-locations.md) | Every folder, file and log DewDrop uses on Windows, macOS, Linux and the Steam Deck, and which ones are safe to delete. |
+| [How DewDrop works](how-it-works.md) | Profiles, the `Selected Mods` folder, **Apply & Restart**, starting in your profile, DewDrop's Steam launcher, updates, uninstalls and the **Mods** button. |
+| [Platform support](platform-support.md) | What works on Windows, macOS, Linux, the Steam Deck and the Xbox app, and what hasn't been tested yet. |
+| [Installer command-line options](installer-options.md) | Running the installer with options: pick the game folder, preview the changes, answer every question automatically or set up Steam on Linux. |
 
 Stuck on a problem? Start with [Troubleshooting](../help/troubleshooting.md) instead.

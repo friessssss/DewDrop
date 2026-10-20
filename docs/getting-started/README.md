@@ -10,10 +10,12 @@ This section takes you from "I've never installed a mod" to playing with DewDrop
 ## First time? Read these three pages
 
 1. [What you need](requirements.md): the game version, SMAPI, and which computers work.
-2. [Install with the installer](installing/installer.md): the easiest way. It installs SMAPI too if you need it.
+2. [Install with the installer](installing/installer.md): the easiest way. It installs SMAPI too, if you need it.
 3. [Your first launch](first-launch.md): find the **Mods** button, meet your **Default** profile and learn when the game needs a restart.
 
 When you have five more minutes, read [How launching works](launching.md). It explains why DewDrop sometimes offers to restart the game, and how to start straight in your profile.
+
+**On a Steam Deck?** Read [DewDrop on the Steam Deck](steam-deck.md) instead of the installer page. You set DewDrop up once in Desktop Mode, then do everything else in Game Mode.
 
 ## How the pieces fit together
 
