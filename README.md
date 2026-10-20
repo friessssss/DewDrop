@@ -84,16 +84,24 @@ You need **Stardew Valley 1.6 or later** on Windows, macOS or Linux. DewDrop run
 
 ### The easy way: the installer
 
-**On macOS or Linux**, open **Terminal**, paste this line and press **Return**:
+Paste one line and the installer does the rest: it finds your game, installs SMAPI if you need it, downloads the
+latest DewDrop into your Mods folder and offers to start the game.
+
+**Windows:** open **PowerShell** (Start menu, type `PowerShell`, press **Enter**), paste this and press **Enter**:
+
+```powershell
+irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex
+```
+
+**macOS or Linux:** open **Terminal**, paste this and press **Return**:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
 ```
 
-It works out which system you're on, downloads the installer and the latest DewDrop release, and runs it in that
-window. Nothing has to be allowed in **Privacy & Security** this way. Then go on from step 4 below.
+Nothing has to be allowed in **Privacy & Security** or SmartScreen this way. Then go on from step 4 below.
 
-**On Windows**, or if you'd rather download it yourself:
+**If you'd rather download it yourself:**
 
 1. Download **`DewDrop-<version>-installer.zip`** from the [latest release](https://github.com/friessssss/DewDrop/releases/latest).
 2. Extract the zip. On Windows, right-click it and choose **Extract All...**; on a Mac, Safari usually unzips it

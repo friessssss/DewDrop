@@ -48,7 +48,7 @@ Yellow `[!]` lines are warnings, and the installer carries on after them. If it 
 {% tab title="Windows" %}
 **"Windows protected your PC"**
 
-This is Windows SmartScreen. It shows for new downloads it doesn't recognize yet. Click **More info**, then **Run anyway**.
+This is Windows SmartScreen. It shows for new downloads it doesn't recognize yet. Click **More info**, then **Run anyway**. Or skip the download: open **PowerShell**, paste `irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex` and press **Enter**.
 
 **"Oops! It looks like you opened this from inside the zip file."**
 

@@ -22,7 +22,7 @@ See [What you need](../getting-started/requirements.md) for the beginner-friendl
 | --- | --- |
 | Windows | **Supported.** This is where DewDrop is built and tested. |
 | Xbox app (PC Game Pass) | **Supported**, using SMAPI's exe swap, which the installer can do for you. It runs the Windows version of the game, so DewDrop behaves as on Windows. The Xbox setup itself has had less testing. |
-| macOS | **Untested.** Built to work, except website download links for free Nexus Mods accounts and **Start in my profile from Steam**. |
+| macOS | **Untested.** The installer works; the mod is built to work, except website download links for free Nexus Mods accounts and **Start in my profile from Steam**. |
 | Linux | **Untested.** Built to work, with the same exception as macOS. The installer has been tested on Linux. |
 | Steam Deck | **New, being tested.** Set up once in Desktop Mode with the installer, then everything happens in Game Mode. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md). |
 | Windows version through Proton or Wine | **Not supported.** The installer warns you if your game is set up this way. |
@@ -33,7 +33,7 @@ In this table, **Yes** means it works and has been tested. **Untested** means th
 
 | Feature | Windows | macOS | Linux | Steam Deck | Xbox app |
 | --- | --- | --- | --- | --- | --- |
-| [Installer](../getting-started/installing/installer.md) | Yes | Untested | Yes | Being tested; also sets up DewDrop's Steam launcher | Untested |
+| [Installer](../getting-started/installing/installer.md) | Yes | Yes (tested on an Apple Silicon Mac) | Yes | Being tested; also sets up DewDrop's Steam launcher | Untested |
 | Starting the game with SMAPI | Installer sets the Steam launch option, or adds a desktop shortcut | SMAPI's installer sets it up; nothing to do | SMAPI's installer sets it up; nothing to do (or DewDrop's Steam launcher, with `--steam-setup`) | Installer sets the Steam launch option to DewDrop's launcher, which starts SMAPI with no terminal window | Installer offers SMAPI's exe swap |
 | **Mods** button, menu and profiles | Yes | Untested | Untested | Being tested; Steam's keyboard for typing in Game Mode | Same as Windows |
 | Linking mods for **Apply & Restart** | Yes (junctions) | Untested (symbolic links) | Untested (symbolic links) | Untested | Same as Windows |
@@ -73,13 +73,14 @@ The Xbox app (and PC Game Pass) always starts `Stardew Valley.exe`. SMAPI's guid
 
 ## macOS
 
-DewDrop's code supports macOS, but it hasn't been tested yet. Neither has the installer.
+DewDrop's code supports macOS, but it hasn't been tested yet. The installer has been, on a Mac with an Apple chip.
 
 * **Free Nexus Mods accounts can't use website download links.** **Get on Nexus** opens the file on the website, and DewDrop tells you to add the mod to your `Mods` folder yourself. See the warning below.
 * **Apply & Restart** starts `StardewModdingAPI` in your game folder directly. You probably won't get a Terminal window for SMAPI in that session, so you can't type [console commands](console-commands.md) until you start the game the usual way. Whether macOS shows security prompts for a game started this way hasn't been tested.
 * The **Load your profile?** box works as on Windows, and its **Restart now** uses the same untested restart as **Apply & Restart**.
 * **Start in my profile from Steam isn't available.** SMAPI's macOS and Linux launcher doesn't pass Steam's launch options on to SMAPI, so DewDrop can't use them. The row on the **Account** tab is grayed out. (On Linux, DewDrop's Steam launcher gets around this; it isn't available for macOS yet.)
-* **The installer** may be blocked by Gatekeeper, macOS's check for apps from the internet, the first time you open it. [Install with the installer](../getting-started/installing/installer.md) shows how to allow it.
+* **The downloaded installer** may be blocked by Gatekeeper, macOS's check for apps from the internet, the first time you open it. [The one line](../getting-started/installing/installer.md#the-quick-way-one-line) pasted into Terminal isn't blocked; [Install with the installer](../getting-started/installing/installer.md) also shows how to allow the download.
+* **Macs with an Apple chip (M1 or later) need Rosetta**, Apple's free add-on for Intel apps, because SMAPI's installer is made for Intel Macs. The installer offers to install it.
 * SMAPI needs macOS 10.15 Catalina or later.
 * DewDrop's data folder is `~/.config/Stardrop/Data`. See [Where DewDrop keeps files](file-locations.md).
 
