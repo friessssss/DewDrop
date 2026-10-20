@@ -598,7 +598,10 @@ namespace DewDrop.UI.Pages
                 Ui.Fill(b, new Rectangle(cell.X + 8, cell.Y + 8, cell.Width - 16, cell.Height - 16), Ui.Hover);
             }
 
-            var tagWidth = (int)Ui.Small.MeasureString("Installed").X + 24;
+            // The panel's border is 12px deep and its corners bevel in to 20px, so the label keeps 24px from each
+            // side and a border's depth above and below its line
+            var tagWidth = (int)Ui.Small.MeasureString("Installed").X + 48;
+            var tagHeight = Ui.LineHeight() + 24;
             Rectangle picture;
             Rectangle tag;
             int textX, textY, textWidth;
@@ -606,7 +609,7 @@ namespace DewDrop.UI.Pages
             {
                 // Tall card: picture on top, tag over its top-right corner
                 picture = new Rectangle(cell.X + 12, cell.Y + 12, cell.Width - 24, cell.Height - 12 - CardTextHeight);
-                tag = new Rectangle(cell.Right - 8 - tagWidth, cell.Y + 8, tagWidth, 44);
+                tag = new Rectangle(cell.Right - 8 - tagWidth, cell.Y + 8, tagWidth, tagHeight);
                 textX = picture.X + 4;
                 textY = picture.Bottom + 6;
                 textWidth = picture.Width - 8;
@@ -617,7 +620,7 @@ namespace DewDrop.UI.Pages
                 var height = Math.Max(0, cell.Height - 24);
                 var width = Math.Min(Math.Max(cell.Width / 3, tagWidth + 8), height * 16 / 9);
                 picture = new Rectangle(cell.X + 12, cell.Y + 12, width, height);
-                tag = new Rectangle(picture.Center.X - tagWidth / 2, picture.Bottom - 40, tagWidth, 44);
+                tag = new Rectangle(picture.Center.X - tagWidth / 2, picture.Bottom + 4 - tagHeight, tagWidth, tagHeight);
                 textX = picture.Right + 12;
                 textY = cell.Y + 10;
                 textWidth = Math.Max(40, cell.Right - 16 - textX);
