@@ -1,6 +1,3 @@
-# GitBook site Git Sync: the DewDrop guide is one space, synced from docs/ (its own docs/.gitbook.yaml says which
-# files are the home page and the sidebar). The repository README stays GitHub-only.
-# Keep each space's key as it is: GitBook treats a new key as a new space.
 $schema: https://api.gitbook.com/gitbook-docs.yaml
 site:
   title: DewDrop
