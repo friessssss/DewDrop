@@ -84,6 +84,17 @@ You need **Stardew Valley 1.6 or later** on Windows, macOS or Linux. DewDrop run
 
 ### The easy way: the installer
 
+**On macOS or Linux**, open **Terminal**, paste this line and press **Return**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
+```
+
+It works out which system you're on, downloads the installer and the latest DewDrop release, and runs it in that
+window. Nothing has to be allowed in **Privacy & Security** this way. Then go on from step 4 below.
+
+**On Windows**, or if you'd rather download it yourself:
+
 1. Download **`DewDrop-<version>-installer.zip`** from the [latest release](https://github.com/friessssss/DewDrop/releases/latest).
 2. Extract the zip. On Windows, right-click it and choose **Extract All...**; on a Mac, Safari usually unzips it
    for you.
@@ -94,6 +105,7 @@ You need **Stardew Valley 1.6 or later** on Windows, macOS or Linux. DewDrop run
      doesn't recognize yet.
    - **macOS:** `Install on macOS.command`. If macOS says it can't be opened, click **Done** (not **Move to Trash**), then
      go to **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password.
+     (The Terminal line above skips this.)
    - **Linux:** `Install on Linux.sh`. If it opens in a text editor instead, right-click an empty spot in the
      folder, choose **Open in Terminal**, and run `bash "Install on Linux.sh"`.
 4. Answer the questions. At a yes/no question, pressing **Enter** picks the recommended answer.

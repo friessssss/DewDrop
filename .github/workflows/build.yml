@@ -63,6 +63,7 @@ jobs:
         /bin/bash -n installer/internal/install.sh
         /bin/bash -n "installer/Install on Linux.sh"
         /bin/bash -n "installer/Install on macOS.command"
+        /bin/bash -n install.sh
     - name: Test install.sh
       run: /bin/bash installer/tests/install-sh.test.sh
 

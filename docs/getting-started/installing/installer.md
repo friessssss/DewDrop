@@ -9,6 +9,18 @@ The installer does the fiddly parts for you. It finds your game, installs or upd
 
 Before you start, check [What you need](../requirements.md). The installer has been tested on Windows and Linux, but not on macOS yet (see [Platform support](../../reference/platform-support.md)).
 
+## The quick way on macOS and Linux
+
+Open **Terminal** (on a Mac, press **Command + Space**, type `Terminal` and press **Return**), paste this line and press **Return**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash
+```
+
+It checks whether you're on macOS or Linux, downloads the installer and the latest DewDrop release, and runs the installer in that window. macOS doesn't block it, so there's nothing to allow in **Privacy & Security**. Then [answer the questions](#answer-the-questions) and [start the game](#start-the-game) as in the steps below.
+
+To pass [installer options](../../reference/installer-options.md), put them after `bash -s --`, for example `... | bash -s -- --dry-run`.
+
 ## Install in five steps
 
 {% stepper %}
@@ -93,7 +105,7 @@ If no SMAPI window opens, the game started without mods. One exception: on macOS
 {% endtab %}
 
 {% tab title="macOS" %}
-**"Install on macOS.command" Not Opened:** macOS shows this for downloaded scripts that Apple hasn't checked. Click **Done** (not **Move to Trash**). Open **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. On older macOS, right-click the file and choose **Open** instead.
+**"Install on macOS.command" Not Opened:** macOS shows this for downloaded scripts that Apple hasn't checked. The easiest fix is to use [the Terminal line](#the-quick-way-on-macos-and-linux) instead. Click **Done** (not **Move to Trash**). Open **System Settings** > **Privacy & Security**, scroll down, click **Open Anyway** and enter your password. On older macOS, right-click the file and choose **Open** instead.
 
 **Double-clicking does nothing:** open Terminal, type `bash` and a space, drag `Install on macOS.command` into the window, and press **Return**.
 
