@@ -12,9 +12,22 @@ namespace DewDrop.Framework
             _monitor = monitor;
         }
 
-        public void Trace(string message) => _monitor.Log(message, LogLevel.Trace);
-        public void Info(string message) => _monitor.Log(message, LogLevel.Info);
-        public void Warn(string message) => _monitor.Log(message, LogLevel.Warn);
-        public void Error(string message) => _monitor.Log(message, LogLevel.Error);
+        public void Trace(string message) => Write(message, LogLevel.Trace);
+        public void Info(string message) => Write(message, LogLevel.Info);
+        public void Warn(string message) => Write(message, LogLevel.Warn);
+        public void Error(string message) => Write(message, LogLevel.Error);
+
+        // Also used while the game closes, when SMAPI may already have shut its logging down
+        private void Write(string message, LogLevel level)
+        {
+            try
+            {
+                _monitor.Log(message, level);
+            }
+            catch
+            {
+                // Nowhere left to report it
+            }
+        }
     }
 }

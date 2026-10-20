@@ -313,6 +313,10 @@ namespace DewDrop.UI
         }
 
         private static readonly Regex _bbCode = new(@"\[/?[a-zA-Z*]+(=[^\]]*)?\]", RegexOptions.Compiled);
+
+        // Pictures and videos can't be shown as text, and their addresses are only noise in a description
+        private static readonly Regex _media = new(@"\[(img|youtube)(=[^\]]*)?\].*?\[/\1\]", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex _imageUrlLine = new(@"^[ \t]*https?://\S+\.(png|jpe?g|gif|webp|bmp)(\?\S*)?[ \t]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
         private static readonly Regex _html = new(@"<[^>]+>", RegexOptions.Compiled);
         private static readonly Regex _blankLines = new(@"\n{3,}", RegexOptions.Compiled);
         private static readonly Regex _spaces = new(@" {2,}", RegexOptions.Compiled);
@@ -328,9 +332,11 @@ namespace DewDrop.UI
             var text = markup.Replace("\r", "")
                 .Replace("<br />", "\n").Replace("<br/>", "\n").Replace("<br>", "\n")
                 .Replace("[*]", "\n- ");
+            text = _media.Replace(text, "");
             text = _html.Replace(text, "");
             text = _bbCode.Replace(text, "");
             text = WebUtility.HtmlDecode(text);
+            text = _imageUrlLine.Replace(text, "");
 
             // Keep what the current game font can draw (it depends on the language), take accents off letters it
             // lacks, and drop the rest (most symbols and emoji)

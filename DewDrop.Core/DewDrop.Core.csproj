@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="SharpCompress" Version="0.38.0" />
+    <InternalsVisibleTo Include="DewDrop.Core.Tests" />
   </ItemGroup>
 
 </Project>

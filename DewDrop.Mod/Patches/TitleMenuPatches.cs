@@ -56,9 +56,9 @@ namespace DewDrop.Patches
         /// </summary>
         private static void OverrideSnappyMenuCursorMovementBan_Postfix(ref bool __result)
         {
-            if (TitleMenu.subMenu is DewDropMenu menu)
+            if (TitleMenu.subMenu is DewDropMenu or TitlePrompt)
             {
-                __result |= menu.overrideSnappyMenuCursorMovementBan();
+                __result |= TitleMenu.subMenu.overrideSnappyMenuCursorMovementBan();
             }
         }
 
@@ -70,6 +70,13 @@ namespace DewDrop.Patches
         {
             try
             {
+                // The "Load your profile?" box answers Esc itself (as Not now)
+                if (TitleMenu.subMenu is TitlePrompt prompt && Game1.options.doesInputListContain(Game1.options.menuButton, key))
+                {
+                    prompt.ReceiveMenuKey();
+                    return false;
+                }
+
                 return !(TitleMenu.subMenu is DewDropMenu menu && Game1.options.doesInputListContain(Game1.options.menuButton, key) && menu.ReceiveMenuKey(key));
             }
             catch (Exception ex)

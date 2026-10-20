@@ -34,6 +34,24 @@ namespace DewDrop.Framework
         /// <summary>Whether SMAPI was started on the linked profile folder (rather than e.g. the raw Mods folder).</summary>
         public bool RunningFromProfileFolder { get; }
 
+        /// <summary>
+        /// Profile: SMAPI loaded the linked profile folder. Plain: it loaded the game's Mods folder (or Stardrop's mods
+        /// folder), as a Steam or shortcut launch does. Custom: some other folder, or SMAPI didn't say.
+        /// </summary>
+        public SessionKind Kind { get; }
+
+        /// <summary>What DewDrop keeps between sessions about restarts and mods it has seen.</summary>
+        public StartupState Startup { get; }
+
+        /// <summary>The restart that started this session, until its title screen is reached (then it's cleared).</summary>
+        public RestartRecord? ArrivedRestart { get; private set; }
+
+        /// <summary>A restart that never came back in its profile: this plain session was started some other way after it.</summary>
+        public RestartRecord? FailedRestart { get; }
+
+        /// <summary>What SMAPI loaded, with the folder each came from when SMAPI says.</summary>
+        private readonly List<LoadedMod> _loadedMods;
+
         public bool UpdateCheckRunning { get; private set; }
         public DateTime? LastUpdateCheck { get; private set; }
 
@@ -57,17 +75,53 @@ namespace DewDrop.Framework
             Updates = new UpdateChecker(self.Version.ToString(), log);
 
             _loadedNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            _loadedMods = new List<LoadedMod>();
             foreach (var loaded in helper.ModRegistry.GetAll())
             {
-                _loadedNames[loaded.Manifest.UniqueID] = string.IsNullOrWhiteSpace(loaded.Manifest.Name) ? loaded.Manifest.UniqueID : loaded.Manifest.Name;
+                var name = string.IsNullOrWhiteSpace(loaded.Manifest.Name) ? loaded.Manifest.UniqueID : loaded.Manifest.Name;
+                _loadedNames[loaded.Manifest.UniqueID] = name;
+                _loadedMods.Add(new LoadedMod(loaded.Manifest.UniqueID, name, LoadedFolder(loaded)));
             }
             LoadedIds = new HashSet<string>(_loadedNames.Keys, StringComparer.OrdinalIgnoreCase);
-            RunningModsPath = GetSmapiModsPath() ?? Path.Combine(Constants.GamePath, "Mods");
+            var smapiModsPath = GetSmapiModsPath();
+            var gameModsPath = Path.Combine(Constants.GamePath, "Mods");
+            RunningModsPath = smapiModsPath ?? gameModsPath;
             RunningFromProfileFolder = DewDropPaths.IsSameOrUnder(RunningModsPath, Paths.SelectedModsFolder);
+
+            // The game's Mods folder and Stardrop's mods folder can be one folder under two names (moved to another drive
+            // with a junction, or Steam's two library paths on Linux), so those compare with links resolved
+            var sameAsModsFolder = smapiModsPath is not null
+                && (DewDropPaths.IsSame(smapiModsPath, ModsFolder) || DewDropPaths.IsSame(DewDropPaths.Canonical(smapiModsPath), DewDropPaths.Canonical(ModsFolder)));
+            Kind = RunningFromProfileFolder
+                ? SessionKind.Profile
+                : smapiModsPath is not null && (DewDropPaths.IsSame(smapiModsPath, gameModsPath) || sameAsModsFolder)
+                    ? SessionKind.Plain
+                    : SessionKind.Custom;
+
+            // Then what SMAPI loaded is renamed into the scan's names, or every mod would look like another copy
+            _diffRunningPath = RunningModsPath;
+            if (Kind == SessionKind.Plain && sameAsModsFolder && !DewDropPaths.IsSame(RunningModsPath, ModsFolder))
+            {
+                for (var i = 0; i < _loadedMods.Count; i++)
+                {
+                    if (_loadedMods[i].Folder is { } folder && DewDropPaths.IsSameOrUnder(folder, RunningModsPath))
+                    {
+                        _loadedMods[i] = _loadedMods[i] with { Folder = Path.Combine(ModsFolder, Path.GetRelativePath(RunningModsPath, folder)) };
+                    }
+                }
+                _diffRunningPath = ModsFolder;
+            }
+
+            Startup = new StartupState(Paths.StartupStatePath, log);
+            Startup.Load();
 
             // Updates left over from last session can go in now for any mod this session didn't load
             Pending.ApplyAll();
             Reload();
+
+            FailedRestart = TakeRestartRecord();
+            SeedSeenMods();
+            NewMods = Installed.Where(m => m.SourceId is null && !Startup.HasSeen(m.UniqueId)).ToList();
 
             // Nothing is installing yet, so staging copies no pending update needs are leftovers (a crash mid-install,
             // an old copy that was still open when its update went in)
@@ -81,6 +135,182 @@ namespace DewDrop.Framework
             if (RunningFromProfileFolder)
             {
                 _failedAtLaunch = new HashSet<string>(Installed.Where(IsEnabled).Select(m => m.UniqueId).Where(id => !LoadedIds.Contains(id)), StringComparer.OrdinalIgnoreCase);
+            }
+            else if (Kind == SessionKind.Plain)
+            {
+                // The same for a plain launch: an enabled mod whose only copy SMAPI saw in its folder and still skipped.
+                // Taken once, so a mod copied in or installed later counts as not loaded rather than rejected. Mods new in
+                // the folder count as on, since they're about to be turned on.
+                var turningOn = new HashSet<InstalledMod>(NewMods);
+                _failedAtLaunch = new HashSet<string>(
+                    SessionDiff.Compute(Installed, m => IsEnabled(m) || turningOn.Contains(m), ActiveProfile.SourceId, _loadedMods, _diffRunningPath, new HashSet<string>(new[] { SelfId }, StringComparer.OrdinalIgnoreCase)).Rejected,
+                    StringComparer.OrdinalIgnoreCase);
+                _rejectedAtLaunch = _failedAtLaunch;
+                _difference = null;
+            }
+
+            _changesAtLaunch = _changes;
+        }
+
+        /// <summary>Mods in the Mods folder DewDrop had never seen when the game started: copied in by hand since.</summary>
+        public IReadOnlyList<InstalledMod> NewMods { get; private set; }
+
+        /// <summary>
+        /// Turns on the mods copied in by hand since DewDrop last ran ("Turn on mods when installed" covers them too), so
+        /// they still load when the game starts in the profile. Returns the ones turned on.
+        /// </summary>
+        public List<InstalledMod> TurnOnNewMods()
+        {
+            var turnedOn = TurnOnUnseen(NewMods);
+            NewMods = Array.Empty<InstalledMod>();
+            return turnedOn;
+        }
+
+        /// <summary>
+        /// Turns on the loose mods among these that DewDrop has never seen (one moved or re-extracted is still the same
+        /// mod, and keeps its choice), then marks them all seen. Returns the ones turned on.
+        /// </summary>
+        public List<InstalledMod> TurnOnUnseen(IEnumerable<InstalledMod> candidates)
+        {
+            var list = candidates.ToList();
+            var turnedOn = new List<InstalledMod>();
+            if (CanEditActiveProfile)
+            {
+                foreach (var mod in list.Where(m => m.SourceId is null && !Startup.HasSeen(m.UniqueId) && !IsEnabled(m)))
+                {
+                    SetEnabled(mod, true);
+                    turnedOn.Add(mod);
+                }
+            }
+
+            MarkSeen(list.Select(m => m.UniqueId));
+            return turnedOn;
+        }
+
+        private int _changesAtLaunch;
+
+        /// <summary>Whether the links in Selected Mods may not be what the active profile wants now.</summary>
+        // In a profile launch, an enabled mod that didn't load may simply have no link (made by Stardrop, or a link failed)
+        public bool LinksMayBeStale => Kind != SessionKind.Profile || _changes != _changesAtLaunch || NeedsRestart() || _failedAtLaunch.Count > 0;
+
+        /// <summary>Set once a restart is on its way, so nothing else is scheduled for when this game closes.</summary>
+        public bool RestartScheduled { get; private set; }
+
+        /// <summary>
+        /// Links the active profile's mods into Selected Mods. Returns false, with the reason for the player in
+        /// <paramref name="error"/>, when some couldn't be linked.
+        /// </summary>
+        public bool RebuildLinks(out string? error)
+        {
+            // DewDrop's own folder is always linked, so the Mods button comes back whatever the profile lists (a
+            // collection profile never lists it) and wherever DewDrop is installed
+            var links = Linker.Rebuild(Paths.SelectedModsFolder, ActiveProfile, Installed, Settings.CollectionsSkipSmapiUpdateCheck, _helper.DirectoryPath);
+            if (links.Succeeded)
+            {
+                error = null;
+                _changesAtLaunch = _changes;
+                return true;
+            }
+
+            var names = string.Join(", ", links.Failed.Take(3)) + (links.Failed.Count > 3 ? $" and {links.Failed.Count - 3} more" : "");
+            error = $"DewDrop couldn't link {names}, so {(links.Failed.Count == 1 ? "it" : "they")} wouldn't load. The SMAPI log says why.";
+            return false;
+        }
+
+        /// <summary>
+        /// Reads the restart left in startup.json. The game that restart started marks it as arrived (cleared at its title
+        /// screen). Any other launch means the restart never came back in its profile; a plain or custom launch gets the
+        /// record back, so the "Load your profile?" box can say why it's asking.
+        /// </summary>
+        private RestartRecord? TakeRestartRecord()
+        {
+            var record = Startup.Data.Restart;
+            if (record is null)
+            {
+                return null;
+            }
+
+            if (Kind == SessionKind.Profile)
+            {
+                if (record.Stage == RestartRecord.StageRestarting && record.Id == Environment.GetEnvironmentVariable(Relauncher.LaunchIdVariable))
+                {
+                    record.Stage = RestartRecord.StageArrived;
+                    ArrivedRestart = record;
+                }
+                else
+                {
+                    _log.Warn($"Last time DewDrop restarted the game into the '{record.Profile}' profile, it didn't come back from that restart.");
+                    Startup.Data.Restart = null;
+                }
+                Startup.Save();
+                return null;
+            }
+
+            _log.Warn(record.Stage == RestartRecord.StageArrived
+                ? $"The game closed while the '{record.Profile}' profile was loading last time."
+                : $"Last time DewDrop restarted the game into the '{record.Profile}' profile, it didn't come back in that profile.");
+            Startup.Data.Restart = null;
+            Startup.Save();
+            return record;
+        }
+
+        /// <summary>
+        /// Called on the restarted game's first title screen: the restart worked, so the record goes. Returns the record
+        /// (null if this session wasn't a restart).
+        /// </summary>
+        public RestartRecord? ConfirmArrived()
+        {
+            var record = ArrivedRestart;
+            if (record is null)
+            {
+                return null;
+            }
+
+            ArrivedRestart = null;
+            Startup.Data.Restart = null;
+            Startup.Save();
+            return record;
+        }
+
+        /// <summary>
+        /// The seen-mods list starts with everything installed (and loaded) the first time; after that every mod switched
+        /// on in any profile counts too, so only mods copied in by hand are ever new.
+        /// </summary>
+        private void SeedSeenMods()
+        {
+            var changed = !Startup.Existed;
+            if (!Startup.Existed)
+            {
+                Startup.MarkSeen(Installed.Select(m => m.UniqueId));
+                Startup.MarkSeen(LoadedIds);
+            }
+
+            changed |= Startup.MarkSeen(Profiles.Profiles.SelectMany(p => p.EnabledModIds ?? new()).Where(r => r is not null).Select(r => r.UniqueId));
+            if (changed)
+            {
+                Startup.Save();
+            }
+        }
+
+        /// <summary>Remembers mods the player has made a choice about (or installed through DewDrop), so they're never "new".</summary>
+        public void MarkSeen(IEnumerable<string> uniqueIds)
+        {
+            if (Startup.MarkSeen(uniqueIds))
+            {
+                Startup.Save();
+            }
+        }
+
+        /// <summary>The folder SMAPI loaded a mod from, read from its internal mod metadata; null if it won't say.</summary>
+        private static string? LoadedFolder(IModInfo mod)
+        {
+            try
+            {
+                return mod.GetType().GetProperty("DirectoryPath", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(mod) as string;
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -204,6 +434,31 @@ namespace DewDrop.Framework
         }
 
         /// <summary>
+        /// Scans the Mods folder again, for mods added or removed by hand while the game runs, and says which mod
+        /// folders appeared and which names are gone.
+        /// </summary>
+        public (List<InstalledMod> Added, List<string> Removed) Rescan()
+        {
+            var before = Installed.ToDictionary(m => m.Folder.FullName, m => m, StringComparer.OrdinalIgnoreCase);
+            Reload();
+            var after = Installed.Select(m => m.Folder.FullName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var added = Installed.Where(m => !before.ContainsKey(m.Folder.FullName)).ToList();
+            var removed = before.Where(p => !after.Contains(p.Key)).Select(p => p.Value.Name).ToList();
+
+            // New folders, and a different version put in place of an old one, aren't what SMAPI loaded or skipped at
+            // launch: they take a restart, and one SMAPI turned down before may load now
+            var replaced = Installed.Where(m => before.TryGetValue(m.Folder.FullName, out var old)
+                && (!string.Equals(old.Version, m.Version, StringComparison.OrdinalIgnoreCase) || !old.UniqueId.Equals(m.UniqueId, StringComparison.OrdinalIgnoreCase)));
+            var changed = added.Concat(replaced).Select(m => m.UniqueId).ToList();
+            if (changed.Count > 0)
+            {
+                MarkChanged(changed);
+            }
+
+            return (added, removed);
+        }
+
+        /// <summary>
         /// For a selected profile whose file couldn't be read: the copy from before this reload, else an empty stand-in
         /// with its name. Falling back to Default instead would quietly apply Default on the next restart.
         /// </summary>
@@ -244,9 +499,35 @@ namespace DewDrop.Framework
                 _indexedFor = stamp;
                 _enabledIndex = new HashSet<ModReference>(list?.Where(r => r is not null) ?? Enumerable.Empty<ModReference>());
                 _needsRestart = null;
+                _difference = null;
             }
 
             return _enabledIndex;
+        }
+
+        private SessionDifference? _difference;
+
+        /// <summary>The folder SMAPI loaded from, under the name DewDrop's scan uses for it.</summary>
+        private readonly string _diffRunningPath;
+
+        /// <summary>For a plain launch: the mods SMAPI saw and skipped as the game started (null until that's known).</summary>
+        private ISet<string>? _rejectedAtLaunch;
+
+        /// <summary>
+        /// How what SMAPI loaded differs from what a restart into the active profile would load. Meaningful for plain
+        /// launches; a profile launch loaded the profile's links, and a custom one can't be compared.
+        /// </summary>
+        public SessionDifference Difference()
+        {
+            EnabledIndex();
+            return _difference ??= SessionDiff.Compute(
+                Installed,
+                IsEnabled,
+                ActiveProfile.SourceId,
+                _loadedMods,
+                _diffRunningPath,
+                new HashSet<string>(new[] { SelfId }, StringComparer.OrdinalIgnoreCase),
+                _rejectedAtLaunch);
         }
 
         public bool IsLoaded(InstalledMod mod) => LoadedIds.Contains(mod.UniqueId);
@@ -282,6 +563,10 @@ namespace DewDrop.Framework
             {
                 EnableDependencies(mod, alsoEnabled, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
             }
+
+            // A mod the player has made a choice about is never "new in the Mods folder" (mods turned on with
+            // it are in the profile now, which counts at the next start)
+            MarkSeen(new[] { mod.UniqueId });
 
             _changes++;
             Profiles.Save(ActiveProfile);
@@ -376,14 +661,22 @@ namespace DewDrop.Framework
         /// <summary>Whether the active profile differs from what's loaded right now, i.e. a restart would change something.</summary>
         public bool NeedsRestart()
         {
-            if (!RunningFromProfileFolder || PendingUpdateCount > 0)
+            // A folder DewDrop doesn't know can't be compared, and waiting updates only go in on a restart
+            if (Kind == SessionKind.Custom || PendingUpdateCount > 0)
             {
                 return true;
             }
 
             // Asked several times a frame; refreshing the index forgets the answer whenever something changed
             EnabledIndex();
-            return _needsRestart ??= ComputeNeedsRestart();
+            return _needsRestart ??= Kind == SessionKind.Plain ? ComputePlainNeedsRestart() : ComputeNeedsRestart();
+        }
+
+        /// <summary>A plain launch needs a restart only if it loaded different mods (or copies) than the profile would.</summary>
+        private bool ComputePlainNeedsRestart()
+        {
+            var wanted = Installed.Where(IsEnabled).Select(m => m.UniqueId);
+            return !Difference().Matches || wanted.Any(_changedOnDisk.Contains);
         }
 
         private bool ComputeNeedsRestart()
@@ -407,6 +700,13 @@ namespace DewDrop.Framework
                 return false;
             }
 
+            // Checked before any link is cleared: without SMAPI the game would close and never come back
+            if (!File.Exists(Relauncher.LauncherPath(Constants.GamePath)))
+            {
+                error = "Didn't restart: SMAPI isn't in your game folder. Run the DewDrop installer (or SMAPI's) to put it back.";
+                return false;
+            }
+
             // Quitting mid-install could leave a mod half extracted, or moved into place but never turned on
             if (ModEntry.Downloads.Jobs.FirstOrDefault(j => j.State == DownloadState.Installing) is { } installing)
             {
@@ -414,28 +714,38 @@ namespace DewDrop.Framework
                 return false;
             }
 
-            // DewDrop's own folder is always linked, so the Mods button comes back whatever the profile lists (a
-            // collection profile never lists it) and wherever DewDrop is installed
-            var links = Linker.Rebuild(Paths.SelectedModsFolder, ActiveProfile, Installed, Settings.CollectionsSkipSmapiUpdateCheck, _helper.DirectoryPath);
-            if (!links.Succeeded)
+            if (!RebuildLinks(out var linkError))
             {
-                var names = string.Join(", ", links.Failed.Take(3)) + (links.Failed.Count > 3 ? $" and {links.Failed.Count - 3} more" : "");
-                error = $"Didn't restart: DewDrop couldn't link {names}, so {(links.Failed.Count == 1 ? "it" : "they")} wouldn't load. The SMAPI log says why.";
+                error = $"Didn't restart: {linkError}";
                 return false;
             }
 
+            // Remembered until the new game reaches its title screen, so a restart that never comes back isn't repeated
+            var record = new RestartRecord
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Profile = ActiveProfile.Name,
+                AtUtc = DateTime.UtcNow
+            };
+            Startup.Data.Restart = record;
+            Startup.Save();
+
             try
             {
-                Relauncher.Schedule(Constants.GamePath, Paths.SelectedModsFolder, Pending.FilePath, Path.Combine(Paths.CacheFolder, "DewDrop"), _log);
+                Relauncher.Schedule(Constants.GamePath, Paths.SelectedModsFolder, Pending.FilePath, Path.Combine(Paths.CacheFolder, "DewDrop"), _log, record.Id);
             }
             catch (Exception ex)
             {
+                Startup.Data.Restart = null;
+                Startup.Save();
                 _log.Error($"Couldn't schedule the relaunch: {ex}");
-                error = $"Didn't restart: DewDrop couldn't set up the relaunch ({ex.Message}). The profile is linked; close the game and start it from Stardrop to load it.";
+                // Not everyone has Stardrop, so only mention it as one way to start in the (already linked) profile
+                error = $"Didn't restart: DewDrop couldn't set up the restart ({ex.Message}). The SMAPI log says why. If you use Stardrop, starting the game from Stardrop loads this profile.";
                 return false;
             }
 
             // Nothing should still be writing archives when the game quits
+            RestartScheduled = true;
             ModEntry.Downloads.CancelAll();
             Game1.playSound("wand");
             Game1.game1.Exit();
@@ -492,5 +802,12 @@ namespace DewDrop.Framework
                 return null;
             }
         }
+    }
+
+    internal enum SessionKind
+    {
+        Profile,
+        Plain,
+        Custom
     }
 }

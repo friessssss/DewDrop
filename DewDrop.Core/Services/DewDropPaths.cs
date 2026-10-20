@@ -32,6 +32,55 @@ namespace DewDrop.Core.Services
         /// <summary>Drop folder for nxm:// links handed over by the protocol handler script, one file per link.</summary>
         public string NxmQueueFolder => Path.Combine(CacheFolder, "DewDrop", "nxm");
 
+        /// <summary>What DewDrop remembers between sessions about restarts and mods it has seen (see <see cref="StartupState"/>).</summary>
+        public string StartupStatePath => Path.Combine(CacheFolder, "DewDrop", "startup.json");
+
+        public static bool IsSame(string a, string b)
+        {
+            return string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// The path with every junction or symlink along it resolved, so one folder reached by two names (a Mods folder
+        /// moved to another drive with a junction, Steam's two library paths on Linux) compares equal. Touches the disk,
+        /// so call it once, not per mod. Falls back to the plain full path.
+        /// </summary>
+        public static string Canonical(string path)
+        {
+            return Canonical(path, 0);
+        }
+
+        private static string Canonical(string path, int depth)
+        {
+            var full = Path.GetFullPath(path);
+            if (depth > 8)
+            {
+                return full;
+            }
+
+            try
+            {
+                var root = Path.GetPathRoot(full) ?? "";
+                var current = root;
+                foreach (var part in full.Substring(root.Length).Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    current = Path.Combine(current, part);
+                    var folder = new DirectoryInfo(current);
+                    if (folder.Exists && folder.LinkTarget is not null && folder.ResolveLinkTarget(returnFinalTarget: true) is { } target)
+                    {
+                        // The target can itself sit under a link
+                        current = Canonical(target.FullName, depth + 1);
+                    }
+                }
+
+                return current;
+            }
+            catch
+            {
+                return full;
+            }
+        }
+
         public void EnsureFolders()
         {
             foreach (var folder in new[] { HomePath, ProfilesFolder, SelectedModsFolder, CacheFolder, DownloadsFolder, ThumbnailsFolder, NxmQueueFolder })

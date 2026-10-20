@@ -1,0 +1,99 @@
+---
+description: "Read about a mod, pick the right file and install it, and learn what each Install button means."
+icon: file-arrow-down
+---
+
+# A mod's page and installing files
+
+Click any card on the [Browse](browse.md) tab to open that mod's page. It shows the mod's picture and description, and lists its files, each with its own install button.
+
+<figure><img src="../.gitbook/assets/shot-mod-page.png" alt="A mod's page in DewDrop: the Back button at the top left, the mod's picture and description on the left, and on the right its name, author, endorsements and downloads above a list of files, each with an Install button"><figcaption><p>A mod's page, opened from Browse.</p></figcaption></figure>
+
+## What's on the page
+
+**Along the top:**
+
+* **Back** returns to your search results. **Backspace** does the same.
+* If you already have the mod, a note shows your version, such as **Installed v1.2.0**. Like the **Installed** tag on Browse, this needs the Nexus update key in your copy's `manifest.json`. When there's a newer version it adds **Update available: v1.3.0** in orange. If an update is already downloaded and waiting, it says **Update ready, restart to finish**.
+* **Show old files** appears when the mod has older versions. Click it to list them, and **Hide old files** to hide them again.
+* **Open on Nexus** opens the mod's page in your web browser.
+
+**On the left:** the mod's picture and its description. The description is plain text, so images and formatting from the website aren't shown. Scroll it with **Up** and **Down**, or with the mouse wheel while the pointer is over it. With the pointer over the file list, the wheel scrolls the files. For the full page, click **Open on Nexus**.
+
+**On the right:** the mod's name, its author, then a heart with endorsements, the download count, the latest version, and when it was last updated.
+
+**The file list** is under that. Each file shows its name and a line like "MAIN | v1.3.0 | 2.4 MB | 3d ago": its category, version, size and age. Hover over a file to read the author's note about it.
+
+## Which file do I want?
+
+Most mods have one **MAIN** file, and that's usually the one to install. **OPTIONAL** files are extras you can add. Some mods offer several main files as alternatives (for example, different styles of the same thing). Check the description before you pick one of those.
+
+The description also lists what else the mod needs, such as a framework like Content Patcher. DewDrop doesn't download those for you.
+
+## The Install button
+
+Every file has a button on its right. What it says depends on your Nexus Mods account and on whether the file is already downloading.
+
+| Button | When you see it | What clicking does |
+| --- | --- | --- |
+| **Log in to install** | You're not logged in to Nexus Mods. | Takes you to the **Account** tab. See [Connecting your Nexus account](../nexus-mods/connecting.md). |
+| **Install** (green) | You have Nexus Mods Premium. | Downloads and installs the file inside the game. |
+| **Get on Nexus** | You have a free Nexus Mods account. | Opens the file on the Nexus Mods website, where you click **Slow download**. |
+| **Queued...**, **Downloading 42%** or **Installing...** (grayed out) | DewDrop is already getting this file. | Nothing. Progress is also on the [Downloads](downloads.md) tab. |
+
+Why the difference? Nexus Mods only lets Premium members download straight into an app. Free accounts download through the website. [Free vs Premium downloads](../nexus-mods/free-vs-premium.md) explains it.
+
+## Install a file with Premium
+
+1. Click the green **Install** button next to the file.
+2. The button counts up (**Downloading 42%**), then reads **Installing...**. You can keep browsing while it works.
+3. When it's done, a message such as "Some Mod 1.3.0: Installed 1 mod. Restart to load it." appears.
+4. Click **Apply & Restart** to load the new mod.
+
+DewDrop turns new mods on in your profile for you, unless the profile is a read-only collection profile. You can change that with **Turn on mods when installed** in [Settings](settings.md).
+
+## Install a file with a free account
+
+{% tabs %}
+{% tab title="Windows" icon="windows" %}
+First, let the website send files to DewDrop. You only do this once: go to the **Account** tab, click **Use DewDrop for these links** in the **Mod manager links** panel, then click **Use DewDrop** to confirm. See ["Mod manager download" links](../nexus-mods/mod-manager-links.md).
+
+1. Click **Get on Nexus** next to the file. The file opens on the Nexus Mods website in your browser.
+2. On the website, click **Slow download**.
+3. If your browser asks whether to open the link, allow it.
+4. Go back to the game. Within a few seconds, DewDrop starts the download. You can follow it on the **Downloads** tab.
+5. When it says the mod is installed, click **Apply & Restart**.
+
+If links aren't set up yet, clicking **Get on Nexus** still opens the website, but DewDrop shows a red message such as "Turn on mod manager links on the Account tab first."
+{% endtab %}
+
+{% tab title="macOS and Linux" icon="desktop" %}
+On macOS and Linux, the website can't send files back to DewDrop yet, because the "Mod manager download" link handler is Windows only. The button's tooltip and the message after you click it say DewDrop will install the file when it arrives, but on these systems that doesn't happen. This is a known issue.
+
+What you can do instead:
+
+* **Install it by hand.** Download the file from the website, close the game, unzip it into your `Mods` folder, then start the game, turn the mod on in the [Installed](installed.md) tab and click **Apply & Restart**.
+* **Use the SMAPI console.** Paste the website's `nxm://` link into the SMAPI console as `dewdrop_nxm <link>`.
+
+[Free accounts on macOS and Linux](../nexus-mods/free-vs-premium.md#free-accounts-on-macos-and-linux) has the details for both.
+{% endtab %}
+{% endtabs %}
+
+## What gets installed
+
+* DewDrop opens `.zip`, `.7z` and `.rar` downloads.
+* Every folder in the download that has a `manifest.json` is installed as its own mod in your `Mods` folder. A mod folder inside another mod's folder stays part of that mod.
+* **If you already have the mod,** DewDrop updates it in its existing folder and keeps your `config.json` settings.
+* **If the game is using the old files,** the message says "Update ready, finishes when the game restarts". The new version goes in when you use **Apply & Restart**, or when you quit the game.
+* **If the download holds several alternative versions of one mod,** DewDrop updates the one you already have, if it can match it by folder or name. Otherwise it can't tell which one you want, so it installs none and says so. Download the file from the website and copy the version you want into your `Mods` folder.
+
+{% hint style="info" %}
+Everything you install loads after a restart, and the bottom bar reminds you until then. Install everything you want first, then click **Apply & Restart** once. If a mod is still installing, DewDrop asks you to restart when it's done. Downloads that haven't finished are cancelled by the restart, and the restart dialog warns you first.
+{% endhint %}
+
+## Leaving the page
+
+* Click **Back** or press **Backspace** to return to the cards. Your page of results and scroll position are kept.
+* If you switch to another tab, the mod's page is still open when you come back to **Browse**.
+
+Nexus collections can't be installed from DewDrop. Use [Stardrop](../stardrop.md) for those.

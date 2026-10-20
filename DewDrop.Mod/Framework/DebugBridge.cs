@@ -1,4 +1,5 @@
 #if DEBUG
+using DewDrop.Core.Services;
 using DewDrop.Patches;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,7 +17,8 @@ namespace DewDrop.Framework
     /// replies land in %TEMP%\dewdrop-bridge\out\&lt;same name&gt;.out.
     ///
     /// Commands: skipintro | open | back | click X Y | rclick X Y | hover X Y | key KEYNAME | type TEXT |
-    /// scroll N | wait MS | shot PATH | status | quit
+    /// scroll N | wait MS | shot PATH | status | quit | ask on|off | steam on|off | steamcheck | marker restarting|arrived|clear |
+    /// unsee ID... | diff
     /// </summary>
     internal static class DebugBridge
     {
@@ -174,6 +176,9 @@ namespace DewDrop.Framework
                 case "status":
                     return $"menu={menu?.GetType().Name ?? "none"} sub={TitleMenu.subMenu?.GetType().Name ?? "none"} ui={Game1.uiViewport.Width}x{Game1.uiViewport.Height} zoom={Game1.options.uiScale} " +
                            $"profile={ModEntry.Mods.ActiveProfile.Name} installed={ModEntry.Mods.Installed.Count} loaded={ModEntry.Mods.LoadedIds.Count} restart={ModEntry.Mods.NeedsRestart()} " +
+                           $"kind={ModEntry.Mods.Kind} ask={ModEntry.Config.AskToLoadProfile} askStatus=\"{ProfileStart.Status}\" " +
+                           $"steamWanted={ProfileStart.SteamWanted} steamOn={ProfileStart.SteamOn} steamPending={ProfileStart.SteamPending} steamProblem=\"{ProfileStart.SteamUnavailableReason ?? "none"}\" " +
+                           $"marker={ModEntry.Mods.Startup.Data.Restart?.Stage ?? "none"} failed={ModEntry.Mods.FailedRestart?.Stage ?? "none"} " +
                            $"nexus={(ModEntry.Nexus.IsLoggedIn ? ModEntry.Nexus.Account!.Name + (ModEntry.Nexus.IsPremium ? "+premium" : "") : "no")} " +
                            $"toasts=[{string.Join(" | ", ModEntry.Toasts.Select(t => t.Text))}]";
 
@@ -197,6 +202,46 @@ namespace DewDrop.Framework
                 case "quit":
                     Game1.game1.Exit();
                     return "bye";
+
+                case "ask":
+                    ModEntry.Config.AskToLoadProfile = arg.Trim().Equals("on", StringComparison.OrdinalIgnoreCase);
+                    ModEntry.SaveConfig();
+                    return $"ask {ModEntry.Config.AskToLoadProfile}";
+
+                case "steam":
+                    // Only the wish: Steam itself changes when the game closes
+                    ProfileStart.SteamWanted = arg.Trim().Equals("on", StringComparison.OrdinalIgnoreCase);
+                    return $"steam wanted {ProfileStart.SteamWanted}, pending {ProfileStart.SteamPending}";
+
+                case "steamcheck":
+                    ProfileStart.RefreshSteam();
+                    return $"problem={ProfileStart.SteamUnavailableReason ?? "none"} option={ProfileStart.SteamOption ?? "(unknown)"} on={ProfileStart.SteamOn} pending={ProfileStart.SteamPending}";
+
+                case "marker":
+                {
+                    // Leaves a restart record as if one had been scheduled, for the next launch to find
+                    var startup = ModEntry.Mods.Startup;
+                    var bits = arg.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var stage = bits.Length > 0 ? bits[0].ToLowerInvariant() : "";
+                    startup.Data.Restart = stage switch
+                    {
+                        "restarting" => new RestartRecord { Id = "bridge", Stage = RestartRecord.StageRestarting, Profile = ModEntry.Mods.ActiveProfile.Name, AtUtc = DateTime.UtcNow },
+                        "arrived" => new RestartRecord { Id = "bridge", Stage = RestartRecord.StageArrived, Profile = ModEntry.Mods.ActiveProfile.Name, AtUtc = DateTime.UtcNow },
+                        _ => null
+                    };
+                    return startup.Save() ? $"marker {startup.Data.Restart?.Stage ?? "cleared"}" : "couldn't save";
+                }
+
+                case "unsee":
+                    ModEntry.Mods.Startup.Forget(arg.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+                    return ModEntry.Mods.Startup.Save() ? "forgotten" : "couldn't save";
+
+                case "diff":
+                {
+                    var d = ModEntry.Mods.Difference();
+                    return $"matches={d.Matches} turnedOff=[{string.Join(", ", d.TurnedOff.Select(m => m.UniqueId))}] notLoaded=[{string.Join(", ", d.NotLoaded.Select(m => m.UniqueId))}] " +
+                           $"otherCopy=[{string.Join(", ", d.OtherCopy.Select(m => m.UniqueId))}] rejected=[{string.Join(", ", d.Rejected)}]";
+                }
 
                 default:
                     return "unknown command";
