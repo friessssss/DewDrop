@@ -50,9 +50,18 @@ namespace DewDrop.Core.Services
         /// </summary>
         public string NexusKeyHandoffPath => Path.Combine(ScriptFolder, "nexus-key.txt");
 
+        /// <summary>
+        /// How the file system compares paths: Linux's is case-sensitive, Windows' and macOS's (by default) aren't. On
+        /// Linux "Mods/Spacecore" and "Mods/SpaceCore" are two folders, and must never be taken for one.
+        /// </summary>
+        public static StringComparison PathComparison { get; } = OperatingSystem.IsLinux() ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+        /// <summary>For sets and dictionaries keyed by path; see <see cref="PathComparison"/>.</summary>
+        public static StringComparer PathComparer { get; } = OperatingSystem.IsLinux() ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+
         public static bool IsSame(string a, string b)
         {
-            return string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);
+            return string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), PathComparison);
         }
 
         /// <summary>
@@ -140,7 +149,7 @@ namespace DewDrop.Core.Services
         {
             var fullPath = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
             var fullParent = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-            return fullPath.StartsWith(fullParent, StringComparison.OrdinalIgnoreCase);
+            return fullPath.StartsWith(fullParent, PathComparison);
         }
     }
 }

@@ -22,12 +22,22 @@ namespace DewDrop.Core.Tests
         }
 
         [Fact]
-        public void IsSameIgnoresCaseAndTrailingSeparator()
+        public void IsSameIgnoresATrailingSeparator()
         {
             var path = Path.Combine(_folder, "Mods");
 
-            Assert.True(DewDropPaths.IsSame(path, path.ToUpperInvariant() + Path.DirectorySeparatorChar));
+            Assert.True(DewDropPaths.IsSame(path, path + Path.DirectorySeparatorChar));
             Assert.False(DewDropPaths.IsSame(path, path + "2"));
+        }
+
+        [Fact]
+        public void CaseCountsOnlyOnLinux()
+        {
+            // As the file systems compare names: Linux's are case-sensitive, Windows' and macOS's (by default) aren't
+            var path = Path.Combine(_folder, "Mods");
+
+            Assert.Equal(!OperatingSystem.IsLinux(), DewDropPaths.IsSame(path, path.ToUpperInvariant() + Path.DirectorySeparatorChar));
+            Assert.Equal(!OperatingSystem.IsLinux(), DewDropPaths.IsSameOrUnder(Path.Combine(path.ToUpperInvariant(), "A"), path));
         }
 
         [Fact]

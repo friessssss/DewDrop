@@ -168,6 +168,8 @@ When a mod can't be uninstalled right now, pointing at its trash can says why, a
 
 If two folders in your `Mods` folder hold the same mod, with the same unique ID, both rows say **Installed twice** in red, and **Show: Problems** lists them. When SMAPI loads your `Mods` folder directly, as a normal launch does, it loads neither copy.
 
+On Linux, including the Steam Deck, folder names that differ only in capital letters, such as `Spacecore` and `SpaceCore`, are two separate folders. Unzipping a newer version next to an old one can leave you with both, and DewDrop treats them as two copies, just as SMAPI does.
+
 Point at one of the rows to see where the other copy is, such as "Also installed in: ContentPatcher (v2.5.3)". Then click the trash can on the copy you don't want. The dialog says "Your other copy, in the '*folder*' folder, stays installed.", and the mod stays on in your profile.
 
 ## Added or removed a mod by hand?
