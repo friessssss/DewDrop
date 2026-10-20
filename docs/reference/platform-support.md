@@ -24,7 +24,7 @@ See [What you need](../getting-started/requirements.md) for the beginner-friendl
 | Xbox app (PC Game Pass) | **Supported**, using SMAPI's exe swap, which the installer can do for you. It runs the Windows version of the game, so DewDrop behaves as on Windows. The Xbox setup itself has had less testing. |
 | macOS | **Untested.** Built to work, except website download links for free Nexus Mods accounts and **Start in my profile from Steam**. |
 | Linux | **Untested.** Built to work, with the same exception as macOS. The installer has been tested on Linux. |
-| Steam Deck | **Not supported.** |
+| Steam Deck | **New, being tested.** Set up once in Desktop Mode with the installer, then everything happens in Game Mode. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md). |
 | Windows version through Proton or Wine | **Not supported.** The installer warns you if your game is set up this way. |
 
 ## Feature by feature
@@ -33,20 +33,20 @@ In this table, **Yes** means it works and has been tested. **Untested** means th
 
 | Feature | Windows | macOS | Linux | Steam Deck | Xbox app |
 | --- | --- | --- | --- | --- | --- |
-| [Installer](../getting-started/installing/installer.md) | Yes | Untested | Yes | Untested | Untested |
-| Starting the game with SMAPI | Installer sets the Steam launch option, or adds a desktop shortcut | SMAPI's installer sets it up; nothing to do | SMAPI's installer sets it up; nothing to do | Untested | Installer offers SMAPI's exe swap |
-| **Mods** button, menu and profiles | Yes | Untested | Untested | Untested | Same as Windows |
+| [Installer](../getting-started/installing/installer.md) | Yes | Untested | Yes | Being tested; also sets up DewDrop's Steam launcher | Untested |
+| Starting the game with SMAPI | Installer sets the Steam launch option, or adds a desktop shortcut | SMAPI's installer sets it up; nothing to do | SMAPI's installer sets it up; nothing to do (or DewDrop's Steam launcher, with `--steam-setup`) | Installer sets the Steam launch option to DewDrop's launcher, which starts SMAPI with no terminal window | Installer offers SMAPI's exe swap |
+| **Mods** button, menu and profiles | Yes | Untested | Untested | Being tested; Steam's keyboard for typing in Game Mode | Same as Windows |
 | Linking mods for **Apply & Restart** | Yes (junctions) | Untested (symbolic links) | Untested (symbolic links) | Untested | Same as Windows |
-| Restarting the game after **Apply & Restart** | Yes | Untested | Untested | Untested, may fail in Game Mode | Untested |
-| [Start in my profile from Steam](../guides/start-in-your-profile.md) | Yes, for the Steam version | No | No | No | No |
-| [**Load your profile?** box](../guides/start-in-your-profile.md) | Yes | Untested | Untested | No | Same as Windows; the restart is untested |
+| Restarting the game after **Apply & Restart** | Yes | Untested | Untested | Being tested: through DewDrop's launcher, staying in Game Mode | Untested |
+| [Start in my profile from Steam](../guides/start-in-your-profile.md) | Yes, for the Steam version | No | Untested, with DewDrop's Steam launcher | Being tested | No |
+| [**Load your profile?** box](../guides/start-in-your-profile.md) | Yes | Untested | Untested | Being tested | Same as Windows; the restart is untested |
 | Browsing Nexus Mods | Yes | Untested | Untested | Untested | Same as Windows |
 | Premium: **Install** downloads in the game | Yes | Untested | Untested | Untested | Same as Windows |
 | Free: website download links (**Use DewDrop for these links**) | Yes | No | No | No | Same as Windows |
 | [`dewdrop_nxm`](console-commands.md) console command | Yes | Untested | Untested | Untested | Same as Windows |
 | Mod update checks | Yes | Untested | Untested | Untested | Same as Windows |
 | Updating a mod the game has loaded | Finishes on **Apply & Restart**, or when you quit the game | Goes in straight away (untested) | Goes in straight away (untested) | Untested | Same as Windows |
-| **Open mods folder** and website buttons | Yes | Untested | Untested (needs `xdg-open`) | Untested | Same as Windows |
+| **Open mods folder** and website buttons | Yes | Untested | Untested (needs `xdg-open`) | Websites open in Steam's overlay in Game Mode; **Open mods folder** only in Desktop Mode | Same as Windows |
 | Sharing profiles and login with Stardrop | Yes | Untested | Untested | Untested | Same as Windows |
 
 ## Windows
@@ -78,7 +78,7 @@ DewDrop's code supports macOS, but it hasn't been tested yet. Neither has the in
 * **Free Nexus Mods accounts can't use website download links.** **Get on Nexus** opens the file on the website, and DewDrop tells you to add the mod to your `Mods` folder yourself. See the warning below.
 * **Apply & Restart** starts `StardewModdingAPI` in your game folder directly. You probably won't get a Terminal window for SMAPI in that session, so you can't type [console commands](console-commands.md) until you start the game the usual way. Whether macOS shows security prompts for a game started this way hasn't been tested.
 * The **Load your profile?** box works as on Windows, and its **Restart now** uses the same untested restart as **Apply & Restart**.
-* **Start in my profile from Steam isn't available.** SMAPI's macOS and Linux launcher doesn't pass Steam's launch options on to SMAPI, so DewDrop can't use them. The row on the **Account** tab is grayed out.
+* **Start in my profile from Steam isn't available.** SMAPI's macOS and Linux launcher doesn't pass Steam's launch options on to SMAPI, so DewDrop can't use them. The row on the **Account** tab is grayed out. (On Linux, DewDrop's Steam launcher gets around this; it isn't available for macOS yet.)
 * **The installer** may be blocked by Gatekeeper, macOS's check for apps from the internet, the first time you open it. [Install with the installer](../getting-started/installing/installer.md) shows how to allow it.
 * SMAPI needs macOS 10.15 Catalina or later.
 * DewDrop's data folder is `~/.config/Stardrop/Data`. See [Where DewDrop keeps files](file-locations.md).
@@ -89,7 +89,7 @@ DewDrop's code supports Linux, but it hasn't been tested yet. The installer has 
 
 * **Free Nexus Mods accounts can't use website download links**, the same as on macOS.
 * **Apply & Restart** runs the game's `StardewValley` file, which SMAPI's installer replaced with SMAPI's own launcher. If a game update puts the original back, the restart starts the game without SMAPI, and so without mods. Run SMAPI's own installer again to fix it; the DewDrop installer skips SMAPI when it's already up to date. See [About SMAPI](../getting-started/installing/smapi.md#macos-and-linux).
-* The **Load your profile?** box works as on macOS, and **Start in my profile from Steam** isn't available, for the same reason.
+* The **Load your profile?** box works as on macOS. **Start in my profile from Steam** needs DewDrop's Steam launcher, which the installer sets up on a Steam Deck, and on other Linux systems with `--steam-setup` (see [Installer command-line options](installer-options.md)). It works as described in [DewDrop on the Steam Deck](../getting-started/steam-deck.md), and hasn't been tested outside SteamOS.
 * The **Open mods folder** button and the buttons that open websites use your desktop's default apps, through `xdg-open`.
 * DewDrop's data folder is `~/.config/Stardrop/Data`.
 
@@ -107,11 +107,15 @@ SMAPI's launcher opens a terminal window to run in. With a few terminal programs
 
 ## Steam Deck
 
-The Steam Deck isn't supported, and DewDrop hasn't been tried on one.
+Steam Deck support is new, and being tested on a real Deck now. [DewDrop on the Steam Deck](../getting-started/steam-deck.md) has the setup steps.
 
-* The Deck runs the Linux version of Stardew Valley. In Desktop Mode, DewDrop would probably behave as it does on Linux, including the missing website download links for free accounts.
-* In Game Mode, Steam may close everything the game started when the game exits. That would stop **Apply & Restart** from bringing the game back.
-* DewDrop never offers to restart into your profile on the Steam Deck: the **Load your profile?** box doesn't appear, and **Start in my profile from Steam** is grayed out.
+* **Set up once, in Desktop Mode.** The installer installs SMAPI and DewDrop, and sets Stardew Valley's launch option in Steam to DewDrop's launcher. After that, everything happens in Game Mode.
+* **DewDrop's launcher** starts SMAPI in place of the game's own launcher, which would open a terminal window Game Mode can't show. It keeps the game inside Steam's runtime, and starts it in your profile when you've asked for that. Because it starts SMAPI directly, a game update doesn't turn mods off.
+* **Apply & Restart** and **Restart now** start the game again through the same launcher, so the restart stays in Game Mode and in the same Steam session.
+* **Start in my profile from Steam** works, and changes at once: Steam doesn't have to close.
+* **In Game Mode**, web pages open in Steam's overlay, text boxes bring up Steam's keyboard, and **Open mods folder** is grayed out.
+* **Free Nexus Mods accounts** can't use website download links on the Deck yet, as on Linux.
+* The Deck runs the Linux version of the game. In Desktop Mode, DewDrop behaves as on Linux, with the launcher.
 
 ## The Windows version through Proton or Wine
 

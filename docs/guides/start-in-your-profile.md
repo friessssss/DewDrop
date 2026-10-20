@@ -45,7 +45,7 @@ Untick **Start in my profile from Steam** and quit the game. Steam closes and op
 
 The row is grayed out, and hovering over it says why, when:
 
-* you're not on Windows, or the game runs through Proton or Wine;
+* you're on macOS, or on Linux or a Steam Deck without DewDrop's Steam launcher (the installer sets it up), or the game runs through Proton or Wine;
 * the game isn't the Steam version, such as GOG or the Xbox app;
 * DewDrop can't find Steam, or can't find or read your Steam account's settings;
 * the game's launch option in Steam starts a program other than SMAPI.
@@ -74,7 +74,7 @@ DewDrop shows nothing when:
 * the mods that loaded match your profile;
 * SMAPI started on a folder other than `Mods`, as it does from **Play** with the Steam setting on, after **Apply & Restart**, from Stardrop, or with your own `--mods-path` option;
 * **Ask to load my profile** is off;
-* you're on Steam Deck, or the game runs through Proton or Wine;
+* the game runs through Proton or Wine;
 * you started the game from a Steam multiplayer invite;
 * DewDrop couldn't read Stardrop's `Settings.json` or your profile file, or SMAPI's launcher is missing;
 * you opened **Load**, **Co-op** or another title menu first.
@@ -140,4 +140,5 @@ To undo either one, delete only the `--mods-path "..."` part.
 * **Windows, Steam version:** everything on this page.
 * **Windows, GOG or Xbox app:** the box and **Apply & Restart**. The Xbox app has nowhere to add launch options.
 * **macOS and Linux:** the box and **Apply & Restart**, though the restart hasn't been tested there yet. There's no Steam setting, because SMAPI's launcher there doesn't pass Steam's launch options on.
-* **Steam Deck, Proton and Wine:** neither the box nor the Steam setting. See [Platform support](../reference/platform-support.md).
+* **Steam Deck:** both, once the installer has set up DewDrop's Steam launcher. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
+* **Proton and Wine:** neither the box nor the Steam setting. See [Platform support](../reference/platform-support.md).

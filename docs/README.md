@@ -21,7 +21,7 @@ DewDrop is a mod manager that lives inside Stardew Valley. It adds a **Mods** bu
 * <img src=".gitbook/assets/icons/restart.png" alt="" data-size="line"> **Apply & Restart**: restart the game with exactly the mods in your profile. See [Apply & Restart](guides/apply-and-restart.md).
 
 {% hint style="info" %}
-DewDrop is built and tested on Windows. It's built to work on macOS and Linux too, but it hasn't been tested there yet, and some Nexus Mods download features are Windows only. Steam Deck isn't supported. See [Platform support](reference/platform-support.md).
+DewDrop is built and tested on Windows. It's built to work on macOS and Linux too, but it hasn't been tested there yet, and some Nexus Mods download features are Windows only. Steam Deck support is new and being tested: set it up once in Desktop Mode, then manage mods from Game Mode. See [DewDrop on the Steam Deck](getting-started/steam-deck.md) and [Platform support](reference/platform-support.md).
 
 Trying it is safe: the installer never deletes your mods, saves or settings, and you can remove DewDrop again in a few steps ([Uninstalling DewDrop](getting-started/uninstalling.md)). If you try it on macOS or Linux, please [tell us how it went](https://github.com/friessssss/DewDrop/issues).
 {% endhint %}

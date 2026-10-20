@@ -40,7 +40,7 @@ The row's description follows what's happening:
 | On | "Steam starts the game in your profile. Changes you make load the next time you start it." |
 | Turning off | "Turns off when you quit the game: Steam closes and opens again once to save it." |
 
-The row is grayed out when the option can't be used: on macOS and Linux, when the game runs through Proton or Wine, for the GOG or Xbox app version of the game, when DewDrop can't find Steam or your Steam account's settings, and when Stardew Valley's launch option in Steam starts some other program than SMAPI.
+The row is grayed out when the option can't be used: on macOS, on Linux and the Steam Deck until the installer has set up DewDrop's Steam launcher, when the game runs through Proton or Wine, for the GOG or Xbox app version of the game, when DewDrop can't find Steam or your Steam account's settings, and when Stardew Valley's launch option in Steam starts some other program than SMAPI.
 
 * **Only Steam's Play button starts in your profile.** A desktop shortcut, or starting `StardewModdingAPI.exe` yourself, still loads the whole `Mods` folder. **Ask to load my profile** covers those launches.
 * **Until you choose, the row follows Steam.** If Steam's launch option already points at `Selected Mods`, for example because you added it yourself, the row shows as ticked and DewDrop leaves the option alone.
@@ -56,7 +56,7 @@ When the game starts on your whole `Mods` folder, for example from a desktop sho
 * If every mod in your `Mods` folder is on in your profile, the mods already match and nothing appears.
 * **Don't ask again** in the box unticks this row.
 * A change here applies from the next time you start the game.
-* On Steam Deck, and when the game runs through Proton or Wine, the box never appears, whatever this row says.
+* When the game runs through Proton or Wine, the box never appears, whatever this row says.
 
 See [Start in your profile](start-in-your-profile.md) for what the box says and what each button does.
 

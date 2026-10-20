@@ -11,7 +11,7 @@ The installer puts DewDrop in your game and also sets up SMAPI, the free tool th
 
 * You need **Stardew Valley 1.6 or later** and an internet connection. See [What you need](getting-started/requirements.md).
 * Use Stardrop? Don't start your first launch from Stardrop. [Here's why](stardrop.md#first-time-setup-if-you-already-use-stardrop).
-* DewDrop is only tested on Windows so far, and Steam Deck isn't supported. See [Platform support](reference/platform-support.md).
+* DewDrop is only tested on Windows so far. Steam Deck support is new and being tested; see [DewDrop on the Steam Deck](getting-started/steam-deck.md) and [Platform support](reference/platform-support.md).
 
 ## Five steps
 

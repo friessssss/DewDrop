@@ -40,7 +40,7 @@ Steam has to be closed to change its launch options, so the change happens **whe
 
 With it on, changes you make in the menu, such as mods turned on or off, another profile or new mods, are linked as you quit. The next **Play** loads them. **Apply & Restart** still loads them right away.
 
-Only Steam's **Play** button starts in your profile. A desktop shortcut is still a normal launch. On GOG, the Xbox app, macOS, Linux, Steam Deck, Proton and Wine, the row is grayed out; hover over it to see why. The Windows installer asks about this setting too, when it sets up Steam.
+Only Steam's **Play** button starts in your profile. A desktop shortcut is still a normal launch. On Linux and the Steam Deck, it works once the installer has set up DewDrop's Steam launcher, and changes at once, without closing Steam (see [DewDrop on the Steam Deck](steam-deck.md)). On GOG, the Xbox app, macOS, Proton and Wine, the row is grayed out; hover over it to see why. The installer asks about this setting too, when it sets up Steam.
 
 ### Ask to load my profile
 
@@ -54,7 +54,7 @@ On Windows with the Steam version, while **Start in my profile from Steam** is o
 
 <figure><img src="../.gitbook/assets/shot-title-prompt.png" alt="The Load your profile? box over the title screen. It says 20 mods that are off in the SVE playthrough profile loaded anyway, names three of them, and asks to restart into the profile. Below are a ticked Start in my profile from Steam from now on checkbox, a note that Steam closes and opens again once after you quit, and the Don't ask again, Restart now and Not now buttons."><figcaption><p>The box DewDrop shows when the mods that loaded differ from your profile.</p></figcaption></figure>
 
-The box doesn't open on Steam Deck or when the game runs through Proton or Wine. **Restart now** uses the same restart as **Apply & Restart**, and like it, hasn't been tested on macOS and Linux yet.
+The box doesn't open when the game runs through Proton or Wine. **Restart now** uses the same restart as **Apply & Restart**, and like it, hasn't been tested on macOS and Linux yet.
 
 [Start in your profile](../guides/start-in-your-profile.md) covers both settings in full.
 

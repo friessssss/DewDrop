@@ -64,7 +64,7 @@ Unlike the other settings, it can also be `null`, with no quotes, which means it
 * **A hand edit works the same way.** Change the value with the game closed, then start the game. Steam's launch option changes the next time you quit it.
 * **The rest of the launch option is kept.** If it was empty, DewDrop sets SMAPI's usual option with `--mods-path` added. With `true`, a `--mods-path` that points at some other folder is replaced. With `false`, it's left alone.
 * **Changes you make in Steam win.** If Stardew Valley's launch options changed in Steam while the game was running, DewDrop leaves them alone, and a message says so the next time you open **Mods**.
-* **It does nothing where it can't be used:** on macOS and Linux, when the game runs through Proton or Wine, for the GOG or Xbox app version, or when the launch option in Steam starts some other program than SMAPI. The menu row is grayed out there.
+* **It does nothing where it can't be used:** on macOS, on Linux and the Steam Deck until the installer has set up DewDrop's Steam launcher, when the game runs through Proton or Wine, for the GOG or Xbox app version, or when the launch option in Steam starts some other program than SMAPI. The menu row is grayed out there.
 * **Other ways it gets set.** Ticking **Start in my profile from Steam from now on** in the **Load your profile?** box and clicking **Restart now** sets it to `true`. The Windows installer asks about it when it sets up Steam's launch option for SMAPI, and saves your answer here; see [Installer command-line options](installer-options.md).
 
 ### AskToLoadProfile
@@ -73,7 +73,7 @@ This is **Ask to load my profile**. When it's `true`, which is the default, and 
 
 * **Don't ask again** in the **Load your profile?** box sets it to `false`.
 * It doesn't matter when the game starts in your profile, such as after **Apply & Restart**, or from Steam with `StartInProfileFromSteam` on.
-* On Steam Deck, and when the game runs through Proton or Wine, the box never appears, whatever the value.
+* When the game runs through Proton or Wine, the box never appears, whatever the value.
 
 A change takes effect the next time the game starts. See [Start in your profile](../guides/start-in-your-profile.md) for how the box works.
 

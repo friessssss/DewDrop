@@ -56,8 +56,10 @@ curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.s
 | `-DryRun` | `--dry-run` | Show what would happen without changing anything. Lines starting with `(dry run) would` describe each change. It still looks for the game and asks its questions. |
 | `-SkipSmapi` | `--skip-smapi` | Don't install or update SMAPI. If SMAPI is missing or older than 4.0, the installer stops instead, because DewDrop can't run without it. |
 | `-NoSteamLaunchOptions` | | Don't change Steam's launch options or show how to set them. The desktop shortcut is offered instead. |
-| `-StartInProfile` | | Answer yes to starting the game in your DewDrop profile, without asking. See [Starting in your profile](#starting-in-your-profile). |
-| `-NoStartInProfile` | | Answer no to starting the game in your DewDrop profile, without asking, and take DewDrop's `--mods-path` out of Steam's launch option if it's there. |
+| | `--steam-setup` | Linux: set Stardew Valley's launch option in Steam to DewDrop's launcher, as on a Steam Deck. See [Steam on Linux and the Steam Deck](#steam-on-linux-and-the-steam-deck). |
+| | `--no-steam-setup` | Steam Deck: leave Steam's launch option alone. |
+| `-StartInProfile` | `--start-in-profile` | Answer yes to starting the game in your DewDrop profile, without asking. See [Starting in your profile](#starting-in-your-profile). |
+| `-NoStartInProfile` | `--no-start-in-profile` | Answer no to starting the game in your DewDrop profile, without asking. On Windows, this also takes DewDrop's `--mods-path` out of Steam's launch option if it's there. |
 | `-NoShortcut` | | Don't offer the desktop shortcut. |
 | `-NoLaunch` | `--no-launch` | Don't offer to start the game at the end. |
 | | `--help` or `-h` | Show a short usage text and exit. |
@@ -66,7 +68,7 @@ A few differences between the two installers:
 
 * **A `-ModSource` path that doesn't exist** stops the Windows installer with an error. The macOS and Linux installer ignores a `--mod-source` path that doesn't exist and uses its bundled copy, so check the path.
 * **`--skip-smapi` with an unknown SMAPI version:** on macOS and Linux, if the installer can't tell which SMAPI you have (for example, a very old SMAPI 3), it carries on and reports "(unknown version)".
-* **Steam and shortcut options are Windows only**, because the installer sets up nothing like that on macOS or Linux.
+* **Steam options:** on Windows, the installer points Steam at SMAPI. On a Steam Deck (and on Linux with `--steam-setup`), it points Steam at DewDrop's launcher instead. On macOS it doesn't change Steam. The shortcut options are Windows only.
 * **An option it doesn't know:** the macOS and Linux installer says "Unknown option" and stops. On Windows, PowerShell refuses to start the script (see [Exit codes](#exit-codes)).
 
 `-FromLauncher`, `-Elevated` and `--from-launcher` are set by the installer's own launchers. You don't need them.
@@ -100,9 +102,13 @@ With `-Yes` (Windows) or `--yes` (macOS and Linux), the installer answers its ow
 | Windows, Steam: the launch option starts SMAPI from another folder. Point it at this game's SMAPI? | Yes. Other options in it are kept; see [Starting in your profile](#starting-in-your-profile) for `--mods-path`. |
 | Windows, Steam: replace other launch options? | No. It shows the manual steps, but doesn't copy the line to your clipboard. |
 | Windows, Steam: start the game in your DewDrop profile when you press Play in Steam? | Yes. Add `-NoStartInProfile` for no. |
+| Steam Deck: add DewDrop's launcher to launch options you already have (they use `%command%`)? | Yes. |
+| Steam Deck: replace launch options you already have (they don't use `%command%`)? | No. It shows what to enter yourself. |
+| Steam Deck: start the game in your DewDrop profile when you press Play in Steam? | Yes. Add `--no-start-in-profile` for no. |
+| Steam Deck: your Nexus Mods API key? | Not asked: it's skipped. |
 | Windows: add the desktop shortcut? | Yes. Add `-NoShortcut` if you don't want it. |
 | Windows, Xbox app: swap in SMAPI's copy of the game's exe? | Yes. |
-| Start Stardew Valley now? | Yes. Add `-NoLaunch` (`--no-launch`) if you don't want that. |
+| Start Stardew Valley now? | Yes (no on a Steam Deck, where the game is for Game Mode). Add `-NoLaunch` (`--no-launch`) if you don't want that. |
 
 On macOS and Linux, the installer also picks these answers when it isn't running in a terminal, for example when its input comes from another program.
 
@@ -125,6 +131,16 @@ Yes is the same as ticking **Start in my profile from Steam** on the **Account**
 * The path to SMAPI is kept the way you typed it, as long as it's this game's SMAPI.
 
 The question only comes up when the installer sets up Steam's launch option, so `-NoSteamLaunchOptions` skips it too.
+
+## Steam on Linux and the Steam Deck
+
+On a Steam Deck (SteamOS), the installer sets Stardew Valley's launch option in Steam to DewDrop's launcher, so the game starts with SMAPI in Game Mode and DewDrop can restart it there. On other Linux systems it only does this with `--steam-setup`; `--no-steam-setup` skips it on a Deck. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md) for what the launcher does.
+
+* **Steam has to be closed** to change its settings, so the installer closes it (`steam -shutdown`) and starts it again at the end. If Steam starts again by itself straight away, as a SteamOS service can, the installer stops that service instead, and starts it again at the end.
+* **Only the signed-in Steam account** is changed (the one marked as most recent in Steam's `loginusers.vdf`), and Steam's settings file is backed up first.
+* **Launch options you already have** that use `%command%`, such as `gamemoderun %command%`, are kept: the launcher goes just before `%command%`. Ones without `%command%` are only replaced if you say so. A launch option that starts SMAPI directly is replaced, since the launcher starts SMAPI itself.
+* **Starting in your profile:** the answer is saved for the launcher at once. The launcher only starts the game in your profile once DewDrop has linked it, so the first start loads your whole `Mods` folder.
+* **Flatpak and Snap Steam** aren't supported for this yet.
 
 ## Exit codes
 

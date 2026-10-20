@@ -122,7 +122,7 @@ The comment at the top of `DebugBridge.cs` doesn't list `window`, `borderless` o
 | `the game started in a profile` | A launch in a profile that isn't a DewDrop restart, such as one from Stardrop, from Steam with **Start in my profile from Steam** on, or with a `--mods-path` launch option. |
 | `SMAPI started on a folder DewDrop doesn't manage` | The session is `Custom`. |
 | `turned off` | **Ask to load my profile** is off. |
-| `not available on Steam Deck or under Wine or Proton` | The box is off on this system. |
+| `not available under Wine or Proton` | The box is off on this system. |
 | `the settings or profile couldn't be read` | Stardrop's `Settings.json` or the active profile file couldn't be read. |
 | `started from a Steam invite` | The game started from a Steam multiplayer invite. |
 | `SMAPI's launcher is missing` | SMAPI's launcher isn't in the game folder, so a restart couldn't start. |

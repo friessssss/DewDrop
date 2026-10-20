@@ -336,7 +336,7 @@ The row is grayed out when DewDrop can't use it on your setup. Hover over it to 
 | The row says | What to do |
 | --- | --- |
 | "Only for the Steam version of the game on Windows." | You play on macOS or Linux. Use the **Load your profile?** box or **Apply & Restart**. |
-| "Not available when the game runs through Proton or Wine." | Steam Deck, Proton and Wine aren't supported, and DewDrop's restart can't bring the game back there either. See [Platform support](../reference/platform-support.md). |
+| "Not available when the game runs through Proton or Wine." | Proton and Wine aren't supported, and DewDrop's restart can't bring the game back there either. See [Platform support](../reference/platform-support.md). |
 | "Only for the Steam version of the game. Use Apply & Restart to load your profile." | You play the GOG or Xbox app version. The **Load your profile?** box still offers the restart. |
 | "Couldn't find Steam on this PC." | DewDrop looks for Steam where Steam's installer records it, and didn't find it there. Use the **Load your profile?** box or **Apply & Restart**. |
 | "Couldn't find your Steam account's settings. Sign in to Steam, then start the game again." | Sign in to Steam, then start the game again. |
@@ -385,7 +385,7 @@ The **Load your profile?** box only appears on the first title screen after a no
 * **The game started in your profile:** after **Apply & Restart**, from Stardrop, from Steam with **Start in my profile from Steam** on, or with a `--mods-path` launch option you added yourself.
 * **SMAPI was started on some other folder with `--mods-path`.** The bottom of the menu says "This session didn't start from a DewDrop profile. Restart to load this profile."
 * **Ask to load my profile is unticked.** **Don't ask again** unticks it. You can tick it again on the **Account** tab.
-* **You play on Steam Deck, or the game runs through Proton or Wine.** DewDrop's restart can't bring the game back there, so it doesn't offer one.
+* **The game runs through Proton or Wine.** DewDrop's restart can't bring the game back there, so it doesn't offer one.
 * **There's a red message at the bottom of the menu.** See [A red message at the bottom of the menu](#a-red-message-at-the-bottom-of-the-menu).
 * **You started the game from a Steam multiplayer invite.** DewDrop lets you go straight to the invite.
 * **SMAPI's launcher is missing** from your game folder (`StardewModdingAPI.exe` on Windows). Run the DewDrop installer again: it notices SMAPI is missing and installs it.

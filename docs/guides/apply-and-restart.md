@@ -67,7 +67,7 @@ Not tested yet. DewDrop waits for the game to close, then starts `StardewModding
 {% tab title="Linux" %}
 Not tested yet. DewDrop waits for the game to close, then runs the game's `StardewValley` launcher. SMAPI's installer replaces that launcher so it starts SMAPI. If you set SMAPI up another way, the restart may start the game without SMAPI, and so without mods.
 
-Steam Deck isn't supported. See [Platform support](../reference/platform-support.md).
+On the Steam Deck, the restart stays in Game Mode: DewDrop starts the game again through its Steam launcher. This is new and being tested. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
 {% endtab %}
 {% endtabs %}
 

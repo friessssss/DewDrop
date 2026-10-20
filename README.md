@@ -194,7 +194,9 @@ so a normal start loads everything in your `Mods` folder. There are two ways to 
   into the game. Free accounts click **Slow download** on the website, and on Windows DewDrop can pick the file
   up from there once you set it as the "Mod manager download" handler.
 - **Windows is the main, tested platform.** The mod is cross-platform, but macOS and Linux haven't been tested
-  much yet, and "Mod manager download" links only work on Windows. Steam Deck and Proton aren't supported yet.
+  much yet, and "Mod manager download" links only work on Windows. **Steam Deck** support is new and being tested:
+  set it up once in Desktop Mode, then manage mods from Game Mode (see
+  [DewDrop on the Steam Deck](https://friessssss.gitbook.io/dewdrop/getting-started/steam-deck)). Proton isn't supported.
 
 See the [guide](https://friessssss.gitbook.io/dewdrop/) for everything else, including the [FAQ](https://friessssss.gitbook.io/dewdrop/help/faq) and
 [troubleshooting](https://friessssss.gitbook.io/dewdrop/help/troubleshooting).

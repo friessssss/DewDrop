@@ -283,7 +283,8 @@ It works by changing Stardew Valley's launch options in Steam, so it needs the S
 
 * **GOG and the Xbox app** don't have Steam's launch options for DewDrop to change.
 * **macOS and Linux:** SMAPI's launcher there doesn't pass on the options Steam gives it, so a launch option can't point SMAPI at your profile.
-* **Steam Deck, Proton and Wine** aren't supported.
+* **Steam Deck:** new, and being tested. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
+* **Proton and Wine** aren't supported.
 
 Everywhere else, the **Load your profile?** box offers to restart into your profile, and **Apply &#x26; Restart** works as always. Both use the same restart, which hasn't been tested on macOS and Linux yet. On Windows, you can also add `--mods-path` to a desktop shortcut by hand: see [Start in your profile](../guides/start-in-your-profile.md).
 
@@ -292,7 +293,7 @@ Everywhere else, the **Load your profile?** box offers to restart into your prof
 <details>
 <summary>Does DewDrop work on Steam Deck?</summary>
 
-It isn't supported, and it hasn't been tested. In Game Mode, Steam may stop DewDrop's restart helper when the game closes, so **Apply &#x26; Restart** might not bring the game back. The Windows version of the game through Proton isn't supported either. On Steam Deck and under Proton, DewDrop doesn't show the **Load your profile?** box, and **Start in my profile from Steam** isn't available. See [Platform support](../reference/platform-support.md#steam-deck).
+It's meant to, and it's being tested now. You run the installer once in Desktop Mode. It sets Stardew Valley up in Steam to start through DewDrop's launcher, which works in Game Mode. After that, you install, update and switch mods from the **Mods** button in Game Mode, and **Apply & Restart** brings the game back in Game Mode. The Windows version of the game through Proton isn't supported. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
 
 </details>
 

@@ -86,7 +86,7 @@ The part in brackets after `ask to load my profile` can say:
 | `started from a Steam invite` | The game started from a Steam multiplayer invite, so DewDrop didn't ask. |
 | `SMAPI's launcher is missing` | SMAPI isn't in your game folder, so a restart couldn't work. |
 | `the settings or profile couldn't be read` | DewDrop couldn't read Stardrop's `Settings.json` or your active profile's file. **Apply & Restart** is off then too. |
-| `not available on Steam Deck or under Wine or Proton` | DewDrop can't restart the game on this system, so it never asks. See [Platform support](platform-support.md). |
+| `not available under Wine or Proton` | DewDrop can't restart the game on this system, so it never asks. See [Platform support](platform-support.md). |
 | `stopped after an error` | Something went wrong. The SMAPI log says what. |
 
 ## `dewdrop_nxm`

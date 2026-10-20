@@ -34,7 +34,7 @@ SMAPI is the mod loader that starts Stardew Valley with mods. DewDrop is a SMAPI
 | Xbox app (PC Game Pass) | Yes, with one extra step from SMAPI's guide. The installer can do it for you. |
 | macOS | Built to work, but not tested yet. SMAPI needs macOS 10.15 Catalina or later. |
 | Linux | Built to work, but not tested yet. You need the Linux version of the game (see below). |
-| Steam Deck | Not supported. |
+| Steam Deck | New, being tested. See [DewDrop on the Steam Deck](steam-deck.md). |
 
 **On Linux, you need the Linux version of the game**, not the Windows version running through Proton (Steam's tool for running Windows games on Linux). To check, right-click **Stardew Valley** in Steam and choose **Properties** > **Compatibility**. If **Force the use of a specific Steam Play compatibility tool** is ticked, untick it and let Steam download the Linux version. The installer warns you if it finds the Windows version.
 
