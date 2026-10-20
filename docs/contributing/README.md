@@ -7,7 +7,7 @@ icon: code
 
 DewDrop is open source under the GPL-3.0 license, and help is welcome. A clearer sentence in these docs is as useful as a bug fix.
 
-The code lives at [github.com/friessssss/DewDrop](https://github.com/friessssss/DewDrop). Work from the `development` branch and open your pull requests against it.
+The code lives at [github.com/friessssss/DewDrop](https://github.com/friessssss/DewDrop). Work from the `development` branch and open your pull requests against it. `master` only holds releases (see [Releasing](releasing.md)).
 
 Before you start, please read:
 
@@ -19,6 +19,7 @@ Found a bug but don't want to write code? [Reporting issues](../help/reporting-i
 ## In this section
 
 * [Building from source](building.md): set up your computer, build DewDrop, and package a release with `tools/package-release.mjs`.
+* [Releasing](releasing.md): how a release goes from `development` to `master` and gets published by CI.
 * [The debug bridge](debug-bridge.md): control the title screen from a script and take screenshots. It's only in Debug builds.
 * [Docs and art style](docs-and-art.md): how this guide is written, how it syncs to GitBook, and how every image is made.
 
