@@ -1,6 +1,6 @@
-# GitBook Git Sync: the user guide lives in docs/ (docs/README.md is its home page, docs/SUMMARY.md its sidebar).
-# The repository README stays GitHub-only.
-root: ./docs/
+# The DewDrop guide's space settings for GitBook Git Sync (the site itself is in gitbook-docs.yaml at the repo root).
+# README.md is the guide's home page and SUMMARY.md its sidebar; images live in .gitbook/assets/.
+root: ./
 
 structure:
   readme: README.md

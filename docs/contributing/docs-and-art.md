@@ -11,16 +11,37 @@ This guide and the README share one voice and one look. Every picture is pixel a
 
 Every page is a Markdown file in the `docs/` folder of the repo. GitBook publishes them as [the DewDrop guide](https://friessssss.gitbook.io/dewdrop/) through **Git Sync**: changes merged into the repo show up on the site, and edits made in GitBook's editor are committed back to the repo.
 
-A `.gitbook.yaml` file at the repo root points GitBook at the `docs/` folder only:
+Two small files tell GitBook what to sync. `gitbook-docs.yaml`, at the repo root, describes the site: one space, the guide, whose content is the `docs/` folder.
 
-{% code title=".gitbook.yaml" %}
+{% code title="gitbook-docs.yaml" %}
 ```yaml
-root: ./docs/
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: DewDrop
+  structure:
+    - type: space
+      key: guide
+      title: Guide
+      path: guide
+      default: true
+      content:
+        directory: ./docs
+        language: en
+```
+{% endcode %}
+
+`docs/.gitbook.yaml` then says which files in that folder are the home page and the sidebar:
+
+{% code title="docs/.gitbook.yaml" %}
+```yaml
+root: ./
 structure:
   readme: README.md
   summary: SUMMARY.md
 ```
 {% endcode %}
+
+Don't change the space's `key`: GitBook treats a new key as a new space and drops the old one.
 
 * `docs/README.md` is the guide's home page. The `README.md` in each folder is that section's first page.
 * `docs/SUMMARY.md` is the sidebar. GitBook leaves out any page that isn't listed there, and each file can appear in it only once.
