@@ -15,18 +15,18 @@ There are two ways to install DewDrop. Both end in the same place: SMAPI install
 
 | | The installer | By hand |
 | --- | --- | --- |
-| What you download | `DewDrop-<version>-installer.zip` | `DewDrop-<version>.zip` |
+| How you get it | Paste one line into PowerShell or Terminal, or download `DewDrop-<version>-installer.zip` | Download `DewDrop-<version>.zip` |
 | Installs or updates SMAPI | Yes, if it's missing or out of date | No. Install SMAPI yourself first. |
 | Finds your `Mods` folder | Yes | You find it |
 | Sets up Steam to start SMAPI (Windows) | Offers to do it for you | You do it yourself, once |
 | Keeps your DewDrop settings when updating | Yes | Yes, if you keep `config.json` |
 | Good for | First-timers, and anyone who wants it done for them | Players who already use mods |
 
-Both downloads are on the [latest release page](https://github.com/friessssss/DewDrop/releases/latest), under **Assets**. You don't need the **Source code** downloads. They're for developers.
+The one line is in [Install with the installer](installer.md#the-quick-way-one-line). Both downloads are on the [latest release page](https://github.com/friessssss/DewDrop/releases/latest), under **Assets**. You don't need the **Source code** downloads. They're for developers.
 
 ## Pages in this section
 
-* [Install with the installer](installer.md): step by step, and what to do if your computer warns you about the file.
+* [Install with the installer](installer.md): the one line to paste, the download steps, and what to do if your computer warns you about the file.
 * [Install by hand](manual.md): where to find your `Mods` folder on each system, and the mistakes to avoid.
 * [About SMAPI](smapi.md): what SMAPI is, how to install or update it yourself, and how to make Steam, GOG Galaxy or the Xbox app start it.
 

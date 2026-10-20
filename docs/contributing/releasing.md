@@ -47,6 +47,8 @@ The **Release** workflow (`.github/workflows/release.yml`) then builds the mod, 
 {% endstep %}
 {% endstepper %}
 
+The one-line installers (`install.ps1` and `install.sh` in the repository root) download the installer scripts from `master` and DewDrop from the latest release, so the merge updates them for everyone straight away.
+
 A version with a tag such as `-beta.1` is published as a **pre-release**. GitHub's "latest release" skips pre-releases, so the installer's download and the update check keep offering the last normal release.
 
 {% hint style="info" %}

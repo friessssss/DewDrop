@@ -234,6 +234,19 @@ try {
     $r = Invoke-Installer @('-GamePath', $other, '-ModSource', $zip)
     Check 'never overwrites a different mod named DewDrop' ($r.Code -eq 10 -and (Get-Content -LiteralPath (Join-Path $other 'Mods\DewDrop\manifest.json') -Raw) -match 'someone.else') $r.Out
 
+    # The one-line installer (irm ... | iex), with options as its comment shows, fetching install.ps1 from this checkout.
+    $oneLine = Join-Path $root 'OneLine\Stardew Valley'
+    New-FakeGame $oneLine
+    $env:DEWDROP_INSTALLER_BASE = Split-Path -Parent $installer
+    try {
+        $bootstrap = [scriptblock]::Create((Get-Content -LiteralPath (Join-Path $PSScriptRoot '..\..\install.ps1') -Raw))
+        $out = & $bootstrap -GamePath $oneLine -ModSource $zip -Yes -NoLaunch -NoShortcut -SkipSmapi *>&1 | Out-String
+        $code = $LASTEXITCODE
+    } finally {
+        Remove-Item -LiteralPath env:DEWDROP_INSTALLER_BASE
+    }
+    Check 'the one-line installer runs install.ps1 with its options' ($code -eq 0 -and (Read-ManifestId (Join-Path $oneLine 'Mods\DewDrop\manifest.json')).Version -eq '1.0.0') $out
+
     $xbox = Join-Path $root 'XboxGames\Stardew Valley\Content'
     New-FakeGame $xbox -NoSmapi
     $before = @(Get-ChildItem -LiteralPath $xbox -Recurse -Force).Count

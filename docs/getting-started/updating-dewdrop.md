@@ -16,9 +16,12 @@ To see which version you have, find **DewDrop** on the **Installed** tab. Its ro
 ## Option 1: run the new installer (easiest)
 
 1. Close the game. If you forget, the installer waits for you.
-2. Download `DewDrop-<version>-installer.zip` from the [Releases page](https://github.com/friessssss/DewDrop/releases/latest) and extract it.
-3. Double-click `Install on Windows.bat`, `Install on macOS.command` or `Install on Linux.sh`, the same as the first time. On macOS or Linux you can instead run `curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash` in Terminal again.
-4. Answer the questions. At a yes/no question, pressing **Enter** picks the recommended answer.
+2. Paste the same line as the first time. It always gets the latest DewDrop:
+   * **Windows** (PowerShell): `irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex`
+   * **macOS or Linux** (Terminal): `curl -fsSL https://raw.githubusercontent.com/friessssss/DewDrop/master/install.sh | bash`
+
+   Or download `DewDrop-<version>-installer.zip` from the [Releases page](https://github.com/friessssss/DewDrop/releases/latest), extract it, and double-click `Install on Windows.bat`, `Install on macOS.command` or `Install on Linux.sh`.
+3. Answer the questions. At a yes/no question, pressing **Enter** picks the recommended answer.
 
 The installer finds your current DewDrop wherever it is in your `Mods` folder, even inside a folder you use to group mods, and updates it in place. It keeps your `config.json`, and it removes the old copy only once the new one is in place, so an update that fails halfway leaves your old DewDrop working. Along the way:
 

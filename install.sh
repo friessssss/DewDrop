@@ -11,6 +11,10 @@
 #
 # Nothing has to be allowed in Privacy & Security: macOS only blocks files opened from Finder.
 #
+# On Windows, paste this into PowerShell instead (see install.ps1):
+#
+#   irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1 | iex
+#
 # Written for bash 3.2, which is what macOS ships.
 
 # Everything is inside main, so a download cut off halfway runs nothing.

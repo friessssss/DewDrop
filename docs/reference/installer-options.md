@@ -25,6 +25,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\internal\install.ps1 -DryR
 
 `-ExecutionPolicy Bypass` lets PowerShell run this one script without changing your PC's settings.
 
+With the one-line installer, wrap it like this and put your options at the end:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/friessssss/DewDrop/master/install.ps1))) -DryRun
+```
+
 Put folder paths in quotes, and don't end them with `\`. Windows reads `\"` at the end of a path as a quote mark, so the rest of the line becomes part of the path.
 {% endtab %}
 
@@ -151,6 +157,7 @@ When it's started from `Install on macOS.command` or `Install on Linux.sh` in a 
 * **`Install on Windows.bat`** refuses to run from inside the zip (Windows would run it from a temporary folder without the other files), checks that `internal\install.ps1` is there, and runs it with Windows PowerShell.
 * **`Install on macOS.command`** clears macOS's download warning flag from the installer folder, then runs `internal/install.sh`.
 * **`install.sh`** (in the repository root, for `curl ... | bash`) downloads `internal/install.sh` from the `master` branch into a temporary folder and runs it, with its questions read from your terminal rather than the pipe. With no bundled copy next to it, `internal/install.sh` then downloads the latest DewDrop release. In Git Bash on Windows it downloads and runs `install.ps1` instead.
+* **`install.ps1`** (in the repository root, for `irm ... | iex`) downloads `internal\install.ps1` from the `master` branch to `%TEMP%\DewDrop-install.ps1` and runs it with Windows PowerShell, even when pasted into PowerShell 7. It keeps that file afterwards, because the installer may restart itself from it as administrator. It never closes the PowerShell window it was pasted into.
 * **`Install on Linux.sh`** runs `internal/install.sh` in the terminal you started it from. When you double-click it, it opens the first terminal it finds out of: xdg-terminal-exec, Ptyxis, GNOME Console, GNOME Terminal, Konsole, Xfce Terminal, MATE Terminal, Terminator, Tilix, kitty, Alacritty, WezTerm, foot, x-terminal-emulator and xterm. Options are only passed on when you start it from a terminal.
 
 ## Files the installer uses
