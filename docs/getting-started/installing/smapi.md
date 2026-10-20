@@ -14,8 +14,8 @@ SMAPI (short for Stardew Modding API) starts Stardew Valley with mods loaded. It
 A few things to know:
 
 * **Mods live in the `Mods` folder** inside your game folder. SMAPI creates it when you install SMAPI.
-* **SMAPI opens a second window** next to the game: the SMAPI console. It shows what SMAPI is loading and any errors. Leave it open while you play. Closing it closes the game.
-* **SMAPI has to be started instead of the plain game.** Installing it doesn't change what Steam's **Play** button does on Windows. See [Starting the game with SMAPI](#starting-the-game-with-smapi).
+* **SMAPI opens a second window** next to the game: the SMAPI console. It shows what SMAPI is loading and any errors. Leave it open while you play: closing it closes the game. (DewDrop's Steam launcher, on a Steam Deck or on Linux after the installer's `--steam-setup`, starts SMAPI without this window.)
+* **SMAPI has to be started instead of the plain game.** On Windows, installing it doesn't change what Steam's **Play** button does. See [Starting the game with SMAPI](#starting-the-game-with-smapi).
 
 The official site is [smapi.io](https://smapi.io), and the Stardew Valley wiki has a [player's guide to getting started with mods](https://stardewvalleywiki.com/Modding:Player_Guide/Getting_Started).
 
@@ -38,6 +38,12 @@ To do it by hand:
 2. Download the latest SMAPI from [smapi.io](https://smapi.io).
 3. Extract the zip somewhere that isn't your game folder. Your Downloads folder is fine.
 4. In the extracted folder, run the installer for your computer: `install on Windows.bat`, `install on macOS.command` or `install on Linux.sh`. Follow the instructions on screen.
+
+   On a Mac with an Apple chip (M1 or later), SMAPI's installer is made for Intel Macs and needs Rosetta, Apple's free add-on for Intel apps. The DewDrop installer offers to install it for you. To install it yourself, run this in Terminal before you run SMAPI's installer:
+
+   ```bash
+   softwareupdate --install-rosetta
+   ```
 5. On Windows, set up your game launcher so it starts SMAPI. See below.
 
 SMAPI's own guides have pictures and fixes for common problems: [Windows](https://stardewvalleywiki.com/Modding:Installing_SMAPI_on_Windows), [macOS](https://stardewvalleywiki.com/Modding:Installing_SMAPI_on_Mac), [Linux](https://stardewvalleywiki.com/Modding:Installing_SMAPI_on_Linux).
@@ -56,24 +62,22 @@ The DewDrop installer offers to set this for you, for the Steam account that's s
 2. On the **General** page, find the **Launch Options** box.
 3. If the box already has text, copy it into Notepad first so you can put it back. Then replace it with this line, changed to match your game folder:
 
-   ```
+   ```text
    "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe" %command%
    ```
 
    Keep both quote marks and the `%command%` part. They're both needed.
-4. Close the window. From now on, **Play** starts SMAPI.
+4. Close the window. From now on, **Play** starts SMAPI, and DewDrop's **Apply & Restart** works with it.
 
 Not sure where your game folder is? Right-click **Stardew Valley** and choose **Manage** > **Browse local files**. SMAPI's installer also prints the exact line for your computer when it finishes.
 
-DewDrop's **Apply & Restart** works with this setup.
+With **Start in my profile from Steam** on (on the **Account** tab, or if you said yes when the installer asked), DewDrop adds SMAPI's `--mods-path` option to this line when you quit the game, so **Play** starts the game straight in your DewDrop profile. Steam closes and opens again once for the change. The line then looks like this:
 
-DewDrop can also add SMAPI's `--mods-path` option to this line, so **Play** starts the game straight in your DewDrop profile. It only does that if you turn on **Start in my profile from Steam** on the **Account** tab, or say yes when the installer asks. The change happens when you quit the game, and Steam closes and opens again once for it. The line then looks like this:
-
-```
+```text
 "C:\Program Files (x86)\Steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe" --mods-path "C:\Users\<you>\AppData\Roaming\Stardrop\Data\Selected Mods" %command%
 ```
 
-So if you find a `--mods-path` part pointing at `Selected Mods` in the box, DewDrop probably put it there. To take it out, untick the setting and quit the game. If you delete it by hand while the setting is on, DewDrop adds it back the next time you quit. See [Start in your profile](../../guides/start-in-your-profile.md).
+So a `--mods-path` part pointing at `Selected Mods` was probably put there by DewDrop. To take it out, untick the setting and quit the game. If you delete it by hand while the setting is on, DewDrop adds it back the next time you quit. See [Start in your profile](../../guides/start-in-your-profile.md).
 
 ### GOG Galaxy on Windows
 
@@ -97,22 +101,30 @@ After every game update, you need to do these steps again, or the game starts wi
 
 ### macOS and Linux
 
-There's nothing to set up. SMAPI's installer renames the game's own launcher to `StardewValley-original` and puts a SMAPI launcher in its place. So the game starts SMAPI however you start it, including Steam's **Play** button. You don't need launch options; those are only for Windows. If you play on Steam, SMAPI's macOS guide recommends starting the game through the Steam client.
+There's nothing to set up. SMAPI's installer renames the game's own launcher to `StardewValley-original` and puts a SMAPI launcher in its place. So the game starts SMAPI however you start it, including Steam's **Play** button. You don't need launch options for this. If you play on Steam, SMAPI's macOS guide recommends starting the game through the Steam client.
 
 {% hint style="info" %}
-**After a game update**, the game's launcher can be replaced and the game starts without SMAPI (no SMAPI window appears). To fix it, run SMAPI's own installer again. The DewDrop installer only reinstalls SMAPI when it's missing or out of date, so it won't repair this.
+**After a game update**, the game's launcher can be replaced and the game starts without SMAPI (no SMAPI window appears). To fix it, run SMAPI's own installer again. The DewDrop installer only reinstalls SMAPI when it's missing or out of date, so it won't repair this. With DewDrop's Steam launcher (below), this doesn't happen.
 {% endhint %}
 
 On macOS, SMAPI needs macOS 10.15 Catalina or later. If macOS blocks SMAPI or calls it malware, follow the "Enable macOS security permissions" part of [SMAPI's macOS guide](https://stardewvalleywiki.com/Modding:Installing_SMAPI_on_Mac).
 
+### Steam Deck, and DewDrop's Steam launcher on Linux
+
+On a Steam Deck, SMAPI's own launcher tries to open a terminal window, which Game Mode can't show. So the DewDrop installer sets Stardew Valley's launch option in Steam to DewDrop's launcher instead. The launcher starts SMAPI directly, without a window, and in your DewDrop profile if you've asked for that. Because it doesn't rely on SMAPI's launcher, a game update doesn't turn mods off.
+
+On other Linux systems, the installer does the same with its `--steam-setup` option. See [DewDrop on the Steam Deck](../steam-deck.md) for what it changes in Steam and how to undo it.
+
 ## How DewDrop starts SMAPI
 
-When you click **Apply & Restart**, or **Restart now** when DewDrop asks to load your profile, DewDrop closes the game and starts SMAPI again itself, not through Steam, and tells it to load only the mods in your profile. With **Start in my profile from Steam** on, Steam's **Play** button tells SMAPI the same thing, so the game starts in your profile without that restart. [How launching works](../launching.md) explains why that matters, and [How DewDrop works](../../reference/how-it-works.md) has the technical details.
+When you click **Apply & Restart**, or **Restart now** when DewDrop asks to load your profile, DewDrop closes the game and starts SMAPI again itself, telling it to load only the mods in your profile. On Windows and macOS, and on Linux without DewDrop's Steam launcher, that restart happens outside Steam. With the launcher, it goes through the launcher, so the restarted game stays in the same Steam session.
+
+With **Start in my profile from Steam** on, Steam's **Play** button tells SMAPI the same thing, so the game starts in your profile without that restart. [How launching works](../launching.md) explains why that matters, and [How DewDrop works](../../reference/how-it-works.md) has the technical details.
 
 ## Problems with SMAPI
 
-* **The game starts without the SMAPI window:** your launcher isn't starting SMAPI. Check the section for your launcher above. (On macOS, a game that DewDrop restarted with **Apply & Restart** runs SMAPI without opening a window, so the missing window isn't a problem there.)
+* **The game starts without the SMAPI window:** your launcher isn't starting SMAPI. Check the section for your launcher above. (Two exceptions: DewDrop's Steam launcher never opens the window, and on macOS a game that DewDrop restarted runs SMAPI without one. If the **Mods** button is on the title screen, SMAPI is running.)
 * **SMAPI shows errors:** open [smapi.io/log](https://smapi.io/log) to upload your SMAPI log and read what went wrong. The wiki's [troubleshooting guide](https://stardewvalleywiki.com/Modding:Player_Guide/Troubleshooting) covers common SMAPI problems.
 * **Something's wrong with DewDrop:** see [Troubleshooting](../../help/troubleshooting.md) and [Reporting issues](../../help/reporting-issues.md).
 
-To remove SMAPI, run SMAPI's installer again and choose uninstall, then clear the Steam launch option or undo your launcher changes. (For the Xbox app, SMAPI's Windows guide explains how to undo the swap instead.) Without SMAPI, no mods load, DewDrop included. To remove only DewDrop, see [Uninstalling DewDrop](../uninstalling.md).
+To remove SMAPI, first undo your launcher setup: clear SMAPI or DewDrop's launcher from Steam's launch options, or, for the Xbox app, undo the swap as SMAPI's Windows guide explains. Then run SMAPI's installer again and choose uninstall. Without SMAPI, no mods load, DewDrop included. To remove only DewDrop, see [Uninstalling DewDrop](../uninstalling.md).

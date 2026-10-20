@@ -5,7 +5,7 @@ icon: trash-can
 
 # Uninstalling DewDrop
 
-Removing DewDrop mostly means deleting one folder. If Steam starts the game in your profile, there's one step before that. Your other mods, SMAPI and your saves stay as they are. Mods you installed through DewDrop are ordinary mod folders, so they stay too.
+Removing DewDrop mostly means deleting one folder. If Steam starts the game in your profile on Windows, there's one step before that. Your other mods, SMAPI and your saves stay as they are. Mods you installed through DewDrop are ordinary mod folders, so they stay too.
 
 {% hint style="warning" %}
 **Mods you turned off will load again.** Turning a mod off doesn't move it out of your `Mods` folder. It only changes your profile. Once DewDrop is gone, a normal launch loads everything in `Mods`, including mods you had turned off.
@@ -15,7 +15,7 @@ To see which mods those are, open the **Installed** tab before you uninstall and
 
 ## Remove DewDrop
 
-1. **If Steam starts the game in your profile, turn that off first** (Windows). On the **Account** tab > **Settings** panel, untick **Start in my profile from Steam**, then quit the game. Steam closes and opens again once, and DewDrop takes the `--mods-path` part out of Stardew Valley's launch options. If you skip this, SMAPI keeps loading your last profile, with no **Mods** button to change it.
+1. **On Windows, if Steam starts the game in your profile, turn that off first.** On the **Account** tab > **Settings** panel, untick **Start in my profile from Steam**, then quit the game. Steam closes and opens again once, and DewDrop takes the `--mods-path` part out of Stardew Valley's launch options. If you skip this, SMAPI keeps loading your last profile, with no **Mods** button to change it.
 
    Already removed DewDrop, or added `--mods-path` yourself? In Steam, right-click **Stardew Valley**, choose **Properties** and delete the `--mods-path "..."` part from **Launch Options**, keeping the rest. Do the same for a desktop shortcut you added it to. See [Start in your profile](../guides/start-in-your-profile.md).
 2. Make sure the game is closed.
@@ -23,6 +23,8 @@ To see which mods those are, open the **Installed** tab before you uninstall and
 4. If the installer turned off extra copies of DewDrop, you can also delete any folders named like `.DewDrop-duplicate`.
 
 That's it! The next time you start the game, SMAPI loads your `Mods` folder without DewDrop.
+
+**On Linux and the Steam Deck,** you can leave Steam's launch option as it is. Once DewDrop is gone, DewDrop's Steam launcher starts SMAPI with your whole `Mods` folder, and on a Deck that's still what lets mods load in Game Mode. To remove the launcher too, open "DewDrop's data folder" under [Optional: clean up leftovers](#optional-clean-up-leftovers) below.
 
 ## Optional: clean up leftovers
 
@@ -36,9 +38,8 @@ When DewDrop installs or updates a mod, it unpacks the new version into a hidden
 
 To see them, show hidden files: in Windows 11 File Explorer choose **View** > **Show** > **Hidden items** (on Windows 10, tick **View** > **Hidden items**), in Finder press **Cmd+Shift+.**, and in most Linux file managers press **Ctrl+H**. Any folder whose name starts with `.dewdrop-` is safe to delete once DewDrop is gone.
 
-If a mod said **Update ready, restart to finish** when you removed DewDrop, its new version is in `.dewdrop-staging` and won't go in now. That mod stays on its old version, so update it another way if you need to.
-
-If a mod said **Deleted when the game closes**, DewDrop moved it into `.dewdrop-staging` when you quit, in a folder whose name ends in `-removed`. DewDrop would have deleted it at the next start, so it stays there now. SMAPI skips it, and you can delete it. If the mod's folder is still in `Mods`, delete that yourself.
+* **A mod said Update ready, restart to finish** when you removed DewDrop: its new version is in `.dewdrop-staging` and won't go in now. The mod stays on its old version, so update it another way if you need to.
+* **A mod said Deleted when the game closes:** DewDrop moved it into `.dewdrop-staging` when you quit, in a folder whose name ends in `-removed`, and would have deleted it at the next start. SMAPI skips it, and you can delete it. If the mod's folder is still in `Mods`, delete that yourself.
 
 </details>
 
@@ -46,17 +47,21 @@ If a mod said **Deleted when the game closes**, DewDrop moved it into `.dewdrop-
 
 <summary>DewDrop's data folder (profiles and Nexus Mods login)</summary>
 
-DewDrop keeps its data in Stardrop's folder: `%AppData%\Stardrop\Data` on Windows. For macOS and Linux, see [Where DewDrop keeps files](../reference/file-locations.md).
+DewDrop keeps its data in Stardrop's folder. On Windows, paste this into the File Explorer address bar and press **Enter**:
 
-**On Linux and the Steam Deck,** if the installer set up Steam (it does on a Deck), Steam's launch option runs DewDrop's launcher from this folder. First delete the launcher's path (`"…/steam-launch.sh"`) from Stardew Valley's **Launch Options** in Steam, and keep anything else there, such as `gamemoderun`. Otherwise **Play** can't start the game once the folder is gone. See [DewDrop on the Steam Deck](steam-deck.md#what-the-installer-changes).
+```text
+%AppData%\Stardrop\Data
+```
 
-**If you don't use Stardrop,** you can delete the whole `Stardrop` folder. On Windows, paste `%AppData%` into the File Explorer address bar to find it. Deleting it in File Explorer, Finder or a Linux file manager is safe. Don't use PowerShell's `Remove-Item -Recurse`: the `Selected Mods` folder inside holds links to your real mod folders, and Windows PowerShell can follow them and delete your actual mods.
+On macOS and Linux, it's `~/.config/Stardrop/Data`. See [Where DewDrop keeps files](../reference/file-locations.md#the-shared-data-folder) for what's inside.
 
-Your DewDrop profiles and saved Nexus Mods login go with it. If you might try Stardrop later, keep the folder instead: Stardrop reads the same profiles.
+**On Linux and the Steam Deck,** if the installer set up Steam (it does by default on a Deck), Steam's launch option runs DewDrop's launcher from this folder. Before you delete the folder, open Stardew Valley's **Properties** in Steam and delete the launcher's path (`".../steam-launch.sh"`) from **Launch Options**. Keep anything else there, such as `gamemoderun`, and if only `%command%` is left, clear the box. Otherwise **Play** can't start the game once the folder is gone. On a Deck, the game then starts through SMAPI's own launcher, which may show a black screen or a terminal window in Game Mode. See [DewDrop on the Steam Deck](steam-deck.md#what-the-installer-changes).
+
+**If you don't use Stardrop,** you can delete the whole `Stardrop` folder. Deleting it in File Explorer, Finder or a Linux file manager is safe. Don't use PowerShell's `Remove-Item -Recurse`: the `Selected Mods` folder inside holds links to your real mod folders, and Windows PowerShell can follow them and delete your actual mods. Your DewDrop profiles and saved Nexus Mods login go with the folder. If you might try Stardrop later, keep it: Stardrop reads the same profiles.
 
 **If you use Stardrop,** keep the data folder. Stardrop uses the same profiles, settings, Nexus Mods login and `Selected Mods` folder.
 
-* You can delete `Cache\DewDrop` inside it: DewDrop's download queue, restart script and log, `startup.json`, `mod-sources.json` and link handler script. If DewDrop handles Nexus download links, sort that out first (next section).
+* You can delete `Cache/DewDrop` inside it, DewDrop's own files. If DewDrop handles Nexus download links, sort that out first (next section). On Linux and the Steam Deck, remove the launcher from Steam's launch options first, as above.
 * Your profiles still list DewDrop (`friessssss.DewDrop`) as turned on. That entry does nothing once the DewDrop folder is gone.
 * Don't log out of Nexus Mods in DewDrop before you remove it. Stardrop uses the same saved key, so it would be logged out too.
 
@@ -80,7 +85,7 @@ Skip this unless you clicked **Use DewDrop for these links** on the **Account** 
 
 These belong to SMAPI's setup, not DewDrop. Keep them if you still play with mods.
 
-* **Steam's launch option** (`"...\StardewModdingAPI.exe" %command%`). If the installer set it, it changed only the Steam account you were signed in to, and first saved a backup of that account's Steam settings as `localconfig.vdf.dewdrop-backup-<date>-<time>`, in your Steam folder under `userdata\<number>\config`. If you used **Start in my profile from Steam**, the same folder also has `localconfig.vdf.dewdrop-backup`, the copy DewDrop saved before its last change. You can delete the backups. Don't copy one back over Steam's current file: it's an old copy of all your Steam settings.
+* **Steam's launch option** on Windows (`"...\StardewModdingAPI.exe" %command%`). If the installer set it, it changed only the Steam account you were signed in to, and first saved a backup of that account's Steam settings as `localconfig.vdf.dewdrop-backup-<date>-<time>`, in your Steam folder under `userdata\<number>\config`. If you used **Start in my profile from Steam**, the same folder also has `localconfig.vdf.dewdrop-backup`, the copy DewDrop saved before its last change. On Linux and the Steam Deck, the installer saved the same kind of backup before it set DewDrop's launcher. You can delete the backups. Don't copy one back over Steam's current file: it's an old copy of all your Steam settings.
 * **The Stardew Valley (SMAPI) desktop shortcut** starts SMAPI. Keep it to play with mods, or delete it.
 * **Xbox app:** if the installer did SMAPI's exe swap, `Stardew Valley.exe` is a copy of SMAPI and the game's own exe is `Stardew Valley original.exe`. If you ran the installer again after a game update, that's the updated game's exe.
 * **The installer log**, `DewDrop-installer.log`, is in your temp folder (`%TEMP%` on Windows, `$TMPDIR` or `/tmp` on macOS and Linux). You can delete it.
