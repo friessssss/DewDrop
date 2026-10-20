@@ -18,7 +18,7 @@ There are two ways to install DewDrop. Both end in the same place: SMAPI install
 | How you get it | Paste one line into PowerShell or Terminal, or download `DewDrop-<version>-installer.zip` | Download `DewDrop-<version>.zip` |
 | Installs or updates SMAPI | Yes, if it's missing or out of date | No. Install SMAPI yourself first. |
 | Finds your `Mods` folder | Yes | You find it |
-| Sets up Steam to start SMAPI (Windows) | Offers to do it for you | You do it yourself, once |
+| Sets up Steam to start SMAPI (Windows and Steam Deck) | Offers to do it for you (on a Steam Deck, it's part of the install: see [DewDrop on the Steam Deck](../steam-deck.md)) | You do it yourself, once |
 | Keeps your DewDrop settings when updating | Yes | Yes, if you keep `config.json` |
 | Good for | First-timers, and anyone who wants it done for them | Players who already use mods |
 

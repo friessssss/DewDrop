@@ -5,7 +5,7 @@ icon: terminal
 
 # Console commands
 
-When you play with SMAPI, a console window opens beside the game. On Windows it's a black window full of text; on macOS and Linux it's a terminal window. Besides showing SMAPI's messages, it accepts typed commands. DewDrop adds three:
+When you play with SMAPI, a console window opens beside the game, unless Steam starts it through DewDrop's Steam launcher (see the note under [Running a command](#running-a-command)). On Windows it's a black window full of text; on macOS and Linux it's a terminal window. Besides showing SMAPI's messages, it accepts typed commands. DewDrop adds three:
 
 | Command | What it's for |
 | --- | --- |
@@ -29,6 +29,8 @@ Type `help` to list every command SMAPI knows, or `help dewdrop_status` to see o
 If DewDrop couldn't start, for example because it couldn't read its data folder, its commands aren't added. The SMAPI console shows an error from DewDrop while mods are loading instead.
 
 On macOS, a game that DewDrop restarted into your profile probably runs without a console window, so there's nowhere to type. This hasn't been tested. Start the game the usual way to get the console back.
+
+On a Steam Deck, and on Linux after the installer's `--steam-setup`, Steam starts the game through DewDrop's Steam launcher. It always starts SMAPI without a console window, in Game Mode and Desktop Mode, restarts included, so these commands can't be typed there. DewDrop's and SMAPI's messages still go to the [SMAPI log](../help/reporting-issues.md#find-your-smapi-log).
 {% endhint %}
 
 ## `dewdrop_status`
@@ -65,7 +67,7 @@ What each part means:
 | `Session` | What kind of launch this was. `Profile`: SMAPI loaded your profile's `Selected Mods` folder. `Plain`: a normal launch that loaded your game's `Mods` folder, or the mods folder Stardrop is set to use. `Custom`: SMAPI was started on some other folder with `--mods-path`, or didn't say which folder it used. See [Which session you're in](how-it-works.md#which-session-youre-in). |
 | `ask to load my profile` | The **Ask to load my profile** setting on the **Account** tab: `True` when it's on, `False` when it's off. See [Start in your profile](../guides/start-in-your-profile.md). |
 | In brackets | What happened with the **Load your profile?** box this session. See the table below. |
-| `Start in my profile from Steam` | `on` or `off`, then Stardew Valley's launch option in Steam, as DewDrop read it when the game started. `(changes when the game closes)` at the end means the setting and Steam's launch option don't agree yet, so DewDrop changes the launch option when you quit the game. When the setting isn't available, the line says why instead, such as `Only for the Steam version of the game on Windows.` |
+| `Start in my profile from Steam` | `on` or `off`, then Stardew Valley's launch option in Steam, as DewDrop read it when the game started. `(changes when the game closes)` at the end means the setting and Steam's launch option don't agree yet, so DewDrop changes the launch option when you quit the game. When the setting isn't available, the line says why instead, such as `Only for the Steam version of the game on Windows, Linux and the Steam Deck.` |
 | `Nexus` | The Nexus Mods account you're logged in with, followed by `(Premium)` for Premium accounts, or `not logged in`. |
 
 Both folders come from Stardrop's `Settings.json`, which DewDrop shares. See [config.json options](config.md#settings-dewdrop-reads-from-stardrop).
@@ -97,7 +99,7 @@ Downloads and installs a Nexus Mods file from an `nxm://` link, the same way it 
 dewdrop_nxm nxm://stardewvalley/mods/<mod id>/files/<file id>?key=...&expires=...&user_id=...
 ```
 
-You'll mostly want this on **macOS and Linux with a free Nexus Mods account**. There, DewDrop can't receive the website's **Slow download** links yet, even though the message in the menu says it will. It can also help on Windows when another app handles those links. Premium accounts don't need it: their **Install** button downloads directly. See [Free vs Premium downloads](../nexus-mods/free-vs-premium.md).
+You'll mostly want this on **macOS and Linux with a free Nexus Mods account**. There, DewDrop can't receive the website's **Slow download** links yet, even though the message in the menu says it will. It can also help on Windows when another app handles those links. It isn't available on a Steam Deck, or on Linux with DewDrop's Steam launcher, since there's no console there to type in (see [Running a command](#running-a-command)). Premium accounts don't need it: their **Install** button downloads directly. See [Free vs Premium downloads](../nexus-mods/free-vs-premium.md).
 
 To use it:
 

@@ -15,10 +15,11 @@ If the installer started the game for you, this is already your first launch. Ot
 * **Windows, GOG:** use the **Stardew Valley (SMAPI)** desktop shortcut. GOG Galaxy's **Play** button starts the game without mods, unless you've [set Galaxy up for SMAPI](installing/smapi.md#gog-galaxy-on-windows).
 * **Xbox app:** click **Play** in the Xbox app.
 * **macOS and Linux:** start the game however you usually do. Steam's **Play** button already starts SMAPI.
+* **Steam Deck:** press **Play** in Game Mode. See [DewDrop on the Steam Deck](steam-deck.md).
 
 Use Stardrop? Start this first launch one of the ways above, not from Stardrop. More in [Using DewDrop with Stardrop](../stardrop.md#first-time-setup-if-you-already-use-stardrop).
 
-SMAPI's window opens next to the game: a black console window on Windows, a terminal window on macOS and Linux. It lists what's loading, and yellow lines are normal. Leave it open: closing it closes the game. If no SMAPI window opens, the game started without mods.
+SMAPI's window opens next to the game: a black console window on Windows, a terminal window on macOS and Linux. It lists what's loading, and yellow lines are normal. Leave it open: closing it closes the game. If no SMAPI window opens, the game started without mods, unless Steam started it with DewDrop's launcher (on a Steam Deck, or on Linux after the installer's `--steam-setup`), which never shows one. Then the **Mods** button on the title screen shows that mods loaded.
 
 ## Find the Mods button
 
@@ -51,7 +52,7 @@ Mods load once, when the game starts. So when you change your mods, for example 
 
 1. Click **Apply & Restart**.
 2. A dialog asks **Restart Stardew Valley now with the 'Default' profile?** Click **Restart**.
-3. The game closes, then starts again by itself after a few seconds, with a new SMAPI window. (On macOS, no Terminal window comes back. That's fine: if the **Mods** button is there, your mods loaded.)
+3. The game closes, then starts again by itself after a few seconds, with a new SMAPI window. (On macOS, no Terminal window comes back, and with DewDrop's Steam launcher there's never one. That's fine: if the **Mods** button is there, your mods loaded.)
 4. Click **Mods** again. The bottom line now says **The mods loaded right now match this profile.**, and **Apply & Restart** is grayed out.
 
 <figure><img src="../.gitbook/assets/shot-apply-restart.png" alt="DewDrop's confirm dialog asking to restart Stardew Valley with the Default profile, with Restart and Cancel buttons."><figcaption><p>The confirm dialog names the profile that will load.</p></figcaption></figure>
@@ -72,7 +73,7 @@ Starting the game the normal way loads your whole `Mods` folder again, including
 
 <figure><img src="../.gitbook/assets/shot-title-prompt.png" alt="The Load your profile? box over the title screen. It says 20 mods that are off in the SVE playthrough profile loaded anyway, names three of them, and asks to restart into the profile. Below are a ticked Start in my profile from Steam from now on checkbox, a note that Steam closes and opens again once after you quit, and the Don't ask again, Restart now and Not now buttons."><figcaption><p>The box that opens when the mods that loaded differ from your profile.</p></figcaption></figure>
 
-On Windows with the Steam version, the box also has a **Start in my profile from Steam from now on** checkbox, ticked at first. Leave it ticked when you click **Restart now**, and Steam's **Play** button will start the game in your profile from then on, with no box and no restart. Untick it if you'd rather be asked each time.
+On Windows with the Steam version, and on Linux and the Steam Deck when Steam starts the game with DewDrop's launcher, the box also has a **Start in my profile from Steam from now on** checkbox, ticked at first. Leave it ticked when you click **Restart now**, and Steam's **Play** button will start the game in your profile from then on, with no box and no restart. Untick it if you'd rather be asked each time.
 
 **Never turn mods off?** Then a normal launch already loads the same mods, and the box doesn't open.
 
@@ -86,18 +87,20 @@ This part is for Windows and the Steam version of the game. For Steam to start t
 
 This happens once, the first time you quit after **Start in my profile from Steam** turns on. It turns on when you leave the box's checkbox ticked, or if you said yes to the installer's question **Start the game in your DewDrop profile when you press Play in Steam?** You can turn it on or off any time on the **Account** tab > **Settings** panel, and each change happens the same way when you quit.
 
+On Linux and the Steam Deck, Steam never closes for this. DewDrop's Steam launcher reads the setting each time the game starts, so turning it on or off takes effect at once.
+
 On Windows, quitting the game also finishes any mod updates that say **Update ready, restart to finish**.
 
 ## From then on
 
 * **Play in Steam, with Start in my profile from Steam on:** the game starts in your profile. If you change your mods in the menu, they load the next time you press **Play**, or click **Apply & Restart** to load them now.
-* **Any other launch**, such as Steam without that setting, a desktop shortcut, GOG, the Xbox app, macOS or Linux: when the mods that loaded differ from your profile, the box opens. Click **Restart now**.
+* **Any other launch**, such as Steam without that setting, a desktop shortcut, GOG, the Xbox app, macOS, or Linux without DewDrop's Steam launcher: when the mods that loaded differ from your profile, the box opens. Click **Restart now**.
 
 [How launching works](launching.md) explains why, and [Start in your profile](../guides/start-in-your-profile.md) covers both settings.
 
 ## No Mods button?
 
-* **The game started without SMAPI.** No SMAPI window opened. See [Starting the game with SMAPI](installing/smapi.md#starting-the-game-with-smapi).
+* **The game started without SMAPI.** No SMAPI window opened. See [Starting the game with SMAPI](installing/smapi.md#starting-the-game-with-smapi). DewDrop's Steam launcher never shows one, so there, check `steam-launch.log` instead (see [If something goes wrong](steam-deck.md#if-something-goes-wrong)).
 * **DewDrop is still zipped, or one folder too deep.** Aim for `Mods/DewDrop/manifest.json`. If yours is one level deeper, move the inner `DewDrop` folder straight into `Mods` and delete the empty outer one.
 * **There are two copies of DewDrop.** SMAPI loads neither, so keep one.
 * **You started from Stardrop** before DewDrop was in your profile. Start once the normal way instead.

@@ -9,7 +9,7 @@ DewDrop uses three main places on your computer:
 
 1. **Its own mod folder**, inside your game's `Mods` folder.
 2. **A data folder it shares with Stardrop**, for profiles, settings, your Nexus Mods login and the `Selected Mods` folder SMAPI loads your profile from.
-3. **Your SMAPI log**, where everything DewDrop reports ends up. Apart from a small restart log on Windows, DewDrop has no log file of its own.
+3. **Your SMAPI log**, where everything DewDrop reports ends up. Apart from a small restart log on Windows, and its Steam launcher's log on Linux and the Steam Deck, DewDrop has no log file of its own.
 
 ## Quick list for your system
 
@@ -53,6 +53,7 @@ Folders starting with `~/.config` and `~/Library` are hidden in Finder. To open 
 | DewDrop's mod folder | `<game folder>/Mods/DewDrop` |
 | Shared data folder | `~/.config/Stardrop/Data`, or `$XDG_CONFIG_HOME/Stardrop/Data` if you've set `XDG_CONFIG_HOME` |
 | SMAPI log | `~/.config/StardewValley/ErrorLogs/SMAPI-latest.txt` |
+| Steam launcher log (Steam Deck, or Linux after `--steam-setup`) | `~/.config/Stardrop/Data/Cache/DewDrop/steam-launch.log` |
 | Installer log | `/tmp/DewDrop-installer.log`, or `$TMPDIR/DewDrop-installer.log` if you've set `TMPDIR` |
 
 Folders starting with a dot, like `~/.config`, are hidden. In most file managers, **Ctrl+H** shows them.
@@ -88,7 +89,7 @@ These are the files DewDrop uses inside `Stardrop/Data`:
 | --- | --- | --- |
 | `Settings.json` | Stardrop's settings, which DewDrop shares: the path of your `Mods` folder, your active profile and your Nexus Mods login. DewDrop only changes the parts it uses. | No. You'd lose your login, your active profile and Stardrop's settings. |
 | `Profiles/` | One `.json` file per profile, such as `Default.json`. | No. Deleting a file deletes that profile, for Stardrop too. |
-| `Selected Mods/` | Links to the mods in your active profile. DewDrop rebuilds it each time it restarts the game into your profile, such as when you click **Apply & Restart**. On Windows, with **Start in my profile from Steam** on, it also brings the links up to date when you quit the game. Stardrop uses it too. | Leave it to DewDrop and Stardrop. See the warning below. |
+| `Selected Mods/` | Links to the mods in your active profile. DewDrop rebuilds it each time it restarts the game into your profile, such as when you click **Apply & Restart**. With **Start in my profile from Steam** on (on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher), it also brings the links up to date when you quit the game. Stardrop uses it too. | Leave it to DewDrop and Stardrop. See the warning below. |
 | `Cache/Notion.json` | The key that unlocks the Nexus Mods API key saved in `Settings.json`. | No. Your saved login would stop working in DewDrop and Stardrop. |
 | `Thumbnails/Nexus/` | Pictures from Browse. There's no size limit, so it can grow over time. | Yes, while the game is closed. DewDrop downloads pictures again when it needs them. |
 | `Collections/Mods/` | Mods from Stardrop's Nexus collections, if you use them. | No, if you use Stardrop collections. |
@@ -98,9 +99,9 @@ These are the files DewDrop uses inside `Stardrop/Data`:
 | `Cache/DewDrop/pending-updates.json` | Updates waiting for a restart, or on Windows for you to quit the game. | No, while an update shows **Update ready, restart to finish**. |
 | `Cache/DewDrop/relaunch.ps1`, `relaunch.log` | The script that runs after the game closes, and its log (Windows). It restarts the game for **Apply & Restart**, finishes waiting updates, and changes Steam's launch option for **Start in my profile from Steam**. | Yes, while the game is closed. DewDrop writes them again when it needs them. |
 | `Cache/DewDrop/steam-job.json`, `steam-result.json` | A change to Steam's launch option, and how it went (Windows). `steam-job.json` only exists for a moment after you quit the game. `steam-result.json` stays until the next start, when DewDrop reads it, removes it and tells you how the change went. | Yes. If the change didn't happen, DewDrop tries again the next time you quit. You only miss the message about it. |
-| `Cache/DewDrop/steam-launch.sh`, `steam-launch.log` | Linux and Steam Deck: DewDrop's Steam launcher, which Stardew Valley's launch option in Steam runs, and its record of what it did at each launch. DewDrop writes the launcher again when it changes. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md). | Not the launcher while Steam's launch option uses it: Steam couldn't start the game. Run the installer again to put it back. The log is safe to delete. |
+| `Cache/DewDrop/steam-launch.sh`, `steam-launch.log` | Linux and Steam Deck: DewDrop's Steam launcher, which Stardew Valley's launch option in Steam runs, and its record of what it did at each launch, DewDrop's restarts included. DewDrop writes the launcher again when it changes. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md). | Not the launcher while Steam's launch option uses it: Steam couldn't start the game. Run the installer again to put it back. The log is safe to delete. |
 | `Cache/DewDrop/start-in-profile`, `restart` | Linux and Steam Deck: `start-in-profile` is there while **Start in my profile from Steam** is on. `restart` holds the ID of an **Apply & Restart** until the launcher starts the restarted game, and is gone straight after. | `start-in-profile`: deleting it turns the setting off until DewDrop writes it again. `restart`: yes. |
-| `Cache/DewDrop/nexus-key.txt` | Steam Deck: a Nexus Mods API key you gave the installer. DewDrop logs in with it at the next start, saves it like a key you typed in, and deletes this file. Only you can read it. | Yes. You then log in on the **Account** tab instead. |
+| `Cache/DewDrop/nexus-key.txt` | Steam Deck: a Nexus Mods API key you gave the installer. DewDrop logs in with it at the next start and saves it like a key you typed in. It deletes this file once the key is saved, or if Nexus Mods turns the key down. If Nexus Mods can't be reached, or the key couldn't be saved, the file stays and DewDrop tries again at the next start. Logging out, or logging in with another key, deletes it too. Only you can read it. | Yes. You then log in on the **Account** tab instead. |
 | `Cache/DewDrop/startup.json` | What DewDrop remembers between launches: a restart that's in progress, if any, and the mods DewDrop has already seen, so it can tell which ones you copied in by hand. See [How DewDrop works](how-it-works.md#mods-you-copy-in-by-hand). | Yes, while the game is closed. DewDrop starts a new one, and every mod installed then counts as seen. |
 
 You may also see backup copies:
@@ -128,7 +129,8 @@ Besides the mods themselves, you might notice these folders. Their names start w
 ## Logs
 
 * **SMAPI log** (`SMAPI-latest.txt`): everything DewDrop reports, including errors, goes here, together with SMAPI's own messages. It's rewritten each time the game starts. To share it, upload it at [smapi.io/log](https://smapi.io/log). See [Reporting issues](../help/reporting-issues.md).
-* **`relaunch.log`** (Windows only): written by the script that runs after the game closes, for **Apply & Restart**, waiting updates and **Start in my profile from Steam**. It's emptied each time that script runs, and only gets lines when it finished updates, changed Steam's launch option or something went wrong. macOS and Linux have no restart log.
+* **`relaunch.log`** (Windows only): written by the script that runs after the game closes, for **Apply & Restart**, waiting updates and **Start in my profile from Steam**. It's emptied each time that script runs, and only gets lines when it finished updates, changed Steam's launch option or something went wrong. macOS, and Linux without DewDrop's Steam launcher, have no restart log.
+* **`steam-launch.log`** (Linux and the Steam Deck, with DewDrop's Steam launcher): a line each time Steam or a DewDrop restart starts the game through the launcher, saying which folder SMAPI loaded and why. Only the latest launches are kept. Since the launcher starts SMAPI without a console window, this and the SMAPI log are where to look.
 * **`DewDrop-installer.log`**: a record of the installer's last run, replaced each time you run it. On Windows, it holds everything the installer printed. On macOS and Linux, it holds the installer's steps, warnings and errors, but not your answers to its questions or the output of SMAPI's own installer.
 
 ## Other changes on Windows
@@ -142,6 +144,8 @@ Some actions change things outside these folders. Each one only happens when you
 | Steam starts the game in your profile | You turn on **Start in my profile from Steam** on the **Account** tab, or say yes when the installer or the **Load your profile?** box offers it. The change happens when you quit the game. | The same `localconfig.vdf`, for the same Steam account. DewDrop adds `--mods-path` to Stardew Valley's launch option, and takes it out again when you turn the setting off. Before each change, it saves a backup next to the file named `localconfig.vdf.dewdrop-backup`, replacing the previous one. See [Start in your profile](../guides/start-in-your-profile.md). |
 | Desktop shortcut | You say yes when the installer offers it. | `Stardew Valley (SMAPI)` on your desktop. If the installer ran as administrator, it goes on the desktop all users share (`C:\Users\Public\Desktop`). |
 | Xbox app starts SMAPI | You say yes when the installer offers SMAPI's exe swap. | In the game folder, `Stardew Valley.exe` is renamed `Stardew Valley original.exe`, and a copy of SMAPI takes its name. When you run the installer again after a game update, the updated `Stardew Valley.exe` replaces the older `Stardew Valley original.exe`, and SMAPI's copy takes its name again. |
+
+On Linux and the Steam Deck, the installer changes Stardew Valley's launch option in Steam's `localconfig.vdf` (in `userdata/<number>/config` in Steam's folder, for the Steam account that's signed in) to run DewDrop's Steam launcher, and saves a backup named `localconfig.vdf.dewdrop-backup-<date>-<time>` next to it first. **Start in my profile from Steam** doesn't change Steam there: it's the `start-in-profile` file. See [Steam on Linux and the Steam Deck](installer-options.md#steam-on-linux-and-the-steam-deck).
 
 SMAPI's own files in your game folder, such as `StardewModdingAPI.exe` and the `smapi-internal` folder, belong to SMAPI. See [About SMAPI](../getting-started/installing/smapi.md).
 

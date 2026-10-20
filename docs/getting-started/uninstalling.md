@@ -46,6 +46,8 @@ If a mod said **Update ready, restart to finish** when you removed DewDrop, its 
 
 DewDrop keeps its data in Stardrop's folder: `%AppData%\Stardrop\Data` on Windows. For macOS and Linux, see [Where DewDrop keeps files](../reference/file-locations.md).
 
+**On Linux and the Steam Deck,** if the installer set up Steam (it does on a Deck), Steam's launch option runs DewDrop's launcher from this folder. First delete the launcher's path (`"…/steam-launch.sh"`) from Stardew Valley's **Launch Options** in Steam, and keep anything else there, such as `gamemoderun`. Otherwise **Play** can't start the game once the folder is gone. See [DewDrop on the Steam Deck](steam-deck.md#what-the-installer-changes).
+
 **If you don't use Stardrop,** you can delete the whole `Stardrop` folder. On Windows, paste `%AppData%` into the File Explorer address bar to find it. Deleting it in File Explorer, Finder or a Linux file manager is safe. Don't use PowerShell's `Remove-Item -Recurse`: the `Selected Mods` folder inside holds links to your real mod folders, and Windows PowerShell can follow them and delete your actual mods.
 
 Your DewDrop profiles and saved Nexus Mods login go with it. If you might try Stardrop later, keep the folder instead: Stardrop reads the same profiles.

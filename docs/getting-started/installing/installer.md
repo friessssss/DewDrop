@@ -77,6 +77,8 @@ On Windows with Steam, it offers to change one Steam setting so that **Play** st
 
 It also asks **Start the game in your DewDrop profile when you press Play in Steam?** Press **Enter** for yes. Then **Play** loads only the mods that are on in your profile, so you don't need **Apply & Restart** to get into it. The installer doesn't make this change itself: DewDrop finishes it the next time you quit the game, when Steam closes and opens again once. You can change it any time in **Mods** > **Account**.
 
+On a Steam Deck, the installer sets Steam up to start the game with DewDrop's launcher instead, and offers to take your Nexus Mods API key. It asks its questions first, then closes Steam for a few seconds and opens it again. Your answer about starting in your profile counts at once. See [DewDrop on the Steam Deck](../steam-deck.md). On other Linux systems, it does the same with the [`--steam-setup` option](../../reference/installer-options.md#steam-on-linux-and-the-steam-deck), without the API key question.
+
 <figure><img src="../../.gitbook/assets/installer-windows.png" alt="The DewDrop installer on Windows: it finds the game, checks SMAPI, installs DewDrop and ends with All done"><figcaption><p>The installer on Windows.</p></figcaption></figure>
 
 When you see **All done!**, DewDrop and SMAPI are installed.
@@ -85,9 +87,9 @@ When you see **All done!**, DewDrop and SMAPI are installed.
 {% step %}
 ### Start the game
 
-The installer asks **Start Stardew Valley now?** (not for the Xbox app). Press **Enter**.
+The installer asks **Start Stardew Valley now?** (not for the Xbox app, and not on a Steam Deck, where you start the game in Game Mode). Press **Enter**.
 
-SMAPI's window opens next to the game and lists what's loading. Leave it open: closing it closes the game. On the title screen, click the new **Mods** button. That's it!
+SMAPI's window opens next to the game and lists what's loading. Leave it open: closing it closes the game. (With DewDrop's Steam launcher, on Linux after `--steam-setup`, there's no SMAPI window.) On the title screen, click the new **Mods** button. That's it!
 {% endstep %}
 {% endstepper %}
 
@@ -104,8 +106,9 @@ You're done. Next, read [Your first launch](../first-launch.md). To learn when y
 | Windows, GOG or another setup | Use the **Stardew Valley (SMAPI)** desktop shortcut. GOG Galaxy's **Play** button starts the game **without** mods unless you [set Galaxy up](smapi.md#gog-galaxy-on-windows). |
 | Windows, Xbox app | Press **Play** in the Xbox app. |
 | macOS or Linux | Start it however you usually do. Steam's **Play** button works. |
+| Steam Deck | Press **Play** in Game Mode. See [DewDrop on the Steam Deck](../steam-deck.md). |
 
-If no SMAPI window opens, the game started without mods. One exception: on macOS, a game that DewDrop restarted with **Apply & Restart** doesn't open a new Terminal window. If the **Mods** button is on the title screen, your mods loaded.
+If no SMAPI window opens, the game started without mods. Two exceptions: on macOS, a game that DewDrop restarted with **Apply & Restart** doesn't open a new Terminal window. And on a Steam Deck, or on Linux after `--steam-setup`, Steam starts the game through DewDrop's Steam launcher, which never opens a SMAPI window. If the **Mods** button is on the title screen, your mods loaded.
 
 ## Running the installer on your computer
 
@@ -156,11 +159,12 @@ If no SMAPI window opens, the game started without mods. One exception: on macOS
 5. **Copies DewDrop into `Mods/DewDrop`**, or updates your copy where it is and keeps your `config.json` settings. The old copy is only removed after the new one is in place. It doesn't swap a newer DewDrop for an older one unless you say yes. A mod that only needs DewDrop is never mistaken for it.
 6. **Offers to turn off extra copies** of DewDrop by putting a `.` at the start of their folder names, so SMAPI skips them.
 7. **Reminds Stardrop users** what to do on their first launch.
-8. **Sets up how you start the game** (Windows only):
-   * **Steam:** it sets the launch option `"<your game folder>\StardewModdingAPI.exe" %command%` for the signed-in Steam account, after closing Steam and backing up its `localconfig.vdf`. It replaces other launch options only if you say yes, and offers to fix one that starts SMAPI from another folder. It also asks whether Steam should start the game in your DewDrop profile, and saves your answer in DewDrop's `config.json`. If you say yes, DewDrop adds SMAPI's `--mods-path` option to the launch option the next time you quit the game. A `--mods-path` you set to another folder yourself is kept, unless you say yes. See [Installer command-line options](../../reference/installer-options.md#starting-in-your-profile).
+8. **Sets up how you start the game** (Windows, and Steam on a Steam Deck):
+   * **Steam on Windows:** it sets the launch option `"<your game folder>\StardewModdingAPI.exe" %command%` for the signed-in Steam account, after closing Steam and backing up its `localconfig.vdf`. It replaces other launch options only if you say yes, and offers to fix one that starts SMAPI from another folder. It also asks whether Steam should start the game in your DewDrop profile, and saves your answer in DewDrop's `config.json`. If you say yes, DewDrop adds SMAPI's `--mods-path` option to the launch option the next time you quit the game. A `--mods-path` you set to another folder yourself is kept, unless you say yes. See [Installer command-line options](../../reference/installer-options.md#starting-in-your-profile).
    * **Xbox app:** it renames `Stardew Valley.exe` to `Stardew Valley original.exe` and puts a copy of SMAPI in its place. After a game update, run the installer again: the updated game becomes the new `Stardew Valley original.exe`.
-   * **Anything else:** it offers a **Stardew Valley (SMAPI)** desktop shortcut.
-9. **Offers to start the game.**
+   * **Anything else on Windows:** it offers a **Stardew Valley (SMAPI)** desktop shortcut.
+   * **Steam on a Steam Deck** (or on Linux with `--steam-setup`): on a Deck, it first offers to take your Nexus Mods API key, unless one is already saved. The new launch option, for the signed-in Steam account, runs DewDrop's launcher; launch options you already have are kept where they can be, and it asks first. It also asks whether Steam should start the game in your DewDrop profile, unless that's already on or you turned it off in the game. Then it closes Steam, backs up its `localconfig.vdf`, sets the launch option and opens Steam again straight away. See [Steam on Linux and the Steam Deck](../../reference/installer-options.md#steam-on-linux-and-the-steam-deck).
+9. **Offers to start the game** (not on a Steam Deck).
 
 It never deletes your mods, saves or settings. SMAPI's installer adds or updates its two bundled mods, Console Commands and Save Backup.
 

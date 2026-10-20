@@ -108,10 +108,11 @@ With `-Yes` (Windows) or `--yes` (macOS and Linux), the installer answers its ow
 | Windows, Steam: the launch option starts SMAPI from another folder. Point it at this game's SMAPI? | Yes. Other options in it are kept; see [Starting in your profile](#starting-in-your-profile) for `--mods-path`. |
 | Windows, Steam: replace other launch options? | No. It shows the manual steps, but doesn't copy the line to your clipboard. |
 | Windows, Steam: start the game in your DewDrop profile when you press Play in Steam? | Yes. Add `-NoStartInProfile` for no. |
-| Steam Deck: add DewDrop's launcher to launch options you already have (they use `%command%`)? | Yes. |
-| Steam Deck: replace launch options you already have (they don't use `%command%`)? | No. It shows what to enter yourself. |
-| Steam Deck: start the game in your DewDrop profile when you press Play in Steam? | Yes. Add `--no-start-in-profile` for no. |
-| Steam Deck: your Nexus Mods API key? | Not asked: it's skipped. (Without `--yes`, it's asked before Steam closes, since the Deck's on-screen keyboard closes with Steam.) |
+| Steam Deck or `--steam-setup`: add DewDrop's launcher to launch options you already have (they use `%command%`)? | Yes. |
+| Steam Deck or `--steam-setup`: the launch option starts SMAPI directly. Use DewDrop's launcher instead? | Yes. SMAPI's own options in it, such as `--mods-path`, go; the rest is kept. |
+| Steam Deck or `--steam-setup`: replace launch options you already have (they don't use `%command%`)? | No. It shows what to enter yourself. |
+| Steam Deck or `--steam-setup`: start the game in your DewDrop profile when you press Play in Steam? | Yes, unless it's already on, or you turned it off in the game: then it keeps that without asking. Add `--no-start-in-profile` for no. |
+| Steam Deck: your Nexus Mods API key? | Not asked: it's skipped. (Without `--yes`, it's asked before Steam closes, since the Deck's on-screen keyboard closes with Steam. It isn't asked when a key is already saved.) |
 | Windows: add the desktop shortcut? | Yes. Add `-NoShortcut` if you don't want it. |
 | Windows, Xbox app: swap in SMAPI's copy of the game's exe? | Yes. |
 | Start Stardew Valley now? | Yes. Add `-NoLaunch` (`--no-launch`) if you don't want that. On a Steam Deck it isn't asked: the game is for Game Mode. |
@@ -122,7 +123,7 @@ The Steam launch option is only changed for the Steam account that's signed in (
 
 ## Starting in your profile
 
-This only applies to the Steam version on Windows. When the installer sets up Steam's launch option for SMAPI, it also asks:
+This section is about the Steam version on Windows. On Linux and the Steam Deck, the installer asks the same question, but the answer works through DewDrop's launcher; see [Steam on Linux and the Steam Deck](#steam-on-linux-and-the-steam-deck). When the installer sets up Steam's launch option for SMAPI, it also asks:
 
 ```
 Start the game in your DewDrop profile when you press Play in Steam? [Y/n]
@@ -140,12 +141,17 @@ The question only comes up when the installer sets up Steam's launch option, so 
 
 ## Steam on Linux and the Steam Deck
 
-On a Steam Deck (SteamOS), the installer sets Stardew Valley's launch option in Steam to DewDrop's launcher, so the game starts with SMAPI in Game Mode and DewDrop can restart it there. On other Linux systems it only does this with `--steam-setup`; `--no-steam-setup` skips it on a Deck. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md) for what the launcher does.
+On a Steam Deck (SteamOS, or a Steam Deck running another Linux system), the installer sets Stardew Valley's launch option in Steam to DewDrop's launcher, so the game starts with SMAPI in Game Mode and DewDrop can restart it there. On other Linux systems it only does this with `--steam-setup`; `--no-steam-setup` skips it on a Deck. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md) for what the launcher does.
 
-* **Steam has to be closed** to change its settings, so the installer closes it (`steam -shutdown`) and starts it again straight after the change. It asks all its questions first: on a Steam Deck, the controls and the on-screen keyboard close with Steam. If Steam starts again by itself straight away, as a SteamOS service can, the installer stops that service instead, and starts it again at the end.
+* **Your Nexus Mods API key** (Steam Deck only): the installer offers to take it, so you don't have to type it with the on-screen keyboard. It's skipped when a key is already saved. DewDrop logs in with it the next time the game starts; see [Where DewDrop keeps files](file-locations.md#the-shared-data-folder).
+* **Steam has to be closed** to change its settings, so the installer closes it (`steam -shutdown`) and starts it again straight after the change. It asks all its questions first: on a Steam Deck, the controls and the on-screen keyboard close with Steam. If Steam starts again by itself straight away, as a SteamOS service can, the installer stops that service instead, and starts the service again afterwards.
 * **Only the signed-in Steam account** is changed (the one marked as most recent in Steam's `loginusers.vdf`), and Steam's settings file is backed up first.
-* **Launch options you already have** that use `%command%`, such as `gamemoderun %command%`, are kept: the launcher goes just before `%command%`. Ones without `%command%` are only replaced if you say so. A launch option that starts SMAPI directly is replaced, since the launcher starts SMAPI itself.
-* **Starting in your profile:** the answer is saved for the launcher at once. The launcher only starts the game in your profile once DewDrop has linked it, so the first start loads your whole `Mods` folder.
+* **Launch options you already have** that use `%command%`, such as `gamemoderun %command%`, are kept: the launcher goes just before `%command%`. The installer shows what they become and asks first. Ones without `%command%` are only replaced if you say so.
+* **A launch option that starts SMAPI directly** gets the launcher in SMAPI's place. What comes before SMAPI (such as `gamemoderun`) and after `%command%` is kept. SMAPI's own options, such as `--mods-path`, go, since the launcher picks the mods folder itself. Unless the option was only SMAPI and `%command%`, the installer shows what it becomes, names the SMAPI options that go, and asks first (the recommended answer is yes).
+* **Launch options Steam saves as it closes** are left alone, since the installer can't ask about them while Steam is closed. Run the installer again to add the launcher to them.
+* **Starting in your profile:** the answer is saved for the launcher at once. If **Start in my profile from Steam** is already on, or you turned it off in the game, the installer keeps that and doesn't ask. The launcher only starts the game in your profile once DewDrop has linked it, so the first start loads your whole `Mods` folder.
+* **No SMAPI console:** the launcher starts SMAPI without its terminal window, in Game Mode and Desktop Mode, so you can't type [console commands](console-commands.md). The SMAPI log has what SMAPI and DewDrop said.
+* **If Steam couldn't be set up on a Deck**, the installer's last message says so instead of sending you back to Game Mode. The messages above it say why; fix that and run the installer again.
 * **Flatpak and Snap Steam** aren't supported for this yet.
 
 ## Exit codes
@@ -182,8 +188,10 @@ When it's started from `Install on macOS.command` or `Install on Linux.sh` in a 
 | --- | --- |
 | Log, replaced on each run | Windows: `%TEMP%\DewDrop-installer.log`, a full copy of everything the installer printed. macOS and Linux: `$TMPDIR/DewDrop-installer.log` (or `/tmp/DewDrop-installer.log`), with the installer's steps, warnings and errors, but not your answers or SMAPI's own output. |
 | Work folder for downloads, deleted at the end | Windows: `%TEMP%\dewdrop-installer-<id>`. macOS and Linux: `~/.cache/dewdrop-installer.<id>` (or under `$XDG_CACHE_HOME`), not `/tmp`, because some systems don't allow running programs from `/tmp`. |
-| Backup of Steam's settings (Windows) | `localconfig.vdf.dewdrop-backup-<date>-<time>`, next to `localconfig.vdf` in `Steam\userdata\<account>\config`. |
-| Your answer about starting in your profile (Windows, Steam) | `StartInProfileFromSteam` in DewDrop's `config.json`, in its mod folder. Your other settings in the file are kept. |
+| Backup of Steam's settings (Windows, and Linux when it sets up Steam) | `localconfig.vdf.dewdrop-backup-<date>-<time>`, next to `localconfig.vdf` in `Steam\userdata\<account>\config` (on Linux, `userdata/<account>/config` in Steam's folder). |
+| Your answer about starting in your profile (Steam) | Windows: `StartInProfileFromSteam` in DewDrop's `config.json`, in its mod folder. Your other settings in the file are kept. Linux and the Steam Deck: the `start-in-profile` file next to DewDrop's launcher (there for a yes), and `StartInProfileFromSteam` in `config.json` when the file already has that setting; otherwise the game picks the answer up from the launcher's file at its first start. |
+| DewDrop's Steam launcher (Steam Deck, or Linux with `--steam-setup`) | `steam-launch.sh` in `~/.config/Stardrop/Data/Cache/DewDrop`. See [Where DewDrop keeps files](file-locations.md#the-shared-data-folder). |
+| Your Nexus Mods API key (Steam Deck) | `nexus-key.txt` in the same folder, until DewDrop has saved the key to your login, or Nexus Mods turns it down. Only you can read it. |
 | Desktop shortcut (Windows) | `Stardew Valley (SMAPI)` on your desktop. When the installer runs as administrator, it goes on the desktop for all users instead. |
 | Turned-off copies of DewDrop | Renamed to `.<folder name>-duplicate` in the same place. |
 | Temporary folders during an update | `.dewdrop-installer-<id>` and `.dewdrop-old-<id>` next to your `DewDrop` folder, removed once the new copy is in place. |

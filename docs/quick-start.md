@@ -11,7 +11,7 @@ The installer puts DewDrop in your game and also sets up SMAPI, the free tool th
 
 * You need **Stardew Valley 1.6 or later** and an internet connection. See [What you need](getting-started/requirements.md).
 * Use Stardrop? Don't start your first launch from Stardrop. [Here's why](stardrop.md#first-time-setup-if-you-already-use-stardrop).
-* DewDrop is only tested on Windows so far. Steam Deck support is new and being tested; see [DewDrop on the Steam Deck](getting-started/steam-deck.md) and [Platform support](reference/platform-support.md).
+* DewDrop is only tested on Windows so far. Steam Deck support is new and being tested: to set up a Deck, follow [DewDrop on the Steam Deck](getting-started/steam-deck.md). See also [Platform support](reference/platform-support.md).
 
 ## Five steps
 
@@ -52,6 +52,8 @@ The installer runs in that window. For each question, press **Enter** to pick th
 
 With Steam on Windows, it offers to change one Steam setting, the game's launch option, so **Play** starts the game with mods. Steam closes for this and opens again when the installer starts the game. It also asks **Start the game in your DewDrop profile when you press Play in Steam?** Press **Enter** for yes. You'll see what that does in step 5.
 
+On a Steam Deck, and on Linux if you run the installer with [`--steam-setup`](reference/installer-options.md#steam-on-linux-and-the-steam-deck), it sets that launch option to DewDrop's launcher instead and asks the same question. Steam closes for a few seconds to save it, then opens again. A Deck also asks for your Nexus Mods API key, and doesn't offer to start the game: that's for Game Mode.
+
 When it says **All done!**, press **Enter** at **Start Stardew Valley now?**, then press **Enter** again to close the window. If it stops with a red message, follow what it says, or see [Troubleshooting](help/troubleshooting.md#the-installer).
 
 <figure><img src=".gitbook/assets/installer-windows.png" alt="The DewDrop installer's window on Windows, finding the game, checking SMAPI and copying DewDrop"><figcaption><p>The installer on Windows.</p></figcaption></figure>
@@ -60,7 +62,7 @@ When it says **All done!**, press **Enter** at **Start Stardew Valley now?**, th
 {% step %}
 ### Open the Mods menu
 
-The game starts with SMAPI's window next to it (a Terminal window on macOS and Linux). It lists what's loading, and yellow lines are normal. Leave it open: closing it closes the game. Game didn't start? See [Starting the game with mods](#starting-the-game-with-mods).
+The game starts with SMAPI's window next to it (a Terminal window on macOS and Linux, and none at all when Steam starts the game with DewDrop's launcher, as on a Steam Deck). It lists what's loading, and yellow lines are normal. Leave it open: closing it closes the game. Game didn't start? See [Starting the game with mods](#starting-the-game-with-mods).
 
 On the title screen, click the new **Mods** button between **Co-op** and **Exit**. In a small window, it's a little dew-drop button at the bottom right. Already use Stardrop? If a **Load your profile?** box opens first, click **Restart now**. The game restarts with your Stardrop profile's mods, and then you can click **Mods**.
 
@@ -91,7 +93,8 @@ The game closes and comes back with only your profile's mods. Open **Mods** agai
 **From now on**, it depends on your setup:
 
 * **Windows and Steam, and you said yes in the installer:** the first time you quit the game, Steam closes and opens again once, a few seconds after the game closes. That's how DewDrop saves Steam's new launch option. From then on, **Play** starts the game straight in your profile, with no restart. Change your mods in the menu, quit, and the next **Play** loads them.
-* **Everyone else:** a normal launch loads every mod in your `Mods` folder, even ones you turned off. When those differ from your profile, a **Load your profile?** box opens on the title screen. Click **Restart now**, and the game restarts into your profile. On Windows with Steam, the box also has a **Start in my profile from Steam from now on** checkbox, ticked at first. Leave it ticked, and Steam closes and opens again once after you quit. From then on, **Play** starts in your profile.
+* **Steam Deck, or Linux with DewDrop's Steam launcher, and you said yes in the installer:** **Play** starts the game straight in your profile from now on, with no restart, and Steam never closes. Change your mods in the menu, quit, and the next **Play** loads them.
+* **Everyone else:** a normal launch loads every mod in your `Mods` folder, even ones you turned off. When those differ from your profile, a **Load your profile?** box opens on the title screen. Click **Restart now**, and the game restarts into your profile. On Windows with Steam, the box also has a **Start in my profile from Steam from now on** checkbox, ticked at first. Leave it ticked, and Steam closes and opens again once after you quit. From then on, **Play** starts in your profile. With DewDrop's Steam launcher (Steam Deck, or Linux after `--steam-setup`), the box has the checkbox too, and Steam doesn't close.
 
 See [Start in your profile](guides/start-in-your-profile.md) for more.
 
@@ -107,8 +110,9 @@ That's it!
 * **Windows, GOG or other:** use the **Stardew Valley (SMAPI)** desktop shortcut. GOG Galaxy's **Play** button starts the game without mods unless you [set Galaxy up](getting-started/installing/smapi.md#gog-galaxy-on-windows).
 * **Xbox app:** press **Play** in the Xbox app. Run the DewDrop installer again after each game update.
 * **macOS and Linux:** start the game however you usually do, including Steam's **Play**. If SMAPI's window stops appearing after a game update, run [SMAPI's installer](getting-started/installing/smapi.md#macos-and-linux) again.
+* **Steam Deck, or Linux with DewDrop's Steam launcher:** press **Play** in Steam. The launcher starts SMAPI itself, so a game update doesn't turn mods off.
 
-If no SMAPI window opens, the game started without mods. The exception is macOS after DewDrop restarts the game, with **Apply & Restart** or **Restart now**.
+If no SMAPI window opens, the game started without mods. The exceptions are macOS after DewDrop restarts the game, with **Apply & Restart** or **Restart now**, and DewDrop's Steam launcher, which never shows one. There, the **Mods** button on the title screen shows that mods loaded.
 
 ## Where to next
 

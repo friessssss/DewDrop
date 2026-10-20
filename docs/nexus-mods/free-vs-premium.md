@@ -49,14 +49,14 @@ A few things worth knowing:
 
 ## Free accounts on macOS and Linux
 
-The website can only hand files to DewDrop on Windows for now. On macOS and Linux, **Get on Nexus** still opens the file on the website, but nothing sends the download back to DewDrop.
+The website can only hand files to DewDrop on Windows for now. On macOS and Linux, including the Steam Deck, **Get on Nexus** still opens the file on the website, but nothing sends the download back to DewDrop.
 
 DewDrop says so when you click: "Opened the file on Nexus Mods. Mod manager links only work on Windows for now, so add the mod to your Mods folder yourself."
 
 Here's what you can do instead:
 
 * **Install by hand.** Use the website's **Manual download** button, unzip the file, and put the mod's folder in your `Mods` folder. The **Settings** panel on the **Account** tab shows that folder as "Mods folder". Then click **Rescan** on the **Installed** tab: the mod shows up there, turned on if **Turn on mods when installed** is on (the default). If it's off, turn it on. Then click **Apply & Restart**. See [Managing your mods](../guides/installed.md).
-* **Use the console (advanced).** If you can copy the `nxm://` link the website tries to open, type `dewdrop_nxm` followed by a space and the link in the SMAPI console window, then press **Enter**. DewDrop downloads and installs it like any other download. You need to be logged in, and the link expires after a while, so use it right away. On macOS, a game that DewDrop restarted with **Apply & Restart** probably has no console window, so start the game the usual way to use this. See [Console commands](../reference/console-commands.md).
+* **Use the console (advanced).** If you can copy the `nxm://` link the website tries to open, type `dewdrop_nxm` followed by a space and the link in the SMAPI console window, then press **Enter**. DewDrop downloads and installs it like any other download. You need to be logged in, and the link expires after a while, so use it right away. On macOS, a game that DewDrop restarted with **Apply & Restart** probably has no console window, so start the game the usual way to use this. When Steam starts the game with DewDrop's Steam launcher, as on a Steam Deck (or on Linux after the installer's `--steam-setup`), there's no console window at all, so this option isn't available there. See [Console commands](../reference/console-commands.md).
 
 Premium downloads don't need the website's links at all, so the **Install** button works the same everywhere. DewDrop is only tested on Windows so far; see [Platform support](../reference/platform-support.md).
 

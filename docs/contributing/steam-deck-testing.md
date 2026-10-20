@@ -9,8 +9,8 @@ DewDrop's Steam Deck support was written against SMAPI's and Steam's source code
 
 ## How it's meant to work
 
-* **Setup (Desktop Mode, once):** the installer installs SMAPI and DewDrop, copies DewDrop's launcher (`steam-launch.sh`) into `~/.config/Stardrop/Data/Cache/DewDrop/`, and sets Stardew Valley's Steam launch option to `"<launcher>" %command%`. Steam has to be closed for that, so the installer closes it and starts it again.
-* **Every launch:** Steam runs the launcher with the command it would have run. The launcher swaps the game's `StardewValley` (SMAPI's terminal-opening launcher, after SMAPI is installed) for `StardewModdingAPI --no-terminal`, adds `--mods-path "<Selected Mods>"` when the game should start in the profile, and runs the rest of Steam's command unchanged, so the game stays inside Steam's runtime.
+* **Setup (Desktop Mode, once):** the installer installs SMAPI and DewDrop, asks for a Nexus API key (unless one is saved already), copies DewDrop's launcher (`steam-launch.sh`) into `~/.config/Stardrop/Data/Cache/DewDrop/`, and sets Stardew Valley's Steam launch option to `"<launcher>" %command%`. Steam has to be closed for that, so the installer closes it and starts it again straight after the change. If Steam comes back by itself, the installer stops its systemd user service instead, and starts that again afterwards.
+* **Every launch:** Steam runs the launcher with the command it would have run. The launcher swaps the game's `StardewValley` (SMAPI's terminal-opening launcher, after SMAPI is installed) for `StardewModdingAPI --no-terminal`, adds `--mods-path "<Selected Mods>"` when the game should start in the profile, and runs the rest of Steam's command unchanged, so the game stays inside Steam's runtime. There's never a SMAPI console window, in Game Mode or Desktop Mode, so console commands can't be typed: the SMAPI log is where to look.
 * **Apply & Restart:** DewDrop writes a `restart` file with the restart's ID and starts a small waiter. When the game has closed, the waiter runs the launcher again. It stays inside Steam's process tree, so Steam should keep counting the game as running and Game Mode should show the new window.
 * **Start in my profile from Steam:** a `start-in-profile` file beside the launcher. Changing the setting in the game takes effect at once.
 * **Game Mode:** web pages open in Steam's overlay (Steamworks' `ActivateGameOverlayToWebPage`), and text boxes open Steam's floating keyboard (`ShowFloatingGamepadTextInput`). Both are called by reflection, with fallbacks.
@@ -32,7 +32,7 @@ Until this is in a release, the installer's download is the last release, which 
 - [ ] It sets the launch option, and **Steam closes and opens again within a few seconds**, bringing back the controls and the on-screen keyboard. Note if Steam started again by itself straight away: the installer then says it's stopping Steam's service instead.
 - [ ] In Steam, Stardew Valley's **Properties** > **Launch Options** shows `"/home/deck/.config/Stardrop/Data/Cache/DewDrop/steam-launch.sh" %command%`.
 - [ ] Pasting a Nexus API key into Konsole works (**Ctrl + Shift + V**).
-- [ ] Run the installer again: it says Steam already starts the game with DewDrop's launcher, and doesn't close Steam.
+- [ ] Run the installer again: it says Steam already starts the game with DewDrop's launcher, and doesn't close Steam. It doesn't ask for a Nexus key once the game has saved one.
 
 ### First start in Game Mode
 
@@ -68,11 +68,14 @@ Until this is in a release, the installer's download is the last release, which 
 
 - [ ] On **Account**, the setting isn't grayed out, and changing it shows no "Steam closes" message.
 - [ ] With it on: turn a mod off, quit, press **Play**. The game starts in your profile (that mod isn't loaded), with no restart.
-- [ ] With it off: **Play** loads the whole `Mods` folder, and the **Load your profile?** box offers a restart if your profile differs.
+- [ ] With it off: **Play** loads the whole `Mods` folder, and the **Load your profile?** box offers a restart if your profile differs. The box has a ticked **Start in my profile from Steam from now on** checkbox, with the note "With that ticked, Steam's Play button starts the game in your profile from now on."
+- [ ] With it off, run the installer again in Desktop Mode: it doesn't ask about starting in your profile, and the setting stays off.
 
 ### Other things worth a try
 
-- [ ] **Desktop Mode:** start the game from Steam in Desktop Mode. Does it run? Does **Apply & Restart** work there too?
+- [ ] **Desktop Mode:** start the game from Steam in Desktop Mode. Does it run (with no SMAPI terminal window, as in Game Mode)? Does **Apply & Restart** work there too?
+- [ ] **Launch options you already had:** before running the installer, set Stardew Valley's launch options to `gamemoderun %command%`, or to one that starts SMAPI directly with `--mods-path`. The installer shows what they become and asks first, keeps `gamemoderun`, and names the SMAPI options it drops.
+- [ ] **The installer's Nexus key, offline:** give the installer a key, then start the game with the Deck offline. A message says DewDrop tries the key from the installer again the next time the game starts, and the next start online logs in.
 - [ ] **A game update** (or Steam's **Verify integrity of game files**, which puts the original `StardewValley` back): mods still load from **Play**.
 - [ ] **Exit game** from the Steam button's menu while DewDrop's menu is open: the game closes cleanly, and the next **Play** starts in your profile if that's on.
 

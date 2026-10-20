@@ -7,11 +7,13 @@ icon: forward
 
 SMAPI picks the folder it loads mods from as the game starts. A normal launch, from Steam's **Play** button or a shortcut, loads your whole `Mods` folder. Your profile only loads when SMAPI is pointed at `Selected Mods`, the folder DewDrop fills with links to your profile's mods. [How launching works](../getting-started/launching.md) explains more.
 
-On Windows with the Steam version, **Start in my profile from Steam** makes **Play** start straight in your profile. Otherwise, the **Load your profile?** box offers a restart. [**Apply & Restart**](apply-and-restart.md) works as before.
+With the Steam version on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher, **Start in my profile from Steam** makes **Play** start straight in your profile. Otherwise, the **Load your profile?** box offers a restart. [**Apply & Restart**](apply-and-restart.md) works as before.
 
 ## Start in my profile from Steam
 
-This setting adds SMAPI's `--mods-path` option, pointing at `Selected Mods`, to Stardew Valley's launch options in Steam. The rest of the launch option is kept.
+On Windows, this setting adds SMAPI's `--mods-path` option, pointing at `Selected Mods`, to Stardew Valley's launch options in Steam. The rest of the launch option is kept.
+
+On Linux and the Steam Deck, Steam's launch option runs DewDrop's Steam launcher instead, which the installer sets up: by itself on a Steam Deck, and with `--steam-setup` on other Linux systems (see [Steam on Linux and the Steam Deck](../reference/installer-options.md#steam-on-linux-and-the-steam-deck)). The launcher starts SMAPI on `Selected Mods` while this setting is on, once DewDrop has linked your profile there.
 
 ### Turn it on
 
@@ -19,15 +21,17 @@ This setting adds SMAPI's `--mods-path` option, pointing at `Selected Mods`, to 
 2. In the **Settings** panel, tick **Start in my profile from Steam**.
 3. Quit the game.
 
-The **Load your profile?** box and the Windows [installer](../getting-started/installing/installer.md) offer it too.
+The **Load your profile?** box and the [installer](../getting-started/installing/installer.md) offer it too.
 
-A few seconds after the game closes, Steam closes, DewDrop changes the launch option, and Steam opens again, minimized to the system tray. This happens once each time you turn the setting on or off. If you click **Apply & Restart** instead, the change waits until you quit the restarted game.
+On Windows, a few seconds after the game closes, Steam closes, DewDrop changes the launch option, and Steam opens again, minimized to the system tray. This happens once each time you turn the setting on or off. If you click **Apply & Restart** instead, the change waits until you quit the restarted game.
 
 {% hint style="info" %}
 **Why does Steam close?** Steam saves over its settings file when it closes, so a change made while it runs would be lost. DewDrop changes only the signed-in account's settings, and backs the file up first as `localconfig.vdf.dewdrop-backup`.
 {% endhint %}
 
 The next time you open **Mods**, a message says "Steam now starts the game in your profile." If the change didn't work, the message says why.
+
+With DewDrop's Steam launcher, none of this happens: the setting changes as soon as you tick it, and Steam never closes.
 
 ### Playing with it on
 
@@ -37,9 +41,9 @@ Only **Play** in Steam does this. A desktop shortcut still loads the whole `Mods
 
 ### Turn it off
 
-Untick **Start in my profile from Steam** and quit the game. Steam closes and opens again once, and DewDrop removes only the `--mods-path` part, so **Play** still starts SMAPI.
+Untick **Start in my profile from Steam** and quit the game. On Windows, Steam closes and opens again once, and DewDrop removes only the `--mods-path` part, so **Play** still starts SMAPI. With DewDrop's Steam launcher, unticking takes effect at once.
 
-**Before you uninstall DewDrop,** turn this off and quit the game, or delete the `--mods-path "..."` part from Steam's launch options yourself. Otherwise SMAPI keeps loading your last profile, with no **Mods** button. See [Uninstalling DewDrop](../getting-started/uninstalling.md).
+**Before you uninstall DewDrop** on Windows, turn this off and quit the game, or delete the `--mods-path "..."` part from Steam's launch options yourself. Otherwise SMAPI keeps loading your last profile, with no **Mods** button. With DewDrop's Steam launcher there's nothing to turn off first, but take the launcher out of Steam's launch options (see [DewDrop on the Steam Deck](../getting-started/steam-deck.md#what-the-installer-changes)). See [Uninstalling DewDrop](../getting-started/uninstalling.md).
 
 ### When it isn't available
 
@@ -48,10 +52,11 @@ The row is grayed out, and hovering over it says why, when:
 * you're on macOS, or on Linux or a Steam Deck without DewDrop's Steam launcher (the installer sets it up), or the game runs through Proton or Wine;
 * the game isn't the Steam version, such as GOG or the Xbox app;
 * DewDrop can't find Steam, or can't find or read your Steam account's settings;
-* the game's launch option in Steam starts a program other than SMAPI.
+* DewDrop's Steam launcher couldn't be updated (the SMAPI log says why);
+* on Windows, the game's launch option in Steam starts a program other than SMAPI.
 
 {% hint style="warning" %}
-**Using Stardrop too?** Stardrop rebuilds `Selected Mods` whenever it starts the game. If you start a Stardrop collection profile from Stardrop, its links leave DewDrop out, so the next **Play** in Steam starts without the **Mods** button. To get it back, start one of your own profiles from Stardrop once, or remove the `--mods-path` part from Steam's launch options.
+**Using Stardrop too?** Stardrop rebuilds `Selected Mods` whenever it starts the game. If you start a Stardrop collection profile from Stardrop, its links leave DewDrop out, so the next **Play** in Steam starts without the **Mods** button. To get it back, start one of your own profiles from Stardrop once, or remove the `--mods-path` part from Steam's launch options. DewDrop's Steam launcher on Linux and the Steam Deck checks for DewDrop first, and starts your whole `Mods` folder instead.
 {% endhint %}
 
 ## The "Load your profile?" box
@@ -65,7 +70,7 @@ The box names the mods that are off in your profile but "loaded anyway", and the
 * **Restart now** (or **Enter**): the game closes and opens again in your profile, like **Apply & Restart**. It's grayed out while downloads are running.
 * **Not now** (or **Esc**, or **B** on a controller): keep playing. DewDrop asks again next time.
 * **Don't ask again**: turns **Ask to load my profile** off.
-* **Start in my profile from Steam from now on** (Windows, Steam version, while that setting is off): ticked at first. If it's ticked when you click **Restart now**, the setting turns on, and Steam's launch option changes when you quit the restarted game.
+* **Start in my profile from Steam from now on** (Steam version on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher, while that setting is off): ticked at first. If it's ticked when you click **Restart now**, the setting turns on. On Windows, Steam's launch option changes when you quit the restarted game. With the launcher, the note under it says "With that ticked, Steam's Play button starts the game in your profile from now on.", and the setting changes at once.
 
 ### When it doesn't appear
 
@@ -139,6 +144,7 @@ To undo either one, delete only the `--mods-path "..."` part.
 
 * **Windows, Steam version:** everything on this page.
 * **Windows, GOG or Xbox app:** the box and **Apply & Restart**. The Xbox app has nowhere to add launch options.
-* **macOS and Linux:** the box and **Apply & Restart**, though the restart hasn't been tested there yet. There's no Steam setting, because SMAPI's launcher there doesn't pass Steam's launch options on.
-* **Steam Deck:** both, once the installer has set up DewDrop's Steam launcher. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
+* **macOS:** the box and **Apply & Restart**, though the restart hasn't been tested there yet. There's no Steam setting, because SMAPI's launcher there doesn't pass Steam's launch options on.
+* **Linux:** the box and **Apply & Restart**, though the restart hasn't been tested there yet. The Steam setting works only with DewDrop's Steam launcher: run the installer with `--steam-setup` to set it up. A `--mods-path` you add to Steam's launch options yourself doesn't count as the setting there. See [Steam on Linux and the Steam Deck](../reference/installer-options.md#steam-on-linux-and-the-steam-deck).
+* **Steam Deck:** both, once the installer has set up DewDrop's Steam launcher, which it does by itself on a Deck. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
 * **Proton and Wine:** neither the box nor the Steam setting. See [Platform support](../reference/platform-support.md).

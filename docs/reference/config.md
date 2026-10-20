@@ -41,7 +41,7 @@ The download doesn't include `config.json`. SMAPI creates it with the default va
 
 | Key | Default | Option on the Account tab | In short |
 | --- | --- | --- | --- |
-| `StartInProfileFromSteam` | `null` | **Start in my profile from Steam** | Windows, Steam version: Steam's **Play** button starts the game in your active profile. |
+| `StartInProfileFromSteam` | `null` | **Start in my profile from Steam** | Steam version on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher: Steam's **Play** button starts the game in your active profile. |
 | `AskToLoadProfile` | `true` | **Ask to load my profile** | When the game starts with different mods than your active profile, a box on the title screen offers to restart into it. |
 | `EnableModsOnInstall` | `true` | **Turn on mods when installed** | Mods DewDrop installs or updates are turned on in your active profile. |
 | `ShowAdultContent` | `false` | **Show adult content in Browse** | Browse includes mods Nexus Mods marks as adult content. |
@@ -50,22 +50,23 @@ The download doesn't include `config.json`. SMAPI creates it with the default va
 
 ### StartInProfileFromSteam
 
-This is **Start in my profile from Steam**, for the Steam version of the game on Windows. When it's on, Steam's **Play** button starts the game straight in your profile, with no extra restart. See [Start in your profile](../guides/start-in-your-profile.md).
+This is **Start in my profile from Steam**, for the Steam version of the game on Windows, and on Linux and the Steam Deck once the installer has set up DewDrop's Steam launcher. When it's on, Steam's **Play** button starts the game straight in your profile, with no extra restart. See [Start in your profile](../guides/start-in-your-profile.md).
 
 Unlike the other settings, it can also be `null`, with no quotes, which means it hasn't been set yet.
 
 | Value | What it means |
 | --- | --- |
-| `null` | Not set yet. This is the default. DewDrop goes by what Steam already does: if Stardew Valley's launch option in Steam already points at `Selected Mods`, the setting counts as on and DewDrop leaves the option alone. The first time the game starts where the setting can be used, DewDrop saves what it found as `true` or `false`. |
-| `true` | Steam starts the game in your profile. If Stardew Valley's launch option in Steam doesn't say so yet, DewDrop adds SMAPI's `--mods-path` option to it, pointing at `Selected Mods`. |
-| `false` | Steam starts the game the usual way, with your whole `Mods` folder. If the launch option points at `Selected Mods`, DewDrop takes the `--mods-path` part out and keeps the SMAPI part. |
+| `null` | Not set yet. This is the default. DewDrop goes by what Steam already does: on Windows, if Stardew Valley's launch option in Steam already points at `Selected Mods`, the setting counts as on and DewDrop leaves the option alone. The first time the game starts where the setting can be used, DewDrop saves what it found as `true` or `false`. |
+| `true` | Steam starts the game in your profile. On Windows, if Stardew Valley's launch option in Steam doesn't say so yet, DewDrop adds SMAPI's `--mods-path` option to it, pointing at `Selected Mods`. |
+| `false` | Steam starts the game the usual way, with your whole `Mods` folder. On Windows, if the launch option points at `Selected Mods`, DewDrop takes the `--mods-path` part out and keeps the SMAPI part. |
 
-* **Steam only changes when you quit the game,** because Steam has to be closed to change its launch options. A few seconds after the game closes, Steam closes, the launch option changes, and Steam opens again, minimized to the system tray. Before it writes, DewDrop backs up Steam's settings file as `localconfig.vdf.dewdrop-backup`, in the same folder.
+* **On Windows, Steam only changes when you quit the game,** because Steam has to be closed to change its launch options. A few seconds after the game closes, Steam closes, the launch option changes, and Steam opens again, minimized to the system tray. Before it writes, DewDrop backs up Steam's settings file as `localconfig.vdf.dewdrop-backup`, in the same folder.
 * **A hand edit works the same way.** Change the value with the game closed, then start the game. Steam's launch option changes the next time you quit it.
 * **The rest of the launch option is kept.** If it was empty, DewDrop sets SMAPI's usual option with `--mods-path` added. With `true`, a `--mods-path` that points at some other folder is replaced. With `false`, it's left alone.
 * **Changes you make in Steam win.** If Stardew Valley's launch options changed in Steam while the game was running, DewDrop leaves them alone, and a message says so the next time you open **Mods**.
-* **It does nothing where it can't be used:** on macOS, on Linux and the Steam Deck until the installer has set up DewDrop's Steam launcher, when the game runs through Proton or Wine, for the GOG or Xbox app version, or when the launch option in Steam starts some other program than SMAPI. The menu row is grayed out there.
-* **Other ways it gets set.** Ticking **Start in my profile from Steam from now on** in the **Load your profile?** box and clicking **Restart now** sets it to `true`. The Windows installer asks about it when it sets up Steam's launch option for SMAPI, and saves your answer here; see [Installer command-line options](installer-options.md).
+* **With DewDrop's Steam launcher** (Linux and the Steam Deck), Steam's launch option never changes. `true` puts a `start-in-profile` file next to the launcher, which tells it to start SMAPI on `Selected Mods`, and `false` removes it. Ticking or unticking the menu row does this at once; a hand edit, when the game next starts. `null` goes by whether the file is there. See [Where DewDrop keeps files](file-locations.md).
+* **It does nothing where it can't be used:** on macOS, on Linux and the Steam Deck until the installer has set up DewDrop's Steam launcher, when the game runs through Proton or Wine, for the GOG or Xbox app version, or, on Windows, when the launch option in Steam starts some other program than SMAPI. The menu row is grayed out there.
+* **Other ways it gets set.** Ticking **Start in my profile from Steam from now on** in the **Load your profile?** box and clicking **Restart now** sets it to `true`. The installer asks about it when it sets up Steam's launch option, and saves your answer here; see [Installer command-line options](installer-options.md). On Linux and the Steam Deck, it doesn't ask when the setting is already on, or `false` here: it keeps that.
 
 ### AskToLoadProfile
 
@@ -110,7 +111,7 @@ It's for a **Log in with browser** button. Nexus Mods gives each registered app 
 
 ## An example file
 
-This is the file with every setting at its default. On Windows with the Steam version, `StartInProfileFromSteam` becomes `true` or `false` after the first start.
+This is the file with every setting at its default. With the Steam version on Windows, or with DewDrop's Steam launcher, `StartInProfileFromSteam` becomes `true` or `false` after the first start.
 
 {% code title="config.json" %}
 ```json
@@ -133,7 +134,7 @@ This is the file with every setting at its default. On Windows with the Steam ve
 4. Save the file, then start the game.
 
 {% hint style="warning" %}
-If the file isn't valid JSON, SMAPI can't read it, and DewDrop doesn't start. You won't see the **Mods** button, and the SMAPI console shows an error that names `config.json` and says the mod "crashed on entry". A common cause is curly quotes (“like these”) from a word processor; JSON needs straight quotes.
+If the file isn't valid JSON, SMAPI can't read it, and DewDrop doesn't start. You won't see the **Mods** button, and the SMAPI log (and the SMAPI console, if there's a console window) shows an error that names `config.json` and says the mod "crashed on entry". A common cause is curly quotes (“like these”) from a word processor; JSON needs straight quotes.
 
 To fix it, delete `config.json`. SMAPI makes a fresh one with the defaults the next time you start the game.
 {% endhint %}

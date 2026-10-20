@@ -62,7 +62,7 @@
       <img src="docs/.gitbook/assets/icons/restart.png" alt="" width="40" align="left">
       <b>Apply &amp; Restart</b><br>
       One button loads your profile: DewDrop links its mods and restarts the game through SMAPI for you. On
-      Windows, Steam's <b>Play</b> button can start the game straight in your profile, too.
+      Windows and the Steam Deck, Steam's <b>Play</b> button can start the game straight in your profile, too.
     </td>
   </tr>
 </table>
@@ -85,7 +85,8 @@ You need **Stardew Valley 1.6 or later** on Windows, macOS or Linux. DewDrop run
 ### The easy way: the installer
 
 Paste one line and the installer does the rest: it finds your game, installs SMAPI if you need it, downloads the
-latest DewDrop into your Mods folder and offers to start the game.
+latest DewDrop into your Mods folder and offers to start the game. On a Steam Deck, run it once in Desktop Mode;
+see [DewDrop on the Steam Deck](https://friessssss.gitbook.io/dewdrop/getting-started/steam-deck).
 
 **Windows:** open **PowerShell** (Start menu, type `PowerShell`, press **Enter**), paste this and press **Enter**:
 
@@ -118,7 +119,8 @@ Nothing has to be allowed in **Privacy & Security** or SmartScreen this way. The
      folder, choose **Open in Terminal**, and run `bash "Install on Linux.sh"`.
 4. Answer the questions. At a yes/no question, pressing **Enter** picks the recommended answer.
 5. Start the game and click **Mods** on the title screen. A second window (SMAPI's) opens next to the game and lists
-   what's loading. Leave it open: closing it closes the game.
+   what's loading. Leave it open: closing it closes the game. (On a Steam Deck, or on Linux after the installer's
+   `--steam-setup`, DewDrop's Steam launcher starts SMAPI without that window.)
 
 <details>
 <summary><b>What does the installer do?</b></summary>
@@ -142,8 +144,13 @@ It finds your game, installs SMAPI if you don't have it (or offers to update an 
   the game. With the Xbox app, it swaps in SMAPI's copy of the game's exe (SMAPI's documented way). On other
   Windows setups it can add a desktop shortcut instead.
 - **A protected game folder** (for example under Program Files): it offers to restart itself as administrator.
-- **macOS and Linux:** SMAPI's own installer sets the game up to start SMAPI, so nothing else is needed.
-- Finally it offers to start the game.
+- **macOS and Linux:** SMAPI's own installer sets the game up to start SMAPI, so nothing else is needed (except
+  on a Steam Deck, below).
+- **Steam Deck** (or Linux with `--steam-setup`): it also sets Steam's launch option to DewDrop's launcher, which starts
+  SMAPI without a terminal window, in your profile if you like. Steam closes for a few seconds for this, after the
+  installer's questions. On a Deck it also offers to take your Nexus Mods API key, so you don't have to type it in
+  Game Mode.
+- Finally it offers to start the game (not on a Steam Deck, where you start it in Game Mode).
 
 It never deletes your mods, saves or settings; an old DewDrop copy is only removed once the new one is in place.
 It keeps a log, `DewDrop-installer.log`, in your temp folder.
@@ -178,9 +185,11 @@ platform, store and setup.
 **Your profile loads when the game starts in it.** SMAPI picks the folder it loads mods from as the game starts,
 so a normal start loads everything in your `Mods` folder. There are two ways to start in your profile instead:
 
-- **Windows, Steam version:** tick **Start in my profile from Steam** on the **Account** tab. From then on,
-  Steam's **Play** button starts the game straight in your profile. DewDrop saves this in Steam when you quit the
-  game, so Steam closes and opens again once.
+- **Steam version, on Windows or a Steam Deck:** tick **Start in my profile from Steam** on the **Account** tab.
+  From then on, Steam's **Play** button starts the game straight in your profile. On Windows, DewDrop saves this in
+  Steam when you quit the game, so Steam closes and opens again once. On a Steam Deck (and on Linux after the
+  installer's `--steam-setup`), DewDrop's Steam launcher reads it each time, so it counts at once and Steam doesn't
+  close.
 - **Everywhere else, and from a shortcut:** when the mods that loaded differ from your profile, DewDrop asks
   *"Load your profile?"* on the title screen. Click **Restart now**, and the game closes and opens again in your
   profile. If they already match, DewDrop doesn't ask. You can turn the question off with

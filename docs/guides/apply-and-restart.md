@@ -27,7 +27,7 @@ The numbers are examples. If more than one of the first three lines is true, the
 
 [How launching works](../getting-started/launching.md) explains why a normal launch needs this restart. You don't always have to click the button yourself:
 
-* On Windows with the Steam version, **Start in my profile from Steam** on the **Account** tab makes Steam's **Play** button start the game in your profile every time.
+* With the Steam version on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher, **Start in my profile from Steam** on the **Account** tab makes Steam's **Play** button start the game in your profile every time.
 * When a normal launch loads different mods than your profile, the **Load your profile?** box on the title screen offers this same restart.
 
 See [Start in your profile](start-in-your-profile.md) for both.
@@ -67,7 +67,7 @@ Not tested yet. DewDrop waits for the game to close, then starts `StardewModding
 {% tab title="Linux" %}
 Not tested yet. DewDrop waits for the game to close, then runs the game's `StardewValley` launcher. SMAPI's installer replaces that launcher so it starts SMAPI. If you set SMAPI up another way, the restart may start the game without SMAPI, and so without mods.
 
-On the Steam Deck, the restart stays in Game Mode: DewDrop starts the game again through its Steam launcher. This is new and being tested. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
+With DewDrop's Steam launcher (on a Steam Deck, or on Linux after the installer's `--steam-setup`), DewDrop starts the game again through that launcher instead, the way Steam does. It starts SMAPI directly, with no terminal window, so a game update doesn't turn mods off, and on the Steam Deck the restart stays in Game Mode. This is new and being tested. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md).
 {% endtab %}
 {% endtabs %}
 
@@ -86,7 +86,7 @@ If the button is grayed out and the bottom bar shows a red message that `Setting
 
 ### The game closed but didn't come back
 
-The restart happens after the game has closed, so DewDrop can't show you an error. Start the game the usual way. DewDrop remembers that the restart didn't come back. If the **Load your profile?** box comes up, it says "Last time DewDrop restarted the game, it didn't come back in your profile." Click **Restart now** to try again, or **Not now** to keep playing. On Windows with the Steam version, the box's **Start in my profile from Steam from now on** checkbox starts unticked this time. Otherwise, open **Mods** and try **Apply & Restart** again. Your profile is still selected. See [Start in your profile](start-in-your-profile.md).
+The restart happens after the game has closed, so DewDrop can't show you an error. Start the game the usual way. DewDrop remembers that the restart didn't come back. If the **Load your profile?** box comes up, it says "Last time DewDrop restarted the game, it didn't come back in your profile." Click **Restart now** to try again, or **Not now** to keep playing. If the box has a **Start in my profile from Steam from now on** checkbox, it starts unticked this time. Otherwise, open **Mods** and try **Apply & Restart** again. Your profile is still selected. See [Start in your profile](start-in-your-profile.md).
 
 On Windows, the restart helper writes a log at `C:\Users\<you>\AppData\Roaming\Stardrop\Data\Cache\DewDrop\relaunch.log`. To open the folder, press **Win+R**, paste `%AppData%\Stardrop\Data\Cache\DewDrop`, and press **Enter**. The log is emptied each time the helper runs, after a restart or after you quit the game, and only gets lines when updates were finished, Steam's launch option changed, or something went wrong:
 
@@ -94,12 +94,12 @@ On Windows, the restart helper writes a log at `C:\Users\<you>\AppData\Roaming\S
 * "Could not update ... yet: ..." means an update couldn't be swapped in. It keeps waiting, and DewDrop tries again next time.
 * "Could not change the Steam launch option: ..." means **Start in my profile from Steam** couldn't be saved in Steam. The next time you open **Mods**, a message gives the same reason.
 
-On macOS and Linux there's no restart log. When you report a problem, include your SMAPI log, plus `relaunch.log` on Windows; see [Reporting issues](../help/reporting-issues.md).
+With DewDrop's Steam launcher (Steam Deck, or Linux after `--steam-setup`), `steam-launch.log` in `~/.config/Stardrop/Data/Cache/DewDrop` records each start, restarts included: which folder SMAPI loaded, and why. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md#if-something-goes-wrong). Otherwise, macOS and Linux have no restart log. When you report a problem, include your SMAPI log, plus `relaunch.log` on Windows or `steam-launch.log` with the launcher; see [Reporting issues](../help/reporting-issues.md).
 
 <details>
 
 <summary>A mod in my profile still doesn't load after Apply &#x26; Restart. Why?</summary>
 
-Apply & Restart only decides which mods SMAPI tries to load. If SMAPI skips a mod, for example because it needs a newer SMAPI or a mod you don't have, the SMAPI console window says why. DewDrop doesn't keep asking you to restart for a mod that failed to load, unless you update or reinstall it.
+Apply & Restart only decides which mods SMAPI tries to load. If SMAPI skips a mod, for example because it needs a newer SMAPI or a mod you don't have, the SMAPI log says why, and so does the SMAPI console window, if there is one. DewDrop doesn't keep asking you to restart for a mod that failed to load, unless you update or reinstall it.
 
 </details>

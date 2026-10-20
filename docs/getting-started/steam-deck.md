@@ -44,9 +44,9 @@ You can also download `DewDrop-<version>-installer.zip` from the [latest release
 Press **Enter** at a question to pick the recommended answer. On the Deck, the installer:
 
 * installs SMAPI if you don't have it, and DewDrop;
-* offers to take your **Nexus Mods API key**. Typing a key with the on-screen keyboard is slow, so paste it here instead. Open [your Nexus Mods account's API page](https://www.nexusmods.com/users/myaccount?tab=api) in the browser, copy the **Personal API Key** at the bottom, and paste it into Konsole. DewDrop logs in with it the next time the game starts. Press **Enter** without a key to skip this;
-* asks whether **Play** should start the game in your DewDrop profile (recommended: yes);
-* **sets Stardew Valley's launch option in Steam** to DewDrop's launcher. Steam has to close for this, and the Deck's controls and on-screen keyboard go with it, so the installer asks everything first. Steam is back after a few seconds. See [What the installer changes](#what-the-installer-changes).
+* offers to take your **Nexus Mods API key**, unless you're already logged in. Typing a key with the on-screen keyboard is slow, so paste it here instead. Open [your Nexus Mods account's API page](https://www.nexusmods.com/users/myaccount?tab=api) in the browser, copy the **Personal API Key** at the bottom, and paste it into Konsole. DewDrop logs in with it the next time the game starts. If it can't reach Nexus Mods then, it tries again at the next start. Press **Enter** without a key to skip this;
+* asks whether **Play** should start the game in your DewDrop profile (recommended: yes). If it's already on, or you turned it off in the game, it keeps that and doesn't ask;
+* **sets Stardew Valley's launch option in Steam** to DewDrop's launcher, asking first if the game already has launch options (except one that only starts SMAPI, which the launcher simply replaces). Steam has to close for this, and the Deck's controls and on-screen keyboard go with it, so the installer asks everything first. Steam is back after a few seconds. See [What the installer changes](#what-the-installer-changes).
 
 It doesn't offer to start the game: on the Deck, that's for Game Mode.
 {% endstep %}
@@ -54,7 +54,9 @@ It doesn't offer to start the game: on the Deck, that's for Game Mode.
 {% step %}
 ### Go back to Game Mode
 
-Double-click **Return to Gaming Mode** on the desktop. Start Stardew Valley and press **Mods** on the title screen.
+When the installer says to switch back to Game Mode, double-click **Return to Gaming Mode** on the desktop. Start Stardew Valley and press **Mods** on the title screen.
+
+If it says instead that Steam isn't set to start the game with DewDrop's launcher yet, read the messages above that, then run the installer again.
 {% endstep %}
 {% endstepper %}
 
@@ -63,12 +65,12 @@ Double-click **Return to Gaming Mode** on the desktop. Start Stardew Valley and 
 * **The Mods menu** works with the Deck's controls: the left stick moves the cursor (so does the right trackpad, if your controller layout uses it as a mouse), **A** clicks, **L1** and **R1** switch tabs, and **B** closes a dialog or the menu.
 * **Typing**, in a search box or a profile name, brings up Steam's on-screen keyboard (or the game's own, if Steam's can't open).
 * **Apply & Restart** closes the game and starts it again in your profile, without leaving Game Mode. It goes through the same launcher Steam uses, so Steam still counts it as the same game.
-* **Start in my profile from Steam** (on the **Account** tab) makes **Play** start the game in your profile. On the Deck, changing it takes effect at once: Steam doesn't have to close.
-* **Web pages**, such as **Open on Nexus** or **Get API key**, open in Steam's overlay browser over the game. Close it to go back to the game.
+* **Start in my profile from Steam** (on the **Account** tab) makes **Play** start the game in your profile. On the Deck, changing it takes effect at once: Steam doesn't have to close. While it's off, the **Load your profile?** box offers it too, as a **Start in my profile from Steam from now on** checkbox.
+* **Web pages**, such as **Open on Nexus** or **Get my API key**, open in Steam's overlay browser over the game. Close it to go back to the game.
 * **Open mods folder** is grayed out in Game Mode, which has no file manager. It works in Desktop Mode.
 * **Game updates don't turn mods off.** Normally a Stardew Valley update undoes SMAPI's setup until you run SMAPI's installer again. DewDrop's launcher starts SMAPI directly, so mods keep loading. You still need a SMAPI version that supports the new game version, as on any system.
 
-Free Nexus Mods accounts can't use the website's **Mod manager download** button with DewDrop on the Deck yet. Premium accounts install straight from the game. See [Free vs Premium downloads](../nexus-mods/free-vs-premium.md).
+Free Nexus Mods accounts can't use the website's **Mod manager download** button with DewDrop on the Deck yet, and there's no SMAPI console to paste its links into: install those mods by hand, in Desktop Mode. Premium accounts install straight from the game. See [Free vs Premium downloads](../nexus-mods/free-vs-premium.md#free-accounts-on-macos-and-linux).
 
 ## What the installer changes
 
@@ -78,10 +80,10 @@ Free Nexus Mods accounts can't use the website's **Mod manager download** button
   "/home/deck/.config/Stardrop/Data/Cache/DewDrop/steam-launch.sh" %command%
   ```
 
-  If you already had launch options that use `%command%`, such as `gamemoderun %command%`, the launcher is added just before `%command%` and the rest is kept. Steam's settings file is backed up first, next to it, as `localconfig.vdf.dewdrop-backup-<date>-<time>`. Only the Steam account that's signed in is changed.
-* **DewDrop's launcher**, `steam-launch.sh`, goes in DewDrop's data folder. It starts SMAPI in place of the game's own launcher, which would try to open a terminal window that Game Mode can't show. It starts SMAPI in your profile when you asked for that and your profile is ready, and with your whole `Mods` folder otherwise. DewDrop keeps the launcher up to date itself.
+  If you already had launch options that use `%command%`, such as `gamemoderun %command%`, the installer shows what they'll become and asks first: the launcher goes just before `%command%`, and the rest is kept. Launch options that start SMAPI directly get the launcher in SMAPI's place. What comes before SMAPI (such as `gamemoderun`) and after `%command%` is kept, but SMAPI's own options, such as `--mods-path`, can't be: the installer names them and asks first. Other launch options are only replaced if you say so, and ones Steam saves as it closes are left alone (run the installer again to add the launcher to them). Steam's settings file is backed up first, next to it, as `localconfig.vdf.dewdrop-backup-<date>-<time>`. Only the Steam account that's signed in is changed.
+* **DewDrop's launcher**, `steam-launch.sh`, goes in DewDrop's data folder. It starts SMAPI in place of the game's own launcher, which would try to open a terminal window that Game Mode can't show. So there's no SMAPI console window, in Game Mode or Desktop Mode, and no typing console commands: the [SMAPI log](#if-something-goes-wrong) has what SMAPI and DewDrop said. It starts SMAPI in your profile when you asked for that and your profile is ready, and with your whole `Mods` folder otherwise. DewDrop keeps the launcher up to date itself.
 
-To undo it, open Stardew Valley's **Properties** in Steam and clear **Launch Options**. Mods still load, through SMAPI's own launcher, but **Apply & Restart** and **Start in my profile from Steam** need DewDrop's launcher.
+To undo it, open Stardew Valley's **Properties** in Steam and, under **Launch Options**, delete `"/home/deck/.config/Stardrop/Data/Cache/DewDrop/steam-launch.sh"` and keep anything else, such as `gamemoderun`. If only `%command%` is left, clear the box. The game then starts through SMAPI's own launcher, which may show a black screen or a terminal window in Game Mode. **Start in my profile from Steam** stops working, and **Apply & Restart** restarts the game through SMAPI's launcher instead.
 
 ## If something goes wrong
 
