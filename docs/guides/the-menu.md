@@ -76,7 +76,7 @@ While downloads are running, the status also says how many, like **Downloading 2
 **Apply & Restart** sits on the right. It lights up when restarting would change something. Click it, confirm, and the game closes and starts again with your profile's mods. When it's grayed out, hover over it to see why, for example "Nothing to apply: the loaded mods already match this profile." [Apply & Restart](apply-and-restart.md) explains what happens in detail.
 
 {% hint style="info" %}
-Your profile applies when the game starts in it: after **Apply & Restart**, or, on Windows with the Steam version, from Steam's **Play** button once **Start in my profile from Steam** is on. Any other launch loads every mod in your `Mods` folder, including ones you turned off in DewDrop. [How launching works](../getting-started/launching.md) explains why. When the mods that load differ from your profile, DewDrop offers on the title screen to restart into it. See [Start in your profile](start-in-your-profile.md).
+Your profile applies when the game starts in it: after **Apply & Restart**, or, with the Steam version on Windows, or on Linux and the Steam Deck with DewDrop's Steam launcher, from Steam's **Play** button once **Start in my profile from Steam** is on. Any other launch loads every mod in your `Mods` folder, including ones you turned off in DewDrop. [How launching works](../getting-started/launching.md) explains why. When the mods that load differ from your profile, DewDrop offers on the title screen to restart into it. See [Start in your profile](start-in-your-profile.md).
 {% endhint %}
 
 ## Messages
@@ -138,7 +138,7 @@ The arrow keys don't scroll while you're typing in a box. Press **Esc** to leave
 | **D-pad** | Works like the arrow keys: scroll lists, change pages on **Browse**. |
 | **B** | Closes a dialog. Otherwise leaves the text box. Otherwise closes the menu. |
 
-Selecting a text box with the controller opens the game's on-screen keyboard.
+Selecting a text box with the controller opens an on-screen keyboard: Steam's in Game Mode on a Steam Deck (for any tap or click), otherwise the game's.
 
 To go back from a mod's page, move the cursor to **Back** and press **A**. **B** closes the whole menu.
 {% endtab %}

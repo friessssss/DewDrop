@@ -211,7 +211,7 @@ The **Downloads** tab only lists downloads from the current session, and it's cl
 <details>
 <summary>Can I use a controller?</summary>
 
-Yes. Move the cursor with the left stick and press **A** to click. **LB** and **RB** switch tabs, and **B** closes a dialog or the menu. Selecting a text box opens the game's on-screen keyboard. See [The DewDrop menu](../guides/the-menu.md).
+Yes. Move the cursor with the left stick and press **A** to click. **LB** and **RB** switch tabs, and **B** closes a dialog or the menu. Selecting a text box opens an on-screen keyboard (Steam's, in Game Mode on a Steam Deck). See [The DewDrop menu](../guides/the-menu.md).
 
 </details>
 
