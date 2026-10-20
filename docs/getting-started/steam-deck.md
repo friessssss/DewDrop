@@ -44,9 +44,11 @@ You can also download `DewDrop-<version>-installer.zip` from the [latest release
 Press **Enter** at a question to pick the recommended answer. On the Deck, the installer:
 
 * installs SMAPI if you don't have it, and DewDrop;
-* **sets Stardew Valley's launch option in Steam** to DewDrop's launcher. Steam closes for a moment while it does this, and opens again afterwards. See [What the installer changes](#what-the-installer-changes);
+* offers to take your **Nexus Mods API key**. Typing a key with the on-screen keyboard is slow, so paste it here instead. Open [your Nexus Mods account's API page](https://www.nexusmods.com/users/myaccount?tab=api) in the browser, copy the **Personal API Key** at the bottom, and paste it into Konsole. DewDrop logs in with it the next time the game starts. Press **Enter** without a key to skip this;
 * asks whether **Play** should start the game in your DewDrop profile (recommended: yes);
-* offers to take your **Nexus Mods API key**. Typing a key with the on-screen keyboard is slow, so paste it here instead. Open [your Nexus Mods account's API page](https://www.nexusmods.com/users/myaccount?tab=api) in the browser, copy the **Personal API Key** at the bottom, and paste it into Konsole. DewDrop logs in with it the next time the game starts. Press **Enter** without a key to skip this.
+* **sets Stardew Valley's launch option in Steam** to DewDrop's launcher. Steam has to close for this, and the Deck's controls and on-screen keyboard go with it, so the installer asks everything first. Steam is back after a few seconds. See [What the installer changes](#what-the-installer-changes).
+
+It doesn't offer to start the game: on the Deck, that's for Game Mode.
 {% endstep %}
 
 {% step %}

@@ -111,10 +111,10 @@ With `-Yes` (Windows) or `--yes` (macOS and Linux), the installer answers its ow
 | Steam Deck: add DewDrop's launcher to launch options you already have (they use `%command%`)? | Yes. |
 | Steam Deck: replace launch options you already have (they don't use `%command%`)? | No. It shows what to enter yourself. |
 | Steam Deck: start the game in your DewDrop profile when you press Play in Steam? | Yes. Add `--no-start-in-profile` for no. |
-| Steam Deck: your Nexus Mods API key? | Not asked: it's skipped. |
+| Steam Deck: your Nexus Mods API key? | Not asked: it's skipped. (Without `--yes`, it's asked before Steam closes, since the Deck's on-screen keyboard closes with Steam.) |
 | Windows: add the desktop shortcut? | Yes. Add `-NoShortcut` if you don't want it. |
 | Windows, Xbox app: swap in SMAPI's copy of the game's exe? | Yes. |
-| Start Stardew Valley now? | Yes (no on a Steam Deck, where the game is for Game Mode). Add `-NoLaunch` (`--no-launch`) if you don't want that. |
+| Start Stardew Valley now? | Yes. Add `-NoLaunch` (`--no-launch`) if you don't want that. On a Steam Deck it isn't asked: the game is for Game Mode. |
 
 On macOS and Linux, the installer also picks these answers when it isn't running in a terminal, for example when its input comes from another program.
 
@@ -142,7 +142,7 @@ The question only comes up when the installer sets up Steam's launch option, so 
 
 On a Steam Deck (SteamOS), the installer sets Stardew Valley's launch option in Steam to DewDrop's launcher, so the game starts with SMAPI in Game Mode and DewDrop can restart it there. On other Linux systems it only does this with `--steam-setup`; `--no-steam-setup` skips it on a Deck. See [DewDrop on the Steam Deck](../getting-started/steam-deck.md) for what the launcher does.
 
-* **Steam has to be closed** to change its settings, so the installer closes it (`steam -shutdown`) and starts it again at the end. If Steam starts again by itself straight away, as a SteamOS service can, the installer stops that service instead, and starts it again at the end.
+* **Steam has to be closed** to change its settings, so the installer closes it (`steam -shutdown`) and starts it again straight after the change. It asks all its questions first: on a Steam Deck, the controls and the on-screen keyboard close with Steam. If Steam starts again by itself straight away, as a SteamOS service can, the installer stops that service instead, and starts it again at the end.
 * **Only the signed-in Steam account** is changed (the one marked as most recent in Steam's `loginusers.vdf`), and Steam's settings file is backed up first.
 * **Launch options you already have** that use `%command%`, such as `gamemoderun %command%`, are kept: the launcher goes just before `%command%`. Ones without `%command%` are only replaced if you say so. A launch option that starts SMAPI directly is replaced, since the launcher starts SMAPI itself.
 * **Starting in your profile:** the answer is saved for the launcher at once. The launcher only starts the game in your profile once DewDrop has linked it, so the first start loads your whole `Mods` folder.

@@ -217,6 +217,16 @@ EOF
     check "saved the Nexus key for the game, readable only by you" '[ "$(cat "$(dirname "$LAUNCHER")/nexus-key.txt")" = "my-key" ] && ls -l "$(dirname "$LAUNCHER")/nexus-key.txt" | grep -q "^-rw-------"'
     check "opened Steam again" 'grep -q "steam -silent" "$ROOT/steam.log"'
     check "says to go back to Game Mode" 'grep -q "Return to Gaming Mode" "$ROOT/out.txt"'
+    # On a Deck, Steam's on-screen keyboard and the controls close with Steam: nothing may be asked while it's away
+    at() { grep -n "$1" "$ROOT/out.txt" | head -n 1 | cut -d: -f1; }
+    check "took the Nexus key before closing Steam" '[ "$(at "Saved. DewDrop logs in")" -lt "$(at "Closing Steam")" ]'
+    check "Steam was back straight after the edit" '[ "$(at "Steam is starting again")" -lt "$(at "All done")" ]'
+
+    echo "== Steam Deck: the game isn't offered in Desktop Mode"
+    PATH="$FAKE:$PATH" DEWDROP_OS_RELEASE="$ROOT/os-release" bash "$SCRIPT" --yes --skip-smapi --mod-source "$MOD_ZIP" < /dev/null > "$ROOT/out.txt" 2>&1
+    code=$?
+    check "exit 0" '[ $code = 0 ]' || show
+    check "no Start Stardew Valley question" '! grep -q "Start Stardew Valley now" "$ROOT/out.txt"'
 
     echo "== Steam Deck: running it again changes nothing in Steam"
     : > "$ROOT/steam.log"

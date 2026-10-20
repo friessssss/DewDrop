@@ -28,7 +28,8 @@ Until this is in a release, the installer's download is the last release, which 
 ### Setup in Desktop Mode
 
 - [ ] The installer finds the game, including on a microSD card if that's where it is.
-- [ ] It sets the launch option, and **Steam closes and opens again**. Note if Steam started again by itself straight away: the installer then says it's stopping Steam's service instead.
+- [ ] Every question (including the Nexus key) comes **before** Steam closes, and the installer never waits for an answer while Steam is closed. It doesn't ask to start the game at the end.
+- [ ] It sets the launch option, and **Steam closes and opens again within a few seconds**, bringing back the controls and the on-screen keyboard. Note if Steam started again by itself straight away: the installer then says it's stopping Steam's service instead.
 - [ ] In Steam, Stardew Valley's **Properties** > **Launch Options** shows `"/home/deck/.config/Stardrop/Data/Cache/DewDrop/steam-launch.sh" %command%`.
 - [ ] Pasting a Nexus API key into Konsole works (**Ctrl + Shift + V**).
 - [ ] Run the installer again: it says Steam already starts the game with DewDrop's launcher, and doesn't close Steam.

@@ -838,6 +838,7 @@ close_steam() {
     local unit
     unit="$(ps -o unit= -p "$(pgrep -x steam | head -n 1)" 2>/dev/null | tr -d '[:space:]')"
     note "Closing Steam for a moment (it saves its settings as it exits, so it has to be closed first)..."
+    [ "$DECK" = 1 ] && note "The controls and the on-screen keyboard stop until Steam is back, in a few seconds."
     steam -shutdown >/dev/null 2>&1 &
     wait_steam_closed 120 || [ -n "$unit" ] || return 1
     # Back by itself?
@@ -858,7 +859,7 @@ close_steam() {
 reopen_steam() {
     [ "$CLOSED_STEAM" = 1 ] || return 0
     if [ -n "$STEAM_UNIT" ]; then
-        systemctl --user start "$STEAM_UNIT" >/dev/null 2>&1 && { ok "Steam is starting again."; return 0; }
+        systemctl --user start "$STEAM_UNIT" >/dev/null 2>&1 && { CLOSED_STEAM=0; ok "Steam is starting again."; return 0; }
     fi
     # On its own session, so closing this window doesn't close Steam too
     if command -v setsid >/dev/null 2>&1; then
@@ -866,6 +867,7 @@ reopen_steam() {
     else
         (nohup steam -silent >/dev/null 2>&1 < /dev/null &)
     fi
+    CLOSED_STEAM=0
     ok "Steam is starting again."
 }
 
@@ -888,7 +890,7 @@ steam_manual_steps() {
 # when that's wanted, so the game can restart itself in Game Mode and never needs Steam's settings changed again.
 setup_steam_launcher() {
     step "Setting up Steam to start the game with SMAPI and DewDrop"
-    local data folder script source root config current wanted text backup
+    local data folder script source root config current wanted
     data="$(dewdrop_data)"
     folder="$data/Cache/DewDrop"
     script="$folder/steam-launch.sh"
@@ -954,6 +956,16 @@ setup_steam_launcher() {
         return 0
     fi
     close_steam || { warn "Steam didn't close."; steam_manual_steps "$wanted"; return 1; }
+    # Steam is closed only for the edit: on a Steam Deck, the controls and the on-screen keyboard go with it, so
+    # nothing in between may need an answer
+    local status=0
+    write_launch_option "$config" "$script" "$wanted" || status=1
+    reopen_steam
+    return "$status"
+}
+
+write_launch_option() { # config script wanted
+    local config="$1" script="$2" wanted="$3" current text backup
     # Read again: Steam wrote the file as it closed
     current="$(vdf_launch_option get "$config")" || { warn "Steam's settings file has an unexpected layout, so I won't edit it."; return 1; }
     case "$current" in *"$script"*) wanted="$current" ;; esac
@@ -1015,6 +1027,9 @@ install_smapi
 get_source
 install_dewdrop
 
+# Asked before Steam closes for its settings: on a Steam Deck, the on-screen keyboard closes with it
+[ "$DECK" = 1 ] && ask_nexus_key
+
 [ -z "$STEAM_SETUP" ] && STEAM_SETUP="$DECK"
 if [ "$OS" = "linux" ] && [ "$STEAM_SETUP" = 1 ]; then
     if [ "$(game_store "$GAME")" = "Steam" ]; then
@@ -1023,7 +1038,6 @@ if [ "$OS" = "linux" ] && [ "$STEAM_SETUP" = 1 ]; then
         note "Only the Steam version of the game can be set up to start with DewDrop's launcher."
     fi
 fi
-[ "$DECK" = 1 ] && ask_nexus_key
 
 if [ -f "$HOME/.config/Stardrop/Data/Settings.json" ]; then
     step "Stardrop is installed too"
@@ -1047,16 +1061,9 @@ fi
 printf '   Guide: https://github.com/%s#readme\n' "$DEWDROP_REPO"
 printf '%s  ---------------------------------------------------------------%s\n' "$C_CYAN" "$C_RESET"
 
-# On a Steam Deck the game is for Game Mode; Steam closed for its settings opens again either way
-start_default=y
-[ "$DECK" = 1 ] && start_default=n
-start_question="Start Stardew Valley now?"
-[ "$DECK" = 1 ] && start_question="Start Stardew Valley now, here in Desktop Mode?"
-if [ "$NO_LAUNCH" = 0 ] && ask_yes_no "$start_question" "$start_default"; then
-    [ "$DRY_RUN" = 1 ] || reopen_steam
+# On a Steam Deck the game is for Game Mode, so it isn't offered here
+if [ "$NO_LAUNCH" = 0 ] && [ "$DECK" = 0 ] && ask_yes_no "Start Stardew Valley now?" y; then
     launch_game
-else
-    [ "$DRY_RUN" = 1 ] || reopen_steam
 fi
 
 finish 0
